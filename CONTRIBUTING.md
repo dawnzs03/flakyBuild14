@@ -1,164 +1,330 @@
-- [Contributing to OpenSearch](#contributing-to-opensearch)
-  - [First Things First](#first-things-first)
-  - [Ways to Contribute](#ways-to-contribute)
-    - [Bug Reports](#bug-reports)
-    - [Feature Requests](#feature-requests)
-    - [Documentation Changes](#documentation-changes)
-    - [Contributing Code](#contributing-code)
-  - [Developer Certificate of Origin](#developer-certificate-of-origin)
-  - [Changelog](#changelog)
-  - [Review Process](#review-process)
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-# Contributing to OpenSearch
+      http://www.apache.org/licenses/LICENSE-2.0
 
-OpenSearch is a community project that is built and maintained by people just like **you**. We're glad you're interested in helping out. There are several different ways you can do it, but before we talk about that, let's talk about how to get started.
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
 
-## First Things First
+# Contributing to Beam
 
-1. **When in doubt, open an issue** - For almost any type of contribution, the first step is opening an issue. Even if you think you already know what the solution is, writing down a description of the problem you're trying to solve will help everyone get context when they review your pull request. If it's truly a trivial change (e.g. spelling error), you can skip this step -- but as the subject says, when in doubt, [open an issue](https://github.com/opensearch-project/OpenSearch/issues).
+There are many ways to contribute to Beam, just one of which is by contributing code.
+For a full list of ways to contribute and get plugged into Beam, see the
+[Beam Contribution Guide](https://beam.apache.org/contribute/)
 
-2. **Only submit your own work**  (or work you have sufficient rights to submit) - Please make sure that any code or documentation you submit is your work or you have the rights to submit. We respect the intellectual property rights of others, and as part of contributing, we'll ask you to sign your contribution with a "Developer Certificate of Origin" (DCO) that states you have the rights to submit this work and you understand we'll use your contribution. There's more information about this topic in the [DCO section](#developer-certificate-of-origin).
+## Code Contributions
 
-## Ways to Contribute
+*Before opening a pull request*, review the Beam contribution guide below.
+It lists steps that are required before creating a PR and provides tips for
+getting started. In particular, consider the following:
 
-**Please note:** OpenSearch is a fork of [Elasticsearch 7.10.2](https://github.com/elastic/elasticsearch). If you do find references to Elasticsearch (outside of attributions and copyrights!) please [open an issue](https://github.com/opensearch-project/OpenSearch/issues).
+- Have you searched for existing, related Issues and pull requests?
+- Have you shared your intent by creating an issue and commenting that you plan to take it on?
+- If the change is large, have you discussed it on the dev@ mailing list?
+- Is the change being proposed clearly explained and motivated?
 
-### Bug Reports
+These steps and instructions on getting started are outlined below as well.
 
-Ugh! Bugs!
+### Prerequisites
 
-A bug is when software behaves in a way that you didn't expect and the developer didn't intend. To help us understand what's going on, we first want to make sure you're working from the latest version. Please make sure you're testing against the [latest version](https://github.com/opensearch-project/OpenSearch).
+- A [GitHub](https://github.com/) account.
+- A Linux, macOS, or Microsoft Windows development environment.
+- Java JDK 8 installed.
+- [Go](https://golang.org) 1.16.0 or later installed.
+- [Docker](https://www.docker.com/) installed for some tasks including building worker containers and testing changes to this website locally.
+- For SDK Development:
+  - Python 3.x interpreters. You will need Python interpreters for all Python versions supported by Beam.
+    Interpreters should be installed and available in shell via `python3.x` commands. For more information, see:
+    Python installation tips in [Developer Wiki](https://cwiki.apache.org/confluence/display/BEAM/Python+Tips#PythonTips-InstallingPythoninterpreters).
+- For large contributions, a signed [Individual Contributor License.
+  Agreement](https://www.apache.org/licenses/icla.pdf) (ICLA) to the Apache
+  Software Foundation (ASF).
 
-Once you've confirmed that the bug still exists in the latest version, you'll want to check to make sure it's not something we already know about on the [open issues GitHub page](https://github.com/opensearch-project/OpenSearch/issues).
+### Share Your Intent
+1. Find or create an issue in the [Beam repo](https://github.com/apache/beam/issues/new/choose).
+   Tracking your work in an issue will avoid duplicated or conflicting work, and provide
+   a place for notes. Later, your pull request will be linked to the issue as well.
+2. Comment ".take-issue" on the issue. This will cause the issue to be assigned to you.
+   When you've completed the issue, you can close it by commenting ".close-issue".
+   If you are a committer and would like to assign an issue to a non-committer, they must comment
+   on the issue first; please tag the user asking them to do so or to comment "\`.take-issue\`".
+   The command will be ignored if it is surrounded by `\`` markdown characters.
+3. If your change is large or it is your first change, it is a good idea to
+   [discuss it on the dev@beam.apache.org mailing list](https://beam.apache.org/community/contact-us/).
+4. For large changes create a design doc
+   ([template](https://s.apache.org/beam-design-doc-template),
+   [examples](https://s.apache.org/beam-design-docs)) and email it to the [dev@beam.apache.org mailing list](https://beam.apache.org/community/contact-us/).
 
-If you've upgraded to the latest version and you can't find it in our open issues list, then you'll need to tell us how to reproduce it. To make the behavior as clear as possible, please provided your steps as `curl` commands which we can copy and paste into a terminal to run it locally, for example:
+### Setup Your Environment and Learn About Language Specific Setup
 
-```sh
-# delete the index
-curl -X DELETE localhost:9200/test
+Before you begin, check out the Wiki pages. There are many useful tips about [Git](https://cwiki.apache.org/confluence/display/BEAM/Git+Tips), [Go](https://cwiki.apache.org/confluence/display/BEAM/Go+Tips), [Gradle](https://cwiki.apache.org/confluence/display/BEAM/Gradle+Tips), [Java](https://cwiki.apache.org/confluence/display/BEAM/Java+Tips), [Python](https://cwiki.apache.org/confluence/display/BEAM/Python+Tips), etc.
 
-# insert a document
-curl -x PUT localhost:9200/test/test/1 -d '{
- "title": "test document"
-}'
+#### Configuration Options
+You have two options for configuring your development environment:
+- Local:
+  - Manually installing the [prerequisites](https://beam.apache.org/contribute/#prerequisites).
+  - Using the automated script for Linux and macOS.
+- Container-based: using a [Docker](https://www.docker.com/) image.
 
-# this should return XXXX but instead returns YYYY
-curl ....
+##### Local: Debian-based Distribution
+
+###### Manual steps
+
+To install these in a Debian-based distribution:
+1. Execute:
+    ```
+    sudo apt-get install \
+       openjdk-8-jdk \
+       python-setuptools \
+       python-pip \
+       virtualenv \
+       tox \
+       docker-ce
+    ```
+2. On some systems, like Ubuntu 20.04, install these:
+    ```
+    pip3 install grpcio-tools mypy-protobuf
+    ```
+3. If you develop in GO:
+  1. Install [Go](https://golang.org/doc/install).
+  2. Check BEAM repo is in: `$GOPATH/src/github.com/apache/`
+  3. At the end, it should look like this: `$GOPATH/src/github.com/apache/beam`
+4. Once Go is installed, install goavro:
+    ```
+    $ export GOPATH=`pwd`/sdks/go/examples/.gogradle/project_gopath
+    $ go get github.com/linkedin/goavro/v2
+    ```
+**Important**: gLinux users should configure their machines for sudoless Docker.
+
+###### Automated script for Linux and macOS
+
+You can install these in a Debian-based distribution for Linux or macOs using the [local-env-setup.sh](https://github.com/apache/beam/blob/master/local-env-setup.sh) script, which is part of the Beam repo. It contains:
+
+* pip3 packages
+* go packages
+* goavro
+* JDK 8
+* Python
+* Docker
+
+To install execute:
+```
+./local-env-setup.sh
 ```
 
-Provide as much information as you can. You may think that the problem lies with your query, when actually it depends on how your data is indexed. The easier it is for us to recreate your problem, the faster it is likely to be fixed.
+##### Container: Docker-based
 
-### Feature Requests
+Alternatively, you can use the Docker based local development environment to wrap your clone of the Beam repo
+into a container meeting the requirements above.
 
-If you've thought of a way that OpenSearch could be better, we want to hear about it. We track feature requests using GitHub, so please feel free to open an issue which describes the feature you would like to see, why you need it, and how it should work.
+You can start this container using the [start-build-env.sh](https://github.com/apache/beam/blob/master/start-build-env.sh) script which is part of the Beam repo.
 
-### Documentation Changes
-
-If you would like to contribute to the documentation, please do so in the [documentation-website](https://github.com/opensearch-project/documentation-website) repo. To contribute javadocs, please first check [OpenSearch#221](https://github.com/opensearch-project/OpenSearch/issues/221).
-
-### Contributing Code
-
-As with other types of contributions, the first step is to [**open an issue on GitHub**](https://github.com/opensearch-project/OpenSearch/issues/new/choose). Opening an issue before you make changes makes sure that someone else isn't already working on that particular problem. It also lets us all work together to find the right approach before you spend a bunch of time on a PR. So again, when in doubt, open an issue.
-
-Additionally, here are a few guidelines to help you decide whether a particular feature should be included in OpenSearch.
-
-**Is your feature important to most users of OpenSearch?**
-
-If you believe that a feature is going to fulfill a need for most users of OpenSearch, then it belongs in OpenSearch. However, we don't want every feature built into the core server. If the feature requires additional permissions or brings in extra dependencies it should instead be included as a module in core.
-
-**Is your feature a common dependency across multiple plugins?**
-
-Does this feature contain functionality that cuts across multiple plugins? If so, this most likely belongs in OpenSearch as a core module or plugin.
-
-Once you've opened an issue, check out our [Developer Guide](./DEVELOPER_GUIDE.md) for instructions on how to get started.
-
-## Developer Certificate of Origin
-
-OpenSearch is an open source product released under the Apache 2.0 license (see either [the Apache site](https://www.apache.org/licenses/LICENSE-2.0) or the [LICENSE.txt file](./LICENSE.txt)). The Apache 2.0 license allows you to freely use, modify, distribute, and sell your own products that include Apache 2.0 licensed software.
-
-We respect intellectual property rights of others and we want to make sure all incoming contributions are correctly attributed and licensed. A Developer Certificate of Origin (DCO) is a lightweight mechanism to do that.
-
-The DCO is a declaration attached to every contribution made by every developer. In the commit message of the contribution, the developer simply adds a `Signed-off-by` statement and thereby agrees to the DCO, which you can find below or at [DeveloperCertificate.org](http://developercertificate.org/).
-
+Execute:
 ```
-Developer's Certificate of Origin 1.1
-
-By making a contribution to this project, I certify that:
-
-(a) The contribution was created in whole or in part by me and I
-    have the right to submit it under the open source license
-    indicated in the file; or
-
-(b) The contribution is based upon previous work that, to the
-    best of my knowledge, is covered under an appropriate open
-    source license and I have the right under that license to
-    submit that work with modifications, whether created in whole
-    or in part by me, under the same open source license (unless
-    I am permitted to submit under a different license), as
-    Indicated in the file; or
-
-(c) The contribution was provided directly to me by some other
-    person who certified (a), (b) or (c) and I have not modified
-    it.
-
-(d) I understand and agree that this project and the contribution
-    are public and that a record of the contribution (including
-    all personal information I submit with it, including my
-    sign-off) is maintained indefinitely and may be redistributed
-    consistent with this project or the open source license(s)
-    involved.
- ```
-We require that every contribution to OpenSearch is signed with a Developer Certificate of Origin. Additionally, please use your real name. We do not accept anonymous contributors nor those utilizing pseudonyms.
-
-Each commit must include a DCO which looks like this
-
+./start-build-env.sh
 ```
-Signed-off-by: Jane Smith <jane.smith@email.com>
-```
-You may type this line on your own when writing your commit messages. However, if your user.name and user.email are set in your git configs, you can use `-s` or `--signoff` to add the `Signed-off-by` line to the end of the commit message.
 
-## Changelog
+#### Development Setup {#development-setup}
 
-OpenSearch maintains version specific changelog by enforcing a change to the ongoing [CHANGELOG](CHANGELOG.md) file adhering to the [Keep A Changelog](https://keepachangelog.com/en/1.0.0/) format. The purpose of the changelog is for the contributors and maintainers to incrementally build the release notes throughout the development process to avoid a painful and error-prone process of attempting to compile the release notes at release time. On each release the "unreleased" entries of the changelog are moved to the appropriate release notes document in the `./release-notes` folder. Also, incrementally building the changelog provides a concise, human-readable list of significant features that have been added to the unreleased version under development.
+1. Check [Git workflow tips](https://cwiki.apache.org/confluence/display/BEAM/Git+Tips) if you need help with git forking, cloning, branching, committing, pull requests, and squashing commits.
 
-### Which changes require a CHANGELOG entry?
-Changelogs are intended for operators/administrators, developers integrating with libraries and APIs, and end-users interacting with OpenSearch Dashboards and/or the REST API (collectively referred to as "user"). In short, any change that a user of OpenSearch might want to be aware of should be included in the changelog. The changelog is _not_ intended to replace the git commit log that developers of OpenSearch itself rely upon. The following are some examples of changes that should be in the changelog:
+2. Make a fork of https://github.com/apache/beam repo.
 
-- A newly added feature
-- A fix for a user-facing bug
-- Dependency updates
-- Fixes for security issues
+3. Clone the forked repository. You can download it anywhere you like.
+    ```
+    $ mkdir -p ~/path/to/your/folder
+    $ cd ~/path/to/your/folder
+    $ git clone https://github.com/forked/apache/beam
+    $ cd beam
+    ```
+   For **Go development**:
 
-The following are some examples where a changelog entry is not necessary:
+   We recommend putting it in your `$GOPATH` (`$HOME/go` by default on Unix systems).
 
-- Adding, modifying, or fixing tests
-- An incremental PR for a larger feature (such features should include _one_ changelog entry for the feature)
-- Documentation changes or code refactoring
-- Build-related changes
+   Clone the repo, and update your branch as normal:
+    ```
+    $ git clone https://github.com/apache/beam.git
+    $ cd beam
+    $ git remote add <GitHub_user> git@github.com:<GitHub_user>/beam.git
+    $ git fetch --all
+    ```
 
-Any PR that does not include a changelog entry will result in a failure of the validation workflow in GitHub. If the contributor and maintainers agree that no changelog entry is required, then the `skip-changelog` label can be applied to the PR which will result in the workflow passing.
+   Get or Update all the Go SDK dependencies:
+    ```
+    $ go get -u ./...
+    ```
 
-### How to add my changes to [CHANGELOG](CHANGELOG.md)?
+4. Check the environment was set up correctly.
 
-Adding in the change is two step process:
-1. Add your changes to the corresponding section within the CHANGELOG file with dummy pull request information, publish the PR
-2. Update the entry for your change in [`CHANGELOG.md`](CHANGELOG.md) and make sure that you reference the pull request there.
+   **Option 1**: validate the Go, Java, and Python environments:
 
-### Where should I put my CHANGELOG entry?
-Please review the [branching strategy](https://github.com/opensearch-project/.github/blob/main/RELEASING.md#opensearch-branching) document. The changelog on the `main` branch will contain sections for the _next major_ and _next minor_ releases. Your entry should go into the section it is intended to be released in. In practice, most changes to `main` will be backported to the next minor release so most entries will likely be in that section.
+   **Important**: Make sure you have activated Python development.
+    ```
+    ./gradlew :checkSetup
+    ```
+   **Option 2**: Run independent checks:
+  - For **Go development**:
+      ```
+      export GOLANG_PROTOBUF_REGISTRATION_CONFLICT=ignore./gradlew :sdks:go:examples:wordCount
+      ```
+  - For **Python development**:
+      ```
+      ./gradlew :sdks:python:wordCount
+      ```
+  - For **Java development**:
+      ```
+      ./gradlew :examples:java:wordCount
+     ```
 
-The following examples assume the _next major_ release on main is 3.0, then _next minor_ release is 2.5, and the _current_ release is 2.4.
+5. Familiarize yourself with gradle and the project structure.
 
-- **Add a new feature to release in next minor:** Add a changelog entry to `[Unreleased 2.x]` on main, then backport to 2.x (including the changelog entry).
-- **Introduce a breaking API change to release in next major:** Add a changelog entry to `[Unreleased 3.0]` on main, do not backport.
-- **Upgrade a dependency to fix a CVE:** Add a changelog entry to `[Unreleased 2.x]` on main, then backport to 2.x (including the changelog entry), then backport to 2.4 and ensure the changelog entry is added to `[Unreleased 2.4.1]`.
+   At the root of the git repository, run:
+    ```
+    $ ./gradlew projects
+    ```
+   Examine the available tasks in a project. For the default set of tasks, use:
+    ```
+    $ ./gradlew tasks
+    ```
+   For a given module, use:
+    ```
+    $ ./gradlew -p sdks/java/io/cassandra tasks
+    ```
+   For an exhaustive list of tasks, use:
+    ```
+    $ ./gradlew tasks --all
+    ```
 
-## Review Process
+6. Make sure you can build and run tests.
 
-We deeply appreciate everyone who takes the time to make a contribution. We will review all contributions as quickly as possible. As a reminder, [opening an issue](https://github.com/opensearch-project/OpenSearch/issues/new/choose) discussing your change before you make it is the best way to smooth the PR process. This will prevent a rejection because someone else is already working on the problem, or because the solution is incompatible with the architectural direction.
+   Since Beam is a large project, usually, you will want to limit testing to the particular module you are working on. Gradle will build just the necessary things to run those tests. For example:
+    ```
+    $ ./gradlew -p sdks/go check
+    $ ./gradlew -p sdks/java/io/cassandra check
+    $ ./gradlew -p runners/flink check
+    ```
 
-During the PR process, expect that there will be some back-and-forth. Please try to respond to comments in a timely fashion, and if you don't wish to continue with the PR, let us know. If a PR takes too many iterations for its complexity or size, we may reject it. Additionally, if you stop responding we may close the PR as abandoned. In either case, if you feel this was done in error, please add a comment on the PR.
+7. Now you may want to set up your preferred IDE and other aspects of your development
+   environment. See the Developers' wiki for tips, guides, and FAQs on:
+  - [IntelliJ](https://cwiki.apache.org/confluence/display/BEAM/Using+IntelliJ+IDE)
+  - [Java](https://cwiki.apache.org/confluence/display/BEAM/Java+Tips)
+  - [Python](https://cwiki.apache.org/confluence/display/BEAM/Python+Tips)
+  - [Go](https://cwiki.apache.org/confluence/display/BEAM/Go+Tips)
+  - [Website](https://cwiki.apache.org/confluence/display/BEAM/Website+Tips)
+  - [Gradle](https://cwiki.apache.org/confluence/display/BEAM/Gradle+Tips)
+  - [Jenkins](https://cwiki.apache.org/confluence/display/BEAM/Jenkins+Tips)
+  - [FAQ](https://cwiki.apache.org/confluence/display/BEAM/Contributor+FAQ)
 
-If we accept the PR, a [maintainer](MAINTAINERS.md) will merge your change and usually take care of backporting it to appropriate branches ourselves.
+### Create a Pull Request
 
-If we reject the PR, we will close the pull request with a comment explaining why. This decision isn't always final: if you feel we have misunderstood your intended change or otherwise think that we should reconsider then please continue the conversation with a comment on the PR and we'll do our best to address any further points you raise.
+1. Make your code change. Every source file needs to include the Apache license header. Every new dependency needs to
+   have an open source license [compatible](https://www.apache.org/legal/resolved.html#criteria) with Apache.
+
+2. Add unit tests for your change.
+
+3. Use descriptive commit messages that make it easy to identify changes and provide a clear history.
+
+4. When your change is ready to be reviewed and merged, create a pull request.
+
+5. Link to the issue you are addressing in your pull request.
+
+6. The pull request and any changes pushed to it will trigger [pre-commit
+   jobs](https://cwiki.apache.org/confluence/display/BEAM/Contribution+Testing+Guide#ContributionTestingGuide-Pre-commit). If a test fails and appears unrelated to your
+   change, you can cause tests to be re-run by adding a single line comment on your
+   PR:
+    ```
+    retest this please
+    ```
+Pull request template has a link to a [catalog of trigger phrases](https://github.com/apache/beam/blob/master/.test-infra/jenkins/README.md)
+that start various post-commit tests suites. Use these sparingly because post-commit tests consume shared development resources.
+
+### Review Process and Releases
+
+#### Get Reviewed
+
+Your pull requests should automatically have reviewers assigned within a few hours of opening it.
+If that doesn't happen for some reason, you can also request a review yourself.
+
+1. Pull requests can only be merged by a
+   [Beam committer](https://home.apache.org/phonebook.html?pmc=beam).
+   To find a committer for your area, either:
+  - look for similar code merges, or
+  - ask on [dev@beam.apache.org](https://beam.apache.org/community/contact-us/)
+
+   Use `R: @username` in the pull request to notify a reviewer.
+
+2. If you don't get any response in 3 business days, email the [dev@beam.apache.org mailing list](https://beam.apache.org/community/contact-us/) to ask for someone to look at your pull request.
+
+#### Make the Reviewer’s Job Easier
+
+1. Provide context for your changes in the associated issue and/or PR description.
+
+2. Avoid huge mega-changes.
+
+3. Review feedback typically leads to follow-up changes. It is easier to review follow-up changes when they are added as additional "fixup" commits to the
+   existing PR/branch. This allows reviewer(s) to track the incremental progress and focus on new changes,
+   and keeps comment threads attached to the code.
+   Please refrain from squashing new commits into reviewed commits before review is completed.
+   Because squashing reviewed and unreviewed commits often makes it harder to
+   see the difference between the review iterations, reviewers may ask you to unsquash new changes.
+
+4. After review is complete and the PR is accepted, fixup commits should be squashed (see [Git workflow tips](https://cwiki.apache.org/confluence/display/BEAM/Git+Tips)).
+   Beam committers [can squash](https://beam.apache.org/contribute/committer-guide/#merging-it)
+   all commits in the PR during merge, however if a PR has a mixture of independent changes that should not be squashed, and fixup commits,
+   then the PR author should help squashing fixup commits to maintain a clean commit history.
+
+#### Apache Beam Releases
+
+Apache Beam makes minor releases every 6 weeks. Apache Beam has a
+[calendar](https://calendar.google.com/calendar/embed?src=0p73sl034k80oob7seouanigd0%40group.calendar.google.com) for
+cutting the next release branch. Your change needs to be checked into master before the release branch is cut
+to make the next release.
+
+#### Stale Pull Requests
+
+The community will close stale pull requests in order to keep the project
+healthy. A pull request becomes stale after its author fails to respond to
+actionable comments for 60 days.  Author of a closed pull request is welcome to
+reopen the same pull request again in the future.
+
+### Troubleshooting
+
+If you run into any issues, check out the [contribution FAQ](https://cwiki.apache.org/confluence/display/BEAM/Contributor+FAQ) or ask on the [dev@ mailing list](https://beam.apache.org/community/contact-us/) or [#beam channel of the ASF Slack](https://beam.apache.org/community/contact-us/).
+
+If you didn't find the information you were looking for in this guide, please
+[reach out to the Beam community](https://beam.apache.org/community/contact-us/).
+
+</div>
+
+## Find Efforts to Contribute to
+A great way to contribute is to join an existing effort. If you want to get involved but don’t have a project in mind, check our [list of open starter tasks](https://s.apache.org/beam-starter-tasks).
+For the most intensive efforts, check out the [roadmap](https://beam.apache.org/roadmap/).
+
+## Contributing to the Developer Documentation
+
+New contributors are often best equipped to find gaps in the developer documentation.
+If you'd like to contribute to our documentation, either open a PR in the Beam repo with
+the proposed changes or make edits to the [Beam wiki](https://cwiki.apache.org/confluence/display/BEAM/Apache+Beam).
+
+By default, everyone has access to the wiki. If you wish to contribute changes,
+please create an account and request edit access on the dev@beam.apache.org mailing list (include your Wiki account user ID).
+
+## Additional Resources
+Please see Beam developers’ [Wiki Contributor FAQ](https://cwiki.apache.org/confluence/display/BEAM/Contributor+FAQ) for more information.
+
+If you are contributing a ```PTransform``` to Beam, we have an extensive [PTransform Style Guide](https://beam.apache.org/contribute/ptransform-style-guide).
+
+If you are contributing a Runner to Beam, refer to the [Runner authoring guide](https://beam.apache.org/contribute/runner-guide/).
+
+Review [design documents](https://s.apache.org/beam-design-docs).
