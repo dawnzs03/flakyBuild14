@@ -1,0 +1,11 @@
+{
+    "repoOwner": "janusgraph",
+    "repoName": "janusgraph",
+    "targetBranchChoices": ["v0.6"],
+    "branchLabelMapping": {
+      "^backport/(.+)$": "$1"
+    },
+    "autoMerge": true,
+    "autoMergeMethod": "rebase",
+    "targetPRLabels": ["backport/skip"]
+}

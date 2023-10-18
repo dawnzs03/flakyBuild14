@@ -2,8 +2,12 @@
 
 ## Supported Versions
 
-To see which versions of Apache Camel are supported please refer to this [page](https://camel.apache.org/download/).
+[Currently supported versions](https://docs.janusgraph.org/changelog/#currently-supported) of JanusGraph
+continue to receive security updates. If you are using an older version of JanusGraph that is no longer
+supported, please update to a supported version to continue to receive security updates.
 
 ## Reporting a Vulnerability
 
-For information on how to report a new security problem please see [here](https://camel.apache.org/security/).
+Please report security vulnerabilities privately to the JanusGraph Technical Steering Committee (TSC) by sending
+an email to: **security (at) janusgraph.org**  — please do not post security vulnerabilities to the public issue
+tracker.
