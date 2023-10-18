@@ -121,7 +121,7 @@ allprojects {
         retry {
             if (rootProject.findProperty('retry') == 'true') {
                 maxRetries = 3
-                failOnPassedAfterRetry = rootProject.findProperty('failOnPassedAfterRetry') != 'false'
+                failOnPassedAfterRetry = true
             }
         }
     }
