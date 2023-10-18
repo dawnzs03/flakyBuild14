@@ -1,126 +1,177 @@
+
 <!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
 
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
 
-      http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
-
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
-<div align="center">
-    
-<img src="https://imgur.com/GNevDZ0.png" align="center" alt="Apache Pinot"/>
 
----------------------------------------
-[![Build Status](https://github.com/apache/pinot/actions/workflows/pinot_tests.yml/badge.svg?event=push)](https://github.com/apache/pinot/actions/workflows/pinot_tests.yml)
-[![Release](https://img.shields.io/github/release/apache/pinot/all.svg)](https://pinot.apache.org/download/)
-[![codecov.io](https://codecov.io/github/apache/pinot/branch/master/graph/badge.svg)](https://codecov.io/github/apache/pinot)
-[![Join the chat at https://communityinviter.com/apps/apache-pinot/apache-pinot](https://img.shields.io/badge/slack-apache--pinot-brightgreen?logo=slack)](https://communityinviter.com/apps/apache-pinot/apache-pinot)
-[![Twitter Follow](https://img.shields.io/twitter/follow/apachepinot.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=apachepinot)
-[![License](https://img.shields.io/github/license/apache/pinot.svg)](LICENSE)
+# Apache Hudi
 
-</div>
+Apache Hudi (pronounced Hoodie) stands for `Hadoop Upserts Deletes and Incrementals`. Hudi manages the storage of large
+analytical datasets on DFS (Cloud stores, HDFS or any Hadoop FileSystem compatible storage).
 
-- [What is Apache Pinot?](#what-is-apache-pinot)
-- [Features](#features)
-- [When should I use Pinot?](#when-should-i-use-pinot)
-- [Building Pinot](#building-pinot)
-- [Deploying Pinot to Kubernetes](#deploying-pinot-to-kubernetes)
-- [Join the Community](#join-the-community)
-- [Documentation](#documentation)
-- [License](#license)
+<img src="https://hudi.apache.org/assets/images/hudi-logo-medium.png" alt="Hudi logo" height="80px" align="right" />
 
-# What is Apache Pinot?
+<https://hudi.apache.org/>
 
-[Apache Pinot](https://pinot.apache.org) is a real-time distributed OLAP datastore, built to deliver scalable real-time analytics with low latency. It can ingest from batch data sources (such as Hadoop HDFS, Amazon S3, Azure ADLS, Google Cloud Storage) as well as stream data sources (such as Apache Kafka).
-
-Pinot was built by engineers at LinkedIn and Uber and is designed to scale up and out with no upper bound. Performance always remains constant based on the size of your cluster and an expected query per second (QPS) threshold.
-
-For getting started guides, deployment recipes, tutorials, and more, please visit our project documentation at [https://docs.pinot.apache.org](https://docs.pinot.apache.org).
-
-<img src="https://gblobscdn.gitbook.com/assets%2F-LtH6nl58DdnZnelPdTc%2F-M69C48fK2BhCoou1REr%2F-M69DbDfcATcZOAgyX7k%2Fpinot-overview-graphic.png?alt=media&token=3552722e-8d1d-4397-972e-a81917ced182" align="center" alt="Apache Pinot"/>
+[![Build](https://github.com/apache/hudi/actions/workflows/bot.yml/badge.svg)](https://github.com/apache/hudi/actions/workflows/bot.yml)
+[![Test](https://dev.azure.com/apache-hudi-ci-org/apache-hudi-ci/_apis/build/status/apachehudi-ci.hudi-mirror?branchName=master)](https://dev.azure.com/apache-hudi-ci-org/apache-hudi-ci/_build/latest?definitionId=3&branchName=master)
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.hudi/hudi/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.apache.hudi%22)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/apache/hudi)
+[![Join on Slack](https://img.shields.io/badge/slack-%23hudi-72eff8?logo=slack&color=48c628&label=Join%20on%20Slack)](https://join.slack.com/t/apache-hudi/shared_invite/zt-1e94d3xro-JvlNO1kSeIHJBTVfLPlI5w)
+![Twitter Follow](https://img.shields.io/twitter/follow/ApacheHudi)
 
 ## Features
 
-Pinot was originally built at LinkedIn to power rich interactive real-time analytic applications such as [Who Viewed Profile](https://www.linkedin.com/me/profile-views/urn:li:wvmp:summary/),  [Company Analytics](https://www.linkedin.com/company/linkedin/insights/),  [Talent Insights](https://business.linkedin.com/talent-solutions/talent-insights), and many more. [UberEats Restaurant Manager](https://eng.uber.com/restaurant-manager/) is another example of a customer facing Analytics App. At LinkedIn, Pinot powers 50+ user-facing products, ingesting millions of events per second and serving 100k+ queries per second at millisecond latency.
+* Upsert support with fast, pluggable indexing
+* Atomically publish data with rollback support
+* Snapshot isolation between writer & queries
+* Savepoints for data recovery
+* Manages file sizes, layout using statistics
+* Async compaction of row & columnar data
+* Timeline metadata to track lineage
+* Optimize data lake layout with clustering
+ 
+Hudi supports three types of queries:
+ * **Snapshot Query** - Provides snapshot queries on real-time data, using a combination of columnar & row-based storage (e.g [Parquet](https://parquet.apache.org/) + [Avro](https://avro.apache.org/docs/current/mr.html)).
+ * **Incremental Query** - Provides a change stream with records inserted or updated after a point in time.
+ * **Read Optimized Query** - Provides excellent snapshot query performance via purely columnar storage (e.g. [Parquet](https://parquet.apache.org/)).
 
-* **Column-oriented**: a column-oriented database with various compression schemes such as Run Length, Fixed Bit Length.
+Learn more about Hudi at [https://hudi.apache.org](https://hudi.apache.org)
 
-* [**Pluggable indexing**](https://docs.pinot.apache.org/basics/indexing): pluggable indexing technologies Sorted Index, Bitmap Index, Inverted Index.
+## Building Apache Hudi from source
 
-* **Query optimization**: ability to optimize query/execution plan based on query and segment metadata.
+Prerequisites for building Apache Hudi:
 
-* **Stream and batch ingest**: near real time ingestion from streams and batch ingestion from Hadoop.
+* Unix-like system (like Linux, Mac OS X)
+* Java 8 (Java 9 or 10 may work)
+* Git
+* Maven (>=3.3.1)
 
-* **Query:** SQL based query execution engine.
+```
+# Checkout code and build
+git clone https://github.com/apache/hudi.git && cd hudi
+mvn clean package -DskipTests
 
-* **Upsert during real-time ingestion**: update the data at-scale with consistency
-
-* **Multi-valued fields:** support for multi-valued fields, allowing you to query fields as comma separated values.
-
-* **Cloud-native on Kubernetes**: Helm chart provides a horizontally scalable and fault-tolerant clustered deployment that is easy to manage using Kubernetes.
-
-<a href="https://docs.pinot.apache.org/basics/getting-started"><img src="https://gblobscdn.gitbook.com/assets%2F-LtH6nl58DdnZnelPdTc%2F-MKaPf2qveUt5cg0dMbM%2F-MKaPmS1fuBs2CHnx9-Z%2Fpinot-ui-width-1000.gif?alt=media&token=53e4c5a8-a9cd-4610-a338-d54ea036c090" align="center" alt="Apache Pinot query console"/></a>
-
-## When should I use Pinot?
-
-Pinot is designed to execute real-time OLAP queries with low latency on massive amounts of data and events. In addition to real-time stream ingestion, Pinot also supports batch use cases with the same low latency guarantees. It is suited in contexts where fast analytics, such as aggregations, are needed on immutable data, possibly, with real-time data ingestion. Pinot works very well for querying time series data with lots of dimensions and metrics.
-
-Example query:
-```SQL
-SELECT sum(clicks), sum(impressions) FROM AdAnalyticsTable
-  WHERE
-       ((daysSinceEpoch >= 17849 AND daysSinceEpoch <= 17856)) AND
-       accountId IN (123456789)
-  GROUP BY
-       daysSinceEpoch TOP 100
+# Start command
+spark-3.2.3-bin-hadoop3.2/bin/spark-shell \
+  --jars `ls packaging/hudi-spark-bundle/target/hudi-spark3.2-bundle_2.12-*.*.*-SNAPSHOT.jar` \
+  --conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' \
+  --conf 'spark.sql.extensions=org.apache.spark.sql.hudi.HoodieSparkSessionExtension' \
+  --conf 'spark.sql.catalog.spark_catalog=org.apache.spark.sql.hudi.catalog.HoodieCatalog' \
+  --conf 'spark.kryo.registrator=org.apache.spark.HoodieSparkKryoRegistrar'
 ```
 
-Pinot is not a replacement for database i.e it cannot be used as source of truth store, cannot mutate data. While Pinot [supports text search](https://docs.pinot.apache.org/basics/features/text-search-support), it's not a replacement for a search engine. Also, Pinot queries cannot span across multiple tables by default. You can use the [Trino-Pinot Connector](https://trino.io/docs/current/connector/pinot.html) or [Presto-Pinot Connector](https://prestodb.io/docs/current/connector/pinot.html) to achieve table joins and other features.
+To build for integration tests that include `hudi-integ-test-bundle`, use `-Dintegration-tests`.
 
-## Building Pinot
-More detailed instructions can be found at [Quick Demo](https://docs.pinot.apache.org/basics/getting-started/quick-start) section in the documentation.
+To build the Javadoc for all Java and Scala classes:
 ```
-# Clone a repo
-$ git clone https://github.com/apache/pinot.git
-$ cd pinot
-
-# Build Pinot
-$ mvn clean install -DskipTests -Pbin-dist
-
-# Run the Quick Demo
-$ cd build/
-$ bin/quick-start-batch.sh
+# Javadoc generated under target/site/apidocs
+mvn clean javadoc:aggregate -Pjavadocs
 ```
 
-## Deploying Pinot to Kubernetes
-Please refer to [Running Pinot on Kubernetes](https://docs.pinot.apache.org/basics/getting-started/kubernetes-quickstart) in our project documentation. Pinot also provides Kubernetes integrations with the interactive query engine, [Trino](https://docs.pinot.apache.org/integrations/trino) [Presto](https://docs.pinot.apache.org/integrations/presto), and the data visualization tool, [Apache Superset](kubernetes/helm/superset.yaml).
+### Build with different Spark versions
 
-## Join the Community
- - Ask questions on [Apache Pinot Slack](https://join.slack.com/t/apache-pinot/shared_invite/zt-5z7pav2f-yYtjZdVA~EDmrGkho87Vzw)
- - Please join Apache Pinot mailing lists  
-   dev-subscribe@pinot.apache.org (subscribe to pinot-dev mailing list)  
-   dev@pinot.apache.org (posting to pinot-dev mailing list)  
-   users-subscribe@pinot.apache.org (subscribe to pinot-user mailing list)  
-   users@pinot.apache.org (posting to pinot-user mailing list)
- - Apache Pinot Meetup Group: https://www.meetup.com/apache-pinot/
+The default Spark 2.x version supported is 2.4.4. The default Spark 3.x version, corresponding to `spark3` profile is
+3.4.0. The default Scala version is 2.12. Refer to the table below for building with different Spark and Scala versions.
 
-## Documentation
-Check out [Pinot documentation](https://docs.pinot.apache.org/) for a complete description of Pinot's features.
-- [Quick Demo](https://docs.pinot.apache.org/getting-started/running-pinot-locally)
-- [Pinot Architecture](https://docs.pinot.apache.org/basics/architecture)
-- [Pinot Query Language](https://docs.pinot.apache.org/users/user-guide-query/pinot-query-language)
+| Maven build options       | Expected Spark bundle jar name               | Notes                                            |
+|:--------------------------|:---------------------------------------------|:-------------------------------------------------|
+| (empty)                   | hudi-spark3.2-bundle_2.12                    | For Spark 3.2.x and Scala 2.12 (default options) |
+| `-Dspark2.4 -Dscala-2.11` | hudi-spark2.4-bundle_2.11                    | For Spark 2.4.4 and Scala 2.11                   |
+| `-Dspark3.0`              | hudi-spark3.0-bundle_2.12                    | For Spark 3.0.x and Scala 2.12                   |
+| `-Dspark3.1`              | hudi-spark3.1-bundle_2.12                    | For Spark 3.1.x and Scala 2.12                   |
+| `-Dspark3.2`              | hudi-spark3.2-bundle_2.12                    | For Spark 3.2.x and Scala 2.12 (same as default) |
+| `-Dspark3.3`              | hudi-spark3.3-bundle_2.12                    | For Spark 3.3.x and Scala 2.12                   |
+| `-Dspark3.4`              | hudi-spark3.4-bundle_2.12                    | For Spark 3.4.x and Scala 2.12                   |
+| `-Dspark2 -Dscala-2.11`   | hudi-spark-bundle_2.11 (legacy bundle name)  | For Spark 2.4.4 and Scala 2.11                   |
+| `-Dspark2 -Dscala-2.12`   | hudi-spark-bundle_2.12 (legacy bundle name)  | For Spark 2.4.4 and Scala 2.12                   |
+| `-Dspark3`                | hudi-spark3-bundle_2.12 (legacy bundle name) | For Spark 3.4.x and Scala 2.12                   |
 
-## License
-Apache Pinot is under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+For example,
+```
+# Build against Spark 3.2.x
+mvn clean package -DskipTests
+
+# Build against Spark 3.4.x
+mvn clean package -DskipTests -Dspark3.4
+
+# Build against Spark 2.4.4 and Scala 2.11
+mvn clean package -DskipTests -Dspark2.4 -Dscala-2.11
+```
+
+#### What about "spark-avro" module?
+
+Starting from versions 0.11, Hudi no longer requires `spark-avro` to be specified using `--packages`
+
+### Build with different Flink versions
+
+The default Flink version supported is 1.17. The default Flink 1.17.x version, corresponding to `flink1.17` profile is 1.17.0.
+Flink is Scala-free since 1.15.x, there is no need to specify the Scala version for Flink 1.15.x and above versions.
+Refer to the table below for building with different Flink and Scala versions.
+
+| Maven build options        | Expected Flink bundle jar name | Notes                            |
+|:---------------------------|:-------------------------------|:---------------------------------|
+| (empty)                    | hudi-flink1.17-bundle          | For Flink 1.17 (default options) |
+| `-Dflink1.17`              | hudi-flink1.17-bundle          | For Flink 1.17 (same as default) |
+| `-Dflink1.16`              | hudi-flink1.16-bundle          | For Flink 1.16                   |
+| `-Dflink1.15`              | hudi-flink1.15-bundle          | For Flink 1.15                   |
+| `-Dflink1.14`              | hudi-flink1.14-bundle          | For Flink 1.14 and Scala 2.12    |
+| `-Dflink1.14 -Dscala-2.11` | hudi-flink1.14-bundle          | For Flink 1.14 and Scala 2.11    |
+| `-Dflink1.13`              | hudi-flink1.13-bundle          | For Flink 1.13 and Scala 2.12    |
+| `-Dflink1.13 -Dscala-2.11` | hudi-flink1.13-bundle          | For Flink 1.13 and Scala 2.11    |
+
+For example,
+```
+# Build against Flink 1.15.x
+mvn clean package -DskipTests -Dflink1.15
+
+# Build against Flink 1.14.x and Scala 2.11
+mvn clean package -DskipTests -Dflink1.14 -Dscala-2.11
+
+# Build against Flink 1.13.x and Scala 2.12
+mvn clean package -DskipTests -Dflink1.13
+```
+
+## Running Tests
+
+Unit tests can be run with maven profile `unit-tests`.
+```
+mvn -Punit-tests test
+```
+
+Functional tests, which are tagged with `@Tag("functional")`, can be run with maven profile `functional-tests`.
+```
+mvn -Pfunctional-tests test
+```
+
+Integration tests can be run with maven profile `integration-tests`.
+```
+mvn -Pintegration-tests verify
+```
+
+To run tests with spark event logging enabled, define the Spark event log directory. This allows visualizing test DAG and stages using Spark History Server UI.
+```
+mvn -Punit-tests test -DSPARK_EVLOG_DIR=/path/for/spark/event/log
+```
+
+## Quickstart
+
+Please visit [https://hudi.apache.org/docs/quick-start-guide.html](https://hudi.apache.org/docs/quick-start-guide.html) to quickly explore Hudi's capabilities using spark-shell. 
+
+## Contributing
+
+Please check out our [contribution guide](https://hudi.apache.org/contribute/how-to-contribute) to learn more about how to contribute.
+For code contributions, please refer to the [developer setup](https://hudi.apache.org/contribute/developer-setup).

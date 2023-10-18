@@ -1,53 +1,84 @@
-cscope.*
-.classpath
-.project
-.svn
-.externalToolBuilders/
-maven-eclipse.xml
+# Directories #
+/build/
 target/
-bin/
-*/bin/
-.idea
-.vscode
-*.iml
-.settings/
-out/
-.DS_Store
-test-output
-pinot-broker/test-output/
-pinot-core/test-output/
-*.log
-.doppelganger
-docs/_build
-*.ipr
-*.iws
-.*.swp
-**/.docker/
-**/.env
-**/.factorypath
+metastore_db/
 .mvn/
 
-# Misc
-.envrc
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# OS Files #
+.DS_Store
+ 
+*.class
+.java-version
+ 
+# Package Files #
+*.jar
+# But not these files...
+!/hoodie-cli/lib/dnl/utils/textutils/0.3.3/textutils-0.3.3.jar
+*.war
+*.ear
+*.db
+*.patch 
+ 
+######################
+# OSX
+######################
+ 
+.DS_Store
+ 
+# Thumbnails
+._*
+ 
+######################
+# Eclipse
+######################
+ 
+*.pydevproject
+.project
+.metadata
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*.pyc
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+/src/main/resources/rebel.xml
+# External tool builders
+.externalToolBuilders/
+ 
+# Locally stored "Eclipse launch configurations"
+*.launch
+ 
+# CDT-specific
+.cproject
+ 
+# PDT-specific
+.buildpath
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+#######################################
+# IntelliJ specific files/directories #
+#######################################
+.out
+.idea/*
+!.idea/vcs.xml
+*.ipr
+*.iws
+*.iml
+*.log
 
-.github/PULL_REQUEST_TEMPLATE.md
+#######################################
+# Maven
+#######################################
+dependency-reduced-pom.xml
 
-#quickstart files
-quickstart*
 
-#build symlink directory
-build*
-
-#helm related files
-kubernetes/helm/**/charts/
-kubernetes/helm/**/requirements.lock
-kubernetes/helm/**/Chart.lock
-
+#######################################
+# Docker
+#######################################
+hudi-integ-test/compose_env
+node_modules
+package-lock.json

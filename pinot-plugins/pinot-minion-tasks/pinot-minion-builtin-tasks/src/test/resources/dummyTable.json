@@ -1,8 +1,0 @@
-{
-    "tableName": "pinotTable",
-    "tableType": "OFFLINE",
-    "segmentsConfig": {},
-    "tenants": {},
-    "tableIndexConfig": {},
-    "metadata": {}
-}

@@ -1,27 +1,27 @@
-Instructions:
-1. The PR has to be tagged with at least one of the following labels (*):
-   1. `feature`
-   2. `bugfix`
-   3. `performance`
-   4. `ui`
-   5. `backward-incompat`
-   6. `release-notes` (**)
-2. Remove these instructions before publishing the PR.
- 
-(*) Other labels to consider:
-- `testing`
-- `dependencies`
-- `docker`
-- `kubernetes`
-- `observability`
-- `security`
-- `code-style`
-- `extension-point`
-- `refactor`
-- `cleanup`
+### Change Logs
 
-(**) Use `release-notes` label for scenarios like:
-- New configuration options
-- Deprecation of configurations
-- Signature changes to public methods/interfaces
-- New plugins added or old plugins removed
+_Describe context and summary for this change. Highlight if any code was copied._
+
+### Impact
+
+_Describe any public API or user-facing feature change or any performance impact._
+
+### Risk level (write none, low medium or high below)
+
+_If medium or high, explain what verification was done to mitigate the risks._
+
+### Documentation Update
+
+_Describe any necessary documentation update if there is any new feature, config, or user-facing change_
+
+- _The config description must be updated if new configs are added or the default value of the configs are changed_
+- _Any new feature or user-facing change requires updating the Hudi website. Please create a Jira ticket, attach the
+  ticket number here and follow the [instruction](https://hudi.apache.org/contribute/developer-setup#website) to make
+  changes to the website._
+
+### Contributor's checklist
+
+- [ ] Read through [contributor's guide](https://hudi.apache.org/contribute/how-to-contribute)
+- [ ] Change Logs and Impact were stated clearly
+- [ ] Adequate tests were added if applicable
+- [ ] CI passed
