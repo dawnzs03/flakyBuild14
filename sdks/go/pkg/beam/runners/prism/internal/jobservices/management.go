@@ -226,7 +226,7 @@ func (s *Server) GetMessageStream(req *jobpb.JobMessagesRequest, stream jobpb.Jo
 			job.streamCond.Wait()
 			select { // Quit out if the external connection is done.
 			case <-stream.Context().Done():
-				return context.Cause(stream.Context())
+				return stream.Context().Err()
 			default:
 			}
 		}

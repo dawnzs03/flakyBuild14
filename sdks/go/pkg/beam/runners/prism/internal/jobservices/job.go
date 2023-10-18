@@ -137,13 +137,9 @@ func (j *Job) SendMsg(msg string) {
 func (j *Job) sendState(state jobpb.JobState_Enum) {
 	j.streamCond.L.Lock()
 	defer j.streamCond.L.Unlock()
-	old := j.state.Load()
-	// Never overwrite a failed state with another one.
-	if old != jobpb.JobState_FAILED {
-		j.state.Store(state)
-		j.stateTime = time.Now()
-		j.stateIdx++
-	}
+	j.stateTime = time.Now()
+	j.stateIdx++
+	j.state.Store(state)
 	j.streamCond.Broadcast()
 }
 
@@ -167,5 +163,5 @@ func (j *Job) Failed(err error) {
 	slog.Error("job failed", slog.Any("job", j), slog.Any("error", err))
 	j.failureErr = err
 	j.sendState(jobpb.JobState_FAILED)
-	j.CancelFn(fmt.Errorf("jobFailed %v: %w", j, err))
+	j.CancelFn(err)
 }
