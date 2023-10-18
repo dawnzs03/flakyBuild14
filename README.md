@@ -1,83 +1,73 @@
-# Liquibase [![Build and Test](https://github.com/liquibase/liquibase/actions/workflows/build.yml/badge.svg)](https://github.com/liquibase/liquibase/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=liquibase&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=liquibase)
-<p align="center"><img src="https://github.com/liquibase/liquibase/blob/master/Liquibase.png" width="30%" height="30%"></p>
+![Dragonwell Logo](https://raw.githubusercontent.com/wiki/dragonwell-project/dragonwell8/images/dragonwell_std_txt_horiz.png)
 
-Liquibase helps millions of developers track, version, and deploy database schema changes. It will help you to:
-- Control database schema changes for specific versions
-- Eliminate errors and delays when releasing databases
-- Automatically order scripts for deployment
-- Easily rollback changes
-- Collaborate with tools you already use
+[Alibaba Dragonwell8 User Guide](https://github.com/dragonwell-project/dragonwell8/wiki/Alibaba-Dragonwell8-User-Guide)
 
-This repository contains the main source code for Liquibase Open Source. For more information about the product, see the [Liquibase website](https://www.liquibase.com/).
+[Alibaba Dragonwell8 Extended Edition Release Notes](https://github.com/dragonwell-project/dragonwell8/wiki/Alibaba-Dragonwell8-Extended-Edition-Release-Notes)
 
-## Liquibase Automation and Integrations
+[Alibaba Dragonwell8 Standard Edition Release Notes](https://github.com/dragonwell-project/dragonwell8/wiki/Alibaba-Dragonwell8-Standard-Edition-Release-Notes)
 
-Liquibase Open Source has built-in support for a variety of databases. Databases that are not part of Liquibase Open Source require extensions that you can download for free. Here is the full list of [supported databases](https://www.liquibase.com/supported-databases).
+# Introduction
 
-Liquibase can be integrated with Maven, Ant, Gradle, Spring Boot, and other CI/CD tools. For a full list, see [Liquibase Tools & Integrations](https://docs.liquibase.com/tools-integrations/home.html). You can use Liquibase with [GitHub Actions](https://github.com/liquibase/liquibase-github-action-example), [Spinnaker](https://github.com/liquibase/liquibase-spinnaker-plugin), and many different [workflows](https://docs.liquibase.com/workflows/home.html).
+Over the years, Java has proliferated in Alibaba. Many applications are written in Java and many our Java developers have written more than one billion lines of Java code.
 
+Alibaba Dragonwell, as a downstream version of OpenJDK, is the in-house OpenJDK implementation at Alibaba optimized for online e-commerce, financial, logistics applications running on 100,000+ servers. Alibaba Dragonwell is the engine that runs these distributed Java applications in extreme scaling.
 
-## Install and Run Liquibase
+The current release supports Linux/x86_64 platform only.
 
-### System Requirements
-Liquibase system requirements can be found on the [Download Liquibase](https://www.liquibase.com/download) page.
+Alibaba Dragonwell is clearly a "friendly fork" under the same licensing terms as the upstream OpenJDK project. Alibaba is committed to collaborate closely with OpenJDK community and intends to bring as many customized features as possible from Alibaba Dragonwell to the upstream.
 
-### An H2 in-memory database example for CLI
-1. [Download and run the appropriate installer](https://www.liquibase.com/download). 
-2. Make sure to add Liquibase to your PATH.
-3. Copy the included `examples` directory to the needed location.
-4. Open your CLI and navigate to your `examples/sql` or `examples/xml` directory.
-5. Start the included H2 database with the `liquibase init start-h2` command.
-6. Run the `liquibase update` command.
-7. Run the `liquibase history` command to see what has executed!
+# Using Alibaba Dragonwell
 
-See also how to [get started with Liquibase in minutes](https://www.liquibase.org/get-started/quickstart) or refer to our [Installing Liquibase](https://docs.liquibase.com/start/install/home.html) documentation page for more details.
+Alibaba Dragonwell JDK currently supports Linux/x86_64 platform only.
 
-## Documentation
+### Installation
 
-Visit the [Liquibase Documentation](https://docs.liquibase.com/home.html) website to find the information on how Liquibase works.
+##### Option 1, Download and install pre-built Alibaba Dragonwell
 
-## Courses
+* You may download a pre-built Alibaba Dragonwell JDK from its GitHub page:
+https://github.com/dragonwell-project/dragonwell8/releases.
+* Uncompress the package to the installation directory.
 
-Learn all about Liquibase by taking our free online courses at [Liquibase University](https://learn.liquibase.com/).
+##### Option 2, Install via YUM
 
-## Want to help?
+Alibaba Dragonwell is officially supported and maintained in Alibaba Cloud Linux 2 (Aliyun Linux 2) YUM repository, and this repo should be also compatible with Aliyun Linux 17.1, Red Hat Enterprise Linux 7 and CentOS 7.
 
-Want to file a bug or improve documentation? Excellent! Read up on our guidelines for [contributing](https://www.liquibase.org/community/index.html)!
+* For users running Alibaba Cloud Linux 2 OS, you should be able to install Alibaba Dragonwell by simply running: `sudo yum install -y java-1.8.0-alibaba-dragonwell`;
+* For users running with aforementioned compatible distros, place a new repository file under `/etc/yum.repos.d` (e.g.: `/etc/repos.d/alinux-plus.repo`) with contents as follows, then you should be able to install Alibaba Dragonwell by executing: `sudo yum install -y java-1.8.0-alibaba-dragonwell`:
+```
+# plus packages provided by Aliyun Linux dev team
+[plus]
+name=AliYun-2.1903 - Plus - mirrors.aliyun.com
+baseurl=http://mirrors.aliyun.com/alinux/2.1903/plus/$basearch/
+gpgcheck=1
+gpgkey=http://mirrors.aliyun.com/alinux/RPM-GPG-KEY-ALIYUN
+```
 
-### Contribute code 
+### Enable Alibaba Dragonwell for Java applications
 
-Use our [step-by-step instructions](https://www.liquibase.org/community/contribute/code) for contributing code to the Liquibase open source project. 
+To enable Alibaba Dragonwell JDK for your application, simply set `JAVA_HOME` to point to the installation directory of Alibaba Dragonwell. If you installed Dragonwell JDK via YUM, follow the instructions prompted from post-install outputs, e.g.:
 
-### Join the Liquibase Community
+```
+=======================================================================
+Alibaba Dragonwell is installed to:
+    /opt/alibaba/java-1.8.0-alibaba-dragonwell-8.0.0.212.b04-1.al7
+You can set Alibaba Dragonwell as default JDK by exporting the
+following ENV VARs:
+$ export JAVA_HOME=/opt/alibaba/java-1.8.0-alibaba-dragonwell-8.0.0.212.b04-1.al7
+$ export PATH=${JAVA_HOME}/bin:$PATH
+=======================================================================
+```
 
-Earn points for your achievements and contributions, collect and show off your badges, add accreditations to your LinkedIn. [Learn more about the pathway to Legend and benefits](https://www.liquibase.org/community/liquibase-legends). Enjoy being part of the community!
+# Acknowledgement
 
-## Liquibase Extensions
+Special thanks to those who have made contributions to Alibaba's internal JDK builds.
 
-[Provide more database support and features for Liquibase](https://www.liquibase.org/extensions).
+# Publications
 
-## License
+Technologies included in Alibaba Dragonwell have been published in following papers
 
-Liquibase Open Source is [licensed under the Apache 2.0 License](https://github.com/liquibase/liquibase/blob/master/LICENSE.txt).
+* ICSE'19：https://2019.icse-conferences.org/event/icse-2019-technical-papers-safecheck-safety-enhancement-of-java-unsafe-api
 
-[Liquibase Pro](https://www.liquibase.com/products/pro) and [Liquibase Enterprise](https://www.liquibase.com/products/enterprise), with additional features and support, are commercially licensed.
+* ICPE'18: https://dl.acm.org/citation.cfm?id=3186295
 
-LIQUIBASE is a registered trademark of [Liquibase Inc.](https://www.liquibase.com/company)
-
-## [Contact us](https://www.liquibase.org/contact)
-
-[Liquibase Forum](https://forum.liquibase.org/) 
-
-[Liquibase Blog](https://www.liquibase.com/blog)
-
-[Get Support & Advanced Features](https://liquibase.com/pricing)
-
-.
-
-## Publish Release Manual Trigger to Sonatype 
-
-1. When a PO (Product Owner) or a Team Leader navigates to Publish a release from here -> https://github.com/liquibase/liquibase/releases/new, the workflow from /workflow/release-published.yml job is triggered. 
-2. When a release is triggered, the workflow file will stop after `Setup` step and an email will be sent out to the list of `approvers` mentioned in job `manual_trigger_deployment`. You can click on the link and perform anyone of the options mentioned in description. 
-3. A minimum of 2 approvers are needed in order for the other jobs such as `deploy_maven`, `deploy_javadocs`, `publish_to_github_packages`, etc to be executed.
-4. When you view the GitHub PR, make sure to verify the version which is being published. It should say something like `Deploying v4.20.0 to sonatype`
+* ICSE'18 SEIP  https://www.icse2018.org/event/icse-2018-software-engineering-in-practice-java-performance-troubleshooting-and-optimization-at-alibaba
