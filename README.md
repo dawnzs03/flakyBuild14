@@ -1,126 +1,122 @@
+Apache Hive (TM)
+================
+[![Master Build Status](https://travis-ci.org/apache/hive.svg?branch=master)](https://travis-ci.org/apache/hive/branches)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.hive/hive/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.apache.hive%22)
 
- <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=e8355b6b-a9fc-4d4e-8ed8-b3157aa1827d" />
- <p align="center">
- <a href="https://starrocks.io/index">
-    <img  width="900" src="https://cdn.starrocks.io/static/github/starrocks.png">
-   </a>
-</p>
-<p align="center">
-  <a href="https://starrocks.io/download/community">Download</a> | <a href="https://docs.starrocks.io/">Docs</a> | <a href="https://starrocks.io/blog/benchmark-test">Benchmarks</a> | <a href="https://github.com/StarRocks/demo">Demo</a>
-</p>
-<p align="center">
+The Apache Hive (TM) data warehouse software facilitates reading,
+writing, and managing large datasets residing in distributed storage
+using SQL. Built on top of Apache Hadoop (TM), it provides:
 
- <img src="https://img.shields.io/badge/Made%20with-JAVA%20%26%20C%2B%2B-red" alt="JAVA&C++">
-    </a>
-    <img src="https://img.shields.io/github/commit-activity/m/StarRocks/starrocks" alt="Commit Activities">
-    </a>
-   <a href="https://github.com/StarRocks/starrocks/issues">
-    <img src="https://img.shields.io/github/issues-raw/StarRocks/starrocks" alt="Open Issues">
-  </a>
-  </a>
-   <a href="https://starrocks.io/index">
-    <img src="https://img.shields.io/badge/Visit%20StarRocks-Website-green" alt="Website">
-  </a>
-  </a>
-   <a href="https://join.slack.com/t/starrocks/shared_invite/zt-z5zxqr0k-U5lrTVlgypRIV8RbnCIAzg">
-    <img src="https://img.shields.io/badge/Join-Slack-ff69b4" alt="Slack">
-  </a>
-  </a>
-   <a href="https://twitter.com/StarRocksLabs">
-    <img src="https://img.shields.io/twitter/follow/StarRocksLabs?style=social" alt="Twitter">
-  </a>
- </p>
+* Tools to enable easy access to data via SQL, thus enabling data
+  warehousing tasks such as extract/transform/load (ETL), reporting,
+  and data analysis
 
-<div align="center"> 
+* A mechanism to impose structure on a variety of data formats
 
-  </div>
-StarRocks, a Linux Foundation project, is the next-generation data platform designed to make data-intensive real-time analytics fast and easy. 
-It delivers query speeds 5 to 10 times faster than other popular solutions. StarRocks can perform real-time analytics well while updating historical records. It can also enhance real-time analytics with historical data from data lakes easily. With StarRocks, you can get rid of the de-normalized tables and get the best performance and flexibility. <br>
+* Access to files stored either directly in Apache HDFS (TM) or in other
+  data storage systems such as Apache HBase (TM)
 
-Learn more 👉🏻 [Introduction to StarRocks](https://www.starrocks.io/blog/introduction_to_starrocks )
+* Query execution using Apache Hadoop MapReduce or Apache Tez frameworks.
 
-<br>
- <p align="center">
-    <img src="https://cdn.starrocks.io/static/github/community.gif">
-   </a>
-</p>
-</br>
+Hive provides standard SQL functionality, including many of the later
+2003 and 2011 features for analytics.  These include OLAP functions,
+subqueries, common table expressions, and more.  Hive's SQL can also be
+extended with user code via user defined functions (UDFs), user defined
+aggregates (UDAFs), and user defined table functions (UDTFs).
 
-## Features
+Hive users have a choice of 3 runtimes when executing SQL queries.
+Users can choose between Apache Hadoop MapReduce or Apache Tez
+frameworks as their execution backend. MapReduce is a
+mature framework that is proven at large scales. However, MapReduce
+is a purely batch framework, and queries using it may experience
+higher latencies (tens of seconds), even over small datasets. Apache
+Tez is designed for interactive query, and has substantially reduced
+overheads versus MapReduce.
 
-* **🚀 Native vectorized SQL engine:** StarRocks adopts vectorization technology to make full use of the parallel computing power of CPU, achieving sub-second query returns in multi-dimensional analyses, which is 5 to 10 times faster than previous systems.
-* **📊 Standard SQL:** StarRocks supports ANSI SQL syntax (fully supported TPC-H and TPC-DS). It is also compatible with the MySQL protocol. Various clients and BI software can be used to access StarRocks.
-* **💡 Smart query optimization:** StarRocks can optimize complex queries through CBO (Cost Based Optimizer). With a better execution plan, the data analysis efficiency will be greatly improved.
-* **⚡ Real-time update:** The updated model of StarRocks can perform upsert/delete operations according to the primary key, and achieve efficient query while concurrent updates.
-* **🪟 Intelligent materialized view:** The materialized view of StarRocks can be automatically updated during the data import and automatically selected when the query is executed.
-* **✨ Querying data in data lakes directly**: StarRocks allows direct access to data from Apache Hive™, Apache Iceberg™, and Apache Hudi™ without importing.
-* **🎛️ Resource management**: This feature allows StarRocks to limit resource consumption for queries and implement isolation and efficient use of resources among tenants in the same cluster.
-* **💠 Easy to maintain**: Simple architecture makes StarRocks easy to deploy, maintain and scale out. StarRocks tunes its query plan agilely, balances the resources when the cluster is scaled in or out, and recovers the data replica under node failure automatically.
+Users are free to switch back and forth between these frameworks
+at any time. In each case, Hive is best suited for use cases
+where the amount of data processed is large enough to require a
+distributed system.
+
+Hive is not designed for online transaction processing. It is best used
+for traditional data warehousing tasks.  Hive is designed to maximize
+scalability (scale out with more machines added dynamically to the Hadoop
+cluster), performance, extensibility, fault-tolerance, and
+loose-coupling with its input formats.
 
 
+General Info
+============
 
-<br>
-  
-## Architecture Overview
+For the latest information about Hive, please visit out website at:
 
- <p align="center">
-    <img src="images/arch.png">
-   </a>
-</p>
-
-StarRocks’s streamlined architecture is mainly composed of two modules: Frontend (FE) and Backend (BE).  The entire system eliminates single points of failure through seamless and horizontal scaling of FE and BE, as well as replication of metadata and data.
-
-Starting from version 3.0, StarRocks supports a new shared-data architecture, which can provide better scalability and lower costs.
-
- <p align="center">
-    <img src="images/arch-v30.png">
-   </a>
-</p>
+  http://hive.apache.org/
 
 
-<br>
+Getting Started
+===============
 
-## Resources
+- Installation Instructions and a quick tutorial:
+  https://cwiki.apache.org/confluence/display/Hive/GettingStarted
 
-### 📚 Read the docs
+- Instructions to build Hive from source:
+  https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-BuildingHivefromSource
 
-| Section | Description |
-|-|-|
-| [Deploy](https://docs.starrocks.io/en-us/latest/quick_start/Deploy) | Learn how to run and configure StarRocks.|
-| [Articles](https://github.com/StarRocks/starrocks/discussions/categories/how-tos-tutorials-best-practices-and-architecture-articles)| How-tos, Tutorials, Best Practices and Architecture Articles. |
-| [Docs](https://docs.starrocks.io/en-us/latest/introduction/StarRocks_intro)| Full documentation. |
-| [Blogs](https://starrocks.io/blog) | StarRocks deep dive and user stories.  |
+- A longer tutorial that covers more features of HiveQL:
+  https://cwiki.apache.org/confluence/display/Hive/Tutorial
 
-### ❓ Get support  
-[<img align="right" width="150" src="https://firstcontributions.github.io/assets/Readme/join-slack-team.png">](https://join.slack.com/t/starrocks/shared_invite/zt-z5zxqr0k-U5lrTVlgypRIV8RbnCIAzg)
--  [Slack community: ](https://join.slack.com/t/starrocks/shared_invite/zt-z5zxqr0k-U5lrTVlgypRIV8RbnCIAzg)join technical discussions, ask questions, and meet other users!
--  [YouTube channel:](https://www.youtube.com/channel/UC38wR-ogamk4naaWNQ45y7Q/featured) subscribe to the latest video tutorials and webcasts.
--  [GitHub issues:](https://github.com/StarRocks/starrocks/issues) report an issue with StarRocks.
+- The HiveQL Language Manual:
+  https://cwiki.apache.org/confluence/display/Hive/LanguageManual
 
 
-<br>  
-  
-## Contributing to StarRocks
+Requirements
+============
 
-We welcome all kinds of contributions from the community, individuals and partners. We owe our success to your active involvement.
+Java
+------
 
-1. See [Contributing.md](https://github.com/StarRocks/starrocks/blob/main/CONTRIBUTING.md) to get started.
-2. Set up StarRocks development environment:
-* [IDE Setup](https://docs.starrocks.io/en-us/main/developers/development-environment/ide-setup) 
-3. Understand our [GitHub workflow](https://github.com/StarRocks/community/blob/main/Contributors/guide/workflow.md) for opening a pull request; use this [PR Template](https://github.com/StarRocks/starrocks/blob/main/.github/PULL_REQUEST_TEMPLATE.md) when submitting a pull request.
-4. Pick a [good first issue](https://github.com/StarRocks/starrocks/labels/good%20first%20issue) and start contributing. 
+| Hive Version  | Java Version  |
+| ------------- |:-------------:|
+| Hive 1.0      | Java 6        |
+| Hive 1.1      | Java 6        |
+| Hive 1.2      | Java 7        |
+| Hive 2.x      | Java 7        |
+| Hive 3.x      | Java 8        |
+| Hive 4.x      | Java 8        |
 
-**📝 License:** StarRocks is licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
-**👥 Community Membership:** Learn more about different [contributor roles](community/membership.md) in StarRocks community.
-  
-<br>
-  
-## Used By
+Hadoop
+------
 
-This project is used by the following companies. Learn more about their use cases:
+- Hadoop 1.x, 2.x
+- Hadoop 3.x (Hive 3.x)
 
-- [Airbnb](https://www.youtube.com/watch?v=AzDxEZuMBwM&ab_channel=StarRocks_labs)
-- [Trip.com](https://starrocks.medium.com/trip-com-starrocks-efficiently-supports-high-concurrent-queries-dramatically-reduces-labor-and-1e1921dd6bf8) 
-- [Zepp Health](https://starrocks.io/blog/zeppheath) 
-- [Lenovo](https://starrocks.io/blog/lenovo_en) 
+
+Upgrading from older versions of Hive
+=====================================
+
+- Hive includes changes to the MetaStore schema. If
+  you are upgrading from an earlier version of Hive it is imperative
+  that you upgrade the MetaStore schema by running the appropriate
+  schema upgrade scripts located in the scripts/metastore/upgrade
+  directory.
+
+- We have provided upgrade scripts for MySQL, PostgreSQL, Oracle,
+  Microsoft SQL Server, and Derby databases. If you are using a
+  different database for your MetaStore you will need to provide
+  your own upgrade script.
+
+Useful mailing lists
+====================
+
+1. user@hive.apache.org - To discuss and ask usage questions. Send an
+   empty email to user-subscribe@hive.apache.org in order to subscribe
+   to this mailing list.
+
+2. dev@hive.apache.org - For discussions about code, design and features.
+   Send an empty email to dev-subscribe@hive.apache.org in order to
+   subscribe to this mailing list.
+
+3. commits@hive.apache.org - In order to monitor commits to the source
+   repository. Send an empty email to commits-subscribe@hive.apache.org
+   in order to subscribe to this mailing list.
