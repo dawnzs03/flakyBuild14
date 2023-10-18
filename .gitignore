@@ -1,63 +1,31 @@
-# Eclipse
+target/
+.clover/
+.idea/
+!.idea/icon.png
+.settings/
+.attach_pid*
 .classpath
-.project
-.settings
-eclipsebin
-
-# m2e-apt
+.directory
 .factorypath
-
-# Ant
-bin/
-out/
-
-# Maven
-dist
-target
-pom.xml.*
-release.properties
-
-# Gradle
-.gradle/
-build
-
-# Android Profiling
-*.hprof
-
-# IntelliJ
-.idea
-*.iml
-*.iws
-*.ipr
-classes
-
-# Other editors
-*.orig
-*.swp
-*~
-\#*\#
-
-# Mac
+.patch
+.project
+.surefire-*
 .DS_Store
+*.iml
+*.ipr
+*.iws
+atlassian-ide-plugin.xml
+*dependency-reduced-pom.xml
+hazelcast/src/main/java/com/hazelcast/instance/GeneratedBuildProperties.java
+diagnostics-*.log
+performance*.log
+build/
+reports/
+*/src/test/resources/data/file*
+*/src/test/resources/data/result*
+*.jfr
+.mvn/wrapper/maven-wrapper.jar
 
-tmp
-local.properties
-
-# CTS stuff
-cts/
-cts-libs/
-
-# CMake
-# CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-*.a
-*.dylib
+# Hadoop files
+*.crc
+**/node_modules/**
