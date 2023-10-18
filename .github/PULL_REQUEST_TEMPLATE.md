@@ -1,27 +1,17 @@
-### Change Logs
+Motivation:
 
-_Describe context and summary for this change. Highlight if any code was copied._
+Explain why you're making this change and what problem you're trying to solve.
 
-### Impact
+Modifications:
 
-_Describe any public API or user-facing feature change or any performance impact._
+- List the modifications you've made in detail.
 
-### Risk level (write none, low medium or high below)
+Result:
 
-_If medium or high, explain what verification was done to mitigate the risks._
+- Closes #<GitHub issue number>. (If this resolves the issue.)
+- Describe the consequences that a user will face after this PR is merged.
 
-### Documentation Update
-
-_Describe any necessary documentation update if there is any new feature, config, or user-facing change_
-
-- _The config description must be updated if new configs are added or the default value of the configs are changed_
-- _Any new feature or user-facing change requires updating the Hudi website. Please create a Jira ticket, attach the
-  ticket number here and follow the [instruction](https://hudi.apache.org/contribute/developer-setup#website) to make
-  changes to the website._
-
-### Contributor's checklist
-
-- [ ] Read through [contributor's guide](https://hudi.apache.org/contribute/how-to-contribute)
-- [ ] Change Logs and Impact were stated clearly
-- [ ] Adequate tests were added if applicable
-- [ ] CI passed
+<!--
+Visit this URL to learn more about how to write a pull request description:
+https://armeria.dev/community/developer-guide#how-to-write-pull-request-description
+-->
