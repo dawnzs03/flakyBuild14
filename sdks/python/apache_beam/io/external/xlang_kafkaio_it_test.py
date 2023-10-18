@@ -28,8 +28,6 @@ import typing
 import unittest
 import uuid
 
-import pytest
-
 import apache_beam as beam
 from apache_beam.coders.coders import VarIntCoder
 from apache_beam.io.kafka import ReadFromKafka
@@ -112,11 +110,11 @@ class CrossLanguageKafkaIO(object):
     pipeline.run(False)
 
 
+@unittest.skipUnless(
+    os.environ.get('LOCAL_KAFKA_JAR'),
+    "LOCAL_KAFKA_JAR environment var is not provided.")
 class CrossLanguageKafkaIOTest(unittest.TestCase):
-  @unittest.skipUnless(
-      os.environ.get('LOCAL_KAFKA_JAR'),
-      "LOCAL_KAFKA_JAR environment var is not provided.")
-  def test_local_kafkaio_populated_key(self):
+  def test_kafkaio_populated_key(self):
     kafka_topic = 'xlang_kafkaio_test_populated_key_{}'.format(uuid.uuid4())
     local_kafka_jar = os.environ.get('LOCAL_KAFKA_JAR')
     with self.local_kafka_service(local_kafka_jar) as kafka_port:
@@ -128,10 +126,7 @@ class CrossLanguageKafkaIOTest(unittest.TestCase):
       self.run_kafka_write(pipeline_creator)
       self.run_kafka_read(pipeline_creator, b'key')
 
-  @unittest.skipUnless(
-      os.environ.get('LOCAL_KAFKA_JAR'),
-      "LOCAL_KAFKA_JAR environment var is not provided.")
-  def test_local_kafkaio_null_key(self):
+  def test_kafkaio_null_key(self):
     kafka_topic = 'xlang_kafkaio_test_null_key_{}'.format(uuid.uuid4())
     local_kafka_jar = os.environ.get('LOCAL_KAFKA_JAR')
     with self.local_kafka_service(local_kafka_jar) as kafka_port:
@@ -142,44 +137,6 @@ class CrossLanguageKafkaIOTest(unittest.TestCase):
 
       self.run_kafka_write(pipeline_creator)
       self.run_kafka_read(pipeline_creator, None)
-
-  @pytest.mark.uses_io_expansion_service
-  @unittest.skipUnless(
-      os.environ.get('EXPANSION_PORT'),
-      "EXPANSION_PORT environment var is not provided.")
-  @unittest.skipUnless(
-      os.environ.get('KAFKA_BOOTSTRAP_SERVER'),
-      "KAFKA_BOOTSTRAP_SERVER environment var is not provided.")
-  def test_hosted_kafkaio_populated_key(self):
-    kafka_topic = 'xlang_kafkaio_test_populated_key_{}'.format(uuid.uuid4())
-    bootstrap_servers = os.environ.get('KAFKA_BOOTSTRAP_SERVER')
-    pipeline_creator = CrossLanguageKafkaIO(
-        bootstrap_servers,
-        kafka_topic,
-        False,
-        'localhost:%s' % os.environ.get('EXPANSION_PORT'))
-
-    self.run_kafka_write(pipeline_creator)
-    self.run_kafka_read(pipeline_creator, b'key')
-
-  @pytest.mark.uses_io_expansion_service
-  @unittest.skipUnless(
-      os.environ.get('EXPANSION_PORT'),
-      "EXPANSION_PORT environment var is not provided.")
-  @unittest.skipUnless(
-      os.environ.get('KAFKA_BOOTSTRAP_SERVER'),
-      "KAFKA_BOOTSTRAP_SERVER environment var is not provided.")
-  def test_hosted_kafkaio_null_key(self):
-    kafka_topic = 'xlang_kafkaio_test_null_key_{}'.format(uuid.uuid4())
-    bootstrap_servers = os.environ.get('KAFKA_BOOTSTRAP_SERVER')
-    pipeline_creator = CrossLanguageKafkaIO(
-        bootstrap_servers,
-        kafka_topic,
-        True,
-        'localhost:%s' % os.environ.get('EXPANSION_PORT'))
-
-    self.run_kafka_write(pipeline_creator)
-    self.run_kafka_read(pipeline_creator, None)
 
   def run_kafka_write(self, pipeline_creator):
     with TestPipeline() as pipeline:

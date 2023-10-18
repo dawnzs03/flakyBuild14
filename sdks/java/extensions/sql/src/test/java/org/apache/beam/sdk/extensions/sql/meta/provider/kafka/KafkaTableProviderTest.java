@@ -21,16 +21,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import java.util.List;
 import org.apache.beam.sdk.extensions.protobuf.PayloadMessages;
-import org.apache.beam.sdk.extensions.sql.TableUtils;
 import org.apache.beam.sdk.extensions.sql.meta.BeamSqlTable;
 import org.apache.beam.sdk.extensions.sql.meta.Table;
 import org.apache.beam.sdk.io.thrift.payloads.SimpleThriftMessage;
 import org.apache.beam.sdk.schemas.Schema;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.ImmutableList;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableList;
 import org.apache.thrift.TBase;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
@@ -205,20 +204,16 @@ public class KafkaTableProviderTest {
       @Nullable Class<?> protoClass,
       @Nullable Class<? extends TBase<?, ?>> thriftClass,
       @Nullable Class<? extends TProtocolFactory> thriftProtocolFactoryClass) {
-    ObjectNode properties = TableUtils.emptyProperties();
+    JSONObject properties = new JSONObject();
 
     if (extraBootstrapServers != null) {
-      ArrayNode bootstrapServers = TableUtils.getObjectMapper().createArrayNode();
-      for (String server : extraBootstrapServers) {
-        bootstrapServers.add(server);
-      }
+      JSONArray bootstrapServers = new JSONArray();
+      bootstrapServers.addAll(extraBootstrapServers);
       properties.put("bootstrap_servers", bootstrapServers);
     }
     if (extraTopics != null) {
-      ArrayNode topics = TableUtils.getObjectMapper().createArrayNode();
-      for (String topic : extraTopics) {
-        topics.add(topic);
-      }
+      JSONArray topics = new JSONArray();
+      topics.addAll(extraTopics);
       properties.put("topics", topics);
     }
 

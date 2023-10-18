@@ -17,7 +17,7 @@
  */
 package org.apache.beam.sdk.io.gcp.bigquery;
 
-import static org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Preconditions.checkArgument;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 
 import com.google.api.client.util.BackOff;
 import com.google.api.client.util.BackOffUtils;
@@ -25,7 +25,6 @@ import com.google.api.gax.rpc.ApiException;
 import com.google.api.services.bigquery.model.Clustering;
 import com.google.api.services.bigquery.model.EncryptionConfiguration;
 import com.google.api.services.bigquery.model.Table;
-import com.google.api.services.bigquery.model.TableConstraints;
 import com.google.api.services.bigquery.model.TableReference;
 import com.google.api.services.bigquery.model.TableSchema;
 import com.google.api.services.bigquery.model.TimePartitioning;
@@ -40,9 +39,9 @@ import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO.Write.CreateDisposition;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryServices.DatasetService;
 import org.apache.beam.sdk.util.FluentBackoff;
 import org.apache.beam.sdk.util.Preconditions;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.annotations.VisibleForTesting;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Strings;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Supplier;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.annotations.VisibleForTesting;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Strings;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Supplier;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.joda.time.Duration;
 
@@ -87,7 +86,6 @@ public class CreateTableHelpers {
       BigQueryOptions bigQueryOptions,
       TableDestination tableDestination,
       Supplier<@Nullable TableSchema> schemaSupplier,
-      Supplier<@Nullable TableConstraints> tableConstraintsSupplier,
       CreateDisposition createDisposition,
       @Nullable Coder<?> tableDestinationCoder,
       @Nullable String kmsKey,
@@ -127,7 +125,6 @@ public class CreateTableHelpers {
           tryCreateTable(
               bigQueryOptions,
               schemaSupplier,
-              tableConstraintsSupplier,
               tableDestination,
               createDisposition,
               tableSpec,
@@ -142,7 +139,6 @@ public class CreateTableHelpers {
   private static void tryCreateTable(
       BigQueryOptions options,
       Supplier<@Nullable TableSchema> schemaSupplier,
-      Supplier<@Nullable TableConstraints> tableConstraintsSupplier,
       TableDestination tableDestination,
       CreateDisposition createDisposition,
       String tableSpec,
@@ -155,7 +151,6 @@ public class CreateTableHelpers {
               tableReference, Collections.emptyList(), DatasetService.TableMetadataView.BASIC)
           == null) {
         TableSchema tableSchema = schemaSupplier.get();
-        @Nullable TableConstraints tableConstraints = tableConstraintsSupplier.get();
         Preconditions.checkArgumentNotNull(
             tableSchema,
             "Unless create disposition is %s, a schema must be specified, i.e. "
@@ -166,10 +161,6 @@ public class CreateTableHelpers {
             createDisposition,
             tableDestination);
         Table table = new Table().setTableReference(tableReference).setSchema(tableSchema);
-
-        if (tableConstraints != null) {
-          table = table.setTableConstraints(tableConstraints);
-        }
 
         String tableDescription = tableDestination.getTableDescription();
         if (tableDescription != null) {

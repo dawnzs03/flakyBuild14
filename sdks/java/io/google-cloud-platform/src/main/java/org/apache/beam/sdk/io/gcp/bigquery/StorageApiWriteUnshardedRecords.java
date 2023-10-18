@@ -17,8 +17,8 @@
  */
 package org.apache.beam.sdk.io.gcp.bigquery;
 
-import static org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Preconditions.checkArgument;
-import static org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Preconditions.checkState;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkState;
 
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutures;
@@ -30,8 +30,8 @@ import com.google.cloud.bigquery.storage.v1.TableSchema;
 import com.google.cloud.bigquery.storage.v1.WriteStream;
 import com.google.cloud.bigquery.storage.v1.WriteStream.Type;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.DynamicMessage;
+import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.Status;
 import java.io.IOException;
 import java.time.Instant;
@@ -46,7 +46,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -72,13 +71,13 @@ import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionTuple;
 import org.apache.beam.sdk.values.TupleTag;
 import org.apache.beam.sdk.values.TupleTagList;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Strings;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.cache.Cache;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.cache.CacheBuilder;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.cache.RemovalNotification;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.Iterables;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.Lists;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.Maps;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Strings;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.cache.Cache;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.cache.CacheBuilder;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.cache.RemovalNotification;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.Iterables;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.Lists;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.Maps;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.joda.time.Duration;
@@ -184,7 +183,7 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
   public PCollectionTuple expand(PCollection<KV<DestinationT, StorageApiWritePayload>> input) {
     String operationName = input.getName() + "/" + getName();
     BigQueryOptions options = input.getPipeline().getOptions().as(BigQueryOptions.class);
-    org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Preconditions.checkArgument(
+    org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument(
         !options.getUseStorageApiConnectionPool(),
         "useStorageApiConnectionPool only supported " + "when using STORAGE_API_AT_LEAST_ONCE");
     TupleTagList tupleTagList = TupleTagList.of(failedRowsTag);
@@ -279,7 +278,6 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
 
       private final boolean useDefaultStream;
       private TableSchema initialTableSchema;
-      private DescriptorProtos.DescriptorProto initialDescriptor;
       private Instant nextCacheTickle = Instant.MAX;
       private final int clientNumber;
       private final boolean usingMultiplexing;
@@ -304,7 +302,6 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
         this.maybeDatasetService = datasetService;
         this.useDefaultStream = useDefaultStream;
         this.initialTableSchema = messageConverter.getTableSchema();
-        this.initialDescriptor = messageConverter.getDescriptor(includeCdcColumns);
         this.clientNumber = new Random().nextInt(streamAppendClientCount);
         this.usingMultiplexing = usingMultiplexing;
         this.maxRequestSize = maxRequestSize;
@@ -362,13 +359,12 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
       }
 
       AppendClientInfo generateClient(@Nullable TableSchema updatedSchema) throws Exception {
-        SchemaAndDescriptor schemaAndDescriptor = getCurrentTableSchema(streamName, updatedSchema);
-
+        TableSchema tableSchema =
+            (updatedSchema != null) ? updatedSchema : getCurrentTableSchema(streamName);
         AtomicReference<AppendClientInfo> appendClientInfo =
             new AtomicReference<>(
                 AppendClientInfo.of(
-                    schemaAndDescriptor.tableSchema,
-                    schemaAndDescriptor.descriptor,
+                    tableSchema,
                     // Make sure that the client is always closed in a different thread to avoid
                     // blocking.
                     client ->
@@ -380,7 +376,8 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
                                 client.unpin();
                                 client.close();
                               }
-                            })));
+                            }),
+                    includeCdcColumns));
 
         CreateTableHelpers.createTableWrapper(
             () -> {
@@ -401,28 +398,8 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
         return appendClientInfo.get();
       }
 
-      private class SchemaAndDescriptor {
-        private final TableSchema tableSchema;
-        private final DescriptorProtos.DescriptorProto descriptor;
-
-        private SchemaAndDescriptor(
-            TableSchema tableSchema, DescriptorProtos.DescriptorProto descriptor) {
-          this.tableSchema = tableSchema;
-          this.descriptor = descriptor;
-        }
-      }
-
-      SchemaAndDescriptor getCurrentTableSchema(String stream, @Nullable TableSchema updatedSchema)
-          throws Exception {
-        if (updatedSchema != null) {
-          return new SchemaAndDescriptor(
-              updatedSchema,
-              TableRowToStorageApiProto.descriptorSchemaFromTableSchema(
-                  updatedSchema, true, includeCdcColumns));
-        }
-
+      TableSchema getCurrentTableSchema(String stream) throws Exception {
         AtomicReference<TableSchema> currentSchema = new AtomicReference<>(initialTableSchema);
-        AtomicBoolean updated = new AtomicBoolean();
         CreateTableHelpers.createTableWrapper(
             () -> {
               if (autoUpdateSchema) {
@@ -431,23 +408,12 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
                     Preconditions.checkStateNotNull(maybeDatasetService).getWriteStream(streamName);
                 if (writeStream != null && writeStream.hasTableSchema()) {
                   currentSchema.set(writeStream.getTableSchema());
-                  updated.set(true);
                 }
               }
               return null;
             },
             tryCreateTable);
-        // Note: While it may appear that these two branches are the same, it's important to return
-        // the actual
-        // initial descriptor if the schema has not changed. Simply converting the schema back into
-        // a descriptor isn't
-        // the same, and would break the direct-from-proto ingestion path.
-        DescriptorProtos.DescriptorProto descriptor =
-            updated.get()
-                ? TableRowToStorageApiProto.descriptorSchemaFromTableSchema(
-                    currentSchema.get(), true, includeCdcColumns)
-                : initialDescriptor;
-        return new SchemaAndDescriptor(currentSchema.get(), descriptor);
+        return currentSchema.get();
       }
 
       AppendClientInfo getAppendClientInfo(
@@ -589,9 +555,7 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
             TableRow failedRow =
                 TableRowToStorageApiProto.tableRowFromMessage(
                     DynamicMessage.parseFrom(
-                        TableRowToStorageApiProto.wrapDescriptorProto(
-                            getAppendClientInfo(true, null).getDescriptor()),
-                        rowBytes),
+                        getAppendClientInfo(true, null).getDescriptor(), rowBytes),
                     true);
             failedRowsReceiver.outputWithTimestamp(
                 new BigQueryStorageApiInsertError(
@@ -654,16 +618,14 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
                     TableRow failedRow =
                         TableRowToStorageApiProto.tableRowFromMessage(
                             DynamicMessage.parseFrom(
-                                TableRowToStorageApiProto.wrapDescriptorProto(
-                                    Preconditions.checkStateNotNull(appendClientInfo)
-                                        .getDescriptor()),
+                                Preconditions.checkStateNotNull(appendClientInfo).getDescriptor(),
                                 protoBytes),
                             true);
                     failedRowsReceiver.outputWithTimestamp(
                         new BigQueryStorageApiInsertError(
                             failedRow, error.getRowIndexToErrorMessage().get(failedIndex)),
                         timestamp);
-                  } catch (Exception e) {
+                  } catch (InvalidProtocolBufferException e) {
                     LOG.error("Failed to insert row and could not parse the result!", e);
                   }
                 }
@@ -754,14 +716,12 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
                     TableRow row =
                         TableRowToStorageApiProto.tableRowFromMessage(
                             DynamicMessage.parseFrom(
-                                TableRowToStorageApiProto.wrapDescriptorProto(
-                                    Preconditions.checkStateNotNull(appendClientInfo)
-                                        .getDescriptor()),
+                                Preconditions.checkStateNotNull(appendClientInfo).getDescriptor(),
                                 rowBytes),
                             true);
                     org.joda.time.Instant timestamp = c.timestamps.get(i);
                     successfulRowsReceiver.outputWithTimestamp(row, timestamp);
-                  } catch (Exception e) {
+                  } catch (InvalidProtocolBufferException e) {
                     LOG.warn("Failure parsing TableRow", e);
                   }
                 }
@@ -939,7 +899,6 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
                 c.getPipelineOptions().as(BigQueryOptions.class),
                 tableDestination1,
                 () -> dynamicDestinations.getSchema(destination),
-                () -> dynamicDestinations.getTableConstraints(destination),
                 createDisposition,
                 destinationCoder,
                 kmsKey,

@@ -40,7 +40,6 @@ github:
     - olehborysevych
     - rshamunov
     - andreydevyatkin
-    - liferoad
 
   enabled_merge_buttons:
     squash: true
@@ -49,7 +48,6 @@ github:
 
   protected_branches:
     master: {}
-    release-2.50.0: {}
     release-2.49.0: {}
     release-2.48.0: {}
     release-2.47.0: {}

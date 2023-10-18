@@ -27,10 +27,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestMain(m *testing.M) {
-	ptest.Main(m)
-}
-
 type testFile struct {
 	filename string
 	data     []byte

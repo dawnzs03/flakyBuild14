@@ -29,8 +29,6 @@ import (
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/log"
 	fnpb "github.com/apache/beam/sdks/v2/go/pkg/beam/model/fnexecution_v1"
 	"github.com/golang/protobuf/proto"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type writeTypeEnum int32
@@ -527,12 +525,7 @@ func (m *StateChannelManager) Open(ctx context.Context, port exec.Port) (*StateC
 		return nil, err
 	}
 	ch.forceRecreate = func(id string, err error) {
-		switch status.Code(err) {
-		case codes.Canceled:
-			// Don't log on context canceled path.
-		default:
-			log.Warnf(ctx, "forcing StateChannel[%v] reconnection on port %v due to %v", id, port, err)
-		}
+		log.Warnf(ctx, "forcing StateChannel[%v] reconnection on port %v due to %v", id, port, err)
 		m.mu.Lock()
 		delete(m.ports, port.URL)
 		m.mu.Unlock()

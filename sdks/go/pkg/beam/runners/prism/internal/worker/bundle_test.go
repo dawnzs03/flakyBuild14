@@ -17,7 +17,6 @@ package worker
 
 import (
 	"bytes"
-	"context"
 	"sync"
 	"testing"
 )
@@ -34,7 +33,7 @@ func TestBundle_ProcessOn(t *testing.T) {
 	var completed sync.WaitGroup
 	completed.Add(1)
 	go func() {
-		b.ProcessOn(context.Background(), wk)
+		b.ProcessOn(wk)
 		completed.Done()
 	}()
 	b.DataDone()

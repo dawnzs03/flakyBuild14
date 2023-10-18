@@ -22,10 +22,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import java.util.stream.Stream;
-import org.apache.beam.sdk.extensions.sql.TableUtils;
 import org.apache.beam.sdk.extensions.sql.impl.BeamSqlEnv;
 import org.apache.beam.sdk.extensions.sql.impl.ParseException;
 import org.apache.beam.sdk.extensions.sql.impl.parser.impl.BeamSqlParserImpl;
@@ -51,8 +50,8 @@ public class BeamDDLTest {
     TestTableProvider tableProvider = new TestTableProvider();
     BeamSqlEnv env = BeamSqlEnv.withTableProvider(tableProvider);
 
-    ObjectNode properties = TableUtils.emptyProperties();
-    ArrayNode hello = TableUtils.getObjectMapper().createArrayNode();
+    JSONObject properties = new JSONObject();
+    JSONArray hello = new JSONArray();
     hello.add("james");
     hello.add("bond");
     properties.put("hello", hello);
@@ -116,8 +115,8 @@ public class BeamDDLTest {
     TestTableProvider tableProvider = new TestTableProvider();
     BeamSqlEnv env = BeamSqlEnv.withTableProvider(tableProvider);
 
-    ObjectNode properties = TableUtils.emptyProperties();
-    ArrayNode hello = TableUtils.getObjectMapper().createArrayNode();
+    JSONObject properties = new JSONObject();
+    JSONArray hello = new JSONArray();
     hello.add("james");
     hello.add("bond");
     properties.put("hello", hello);
@@ -146,7 +145,7 @@ public class BeamDDLTest {
             + "COMMENT 'person table' \n"
             + "LOCATION '/home/admin/person'\n");
     assertEquals(
-        mockTable("person", "text", "person table", TableUtils.emptyProperties()),
+        mockTable("person", "text", "person table", new JSONObject()),
         tableProvider.getTables().get("person"));
   }
 
@@ -163,7 +162,7 @@ public class BeamDDLTest {
             + "COMMENT 'person table' \n");
 
     assertEquals(
-        mockTable("person", "text", "person table", TableUtils.emptyProperties(), null),
+        mockTable("person", "text", "person table", new JSONObject(), null),
         tableProvider.getTables().get("person"));
   }
 
@@ -181,7 +180,7 @@ public class BeamDDLTest {
             .schema(
                 Stream.of(Schema.Field.of("id", CalciteUtils.INTEGER).withNullable(true))
                     .collect(toSchema()))
-            .properties(TableUtils.emptyProperties())
+            .properties(new JSONObject())
             .build(),
         tableProvider.getTables().get("person"));
   }
@@ -250,12 +249,12 @@ public class BeamDDLTest {
         sqlWriter.toSqlString().getSql());
   }
 
-  private static Table mockTable(String name, String type, String comment, ObjectNode properties) {
+  private static Table mockTable(String name, String type, String comment, JSONObject properties) {
     return mockTable(name, type, comment, properties, "/home/admin/" + name);
   }
 
   private static Table mockTable(
-      String name, String type, String comment, ObjectNode properties, String location) {
+      String name, String type, String comment, JSONObject properties, String location) {
 
     return Table.builder()
         .name(name)

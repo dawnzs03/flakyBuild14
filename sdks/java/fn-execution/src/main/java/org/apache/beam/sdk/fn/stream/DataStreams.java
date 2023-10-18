@@ -17,7 +17,7 @@
  */
 package org.apache.beam.sdk.fn.stream;
 
-import static org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Preconditions.checkState;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.apache.beam.sdk.coders.Coder;
-import org.apache.beam.sdk.fn.data.WeightedList;
 import org.apache.beam.sdk.util.ByteStringOutputStream;
 import org.apache.beam.vendor.grpc.v1p54p0.com.google.protobuf.ByteString;
 
@@ -42,9 +41,6 @@ import org.apache.beam.vendor.grpc.v1p54p0.com.google.protobuf.ByteString;
 })
 public class DataStreams {
   public static final int DEFAULT_OUTBOUND_BUFFER_LIMIT_BYTES = 1_000_000;
-
-  /** The number of bytes to add to cache estimates for each element in the weighted list. */
-  private static final long BYTES_LIST_ELEMENT_OVERHEAD = 8L;
 
   /**
    * Converts a single element delimited {@link OutputStream} into multiple {@link ByteString
@@ -190,25 +186,16 @@ public class DataStreams {
      * ByteString} in the underlying {@link ByteString} {@link Iterator iterator} and decoding
      * elements till at the next boundary.
      */
-    public WeightedList<T> decodeFromChunkBoundaryToChunkBoundary() {
-      ByteString byteString = inputByteStrings.next();
-      inbound.currentStream = byteString.newInput();
+    public List<T> decodeFromChunkBoundaryToChunkBoundary() {
+      inbound.currentStream = inputByteStrings.next().newInput();
       inbound.position = 0;
-
       try {
         InputStream previousStream = inbound.currentStream;
         List<T> rvals = new ArrayList<>();
         while (previousStream == inbound.currentStream && inbound.currentStream.available() != 0) {
-          T next = next();
-          rvals.add(next);
+          rvals.add(next());
         }
-
-        // Uses the size of the ByteString as an approximation for the heap size occupied by the
-        // page, considering an overhead of {@link BYTES_LIST_ELEMENT_OVERHEAD} for each element.
-        long elementOverhead = rvals.size() * BYTES_LIST_ELEMENT_OVERHEAD;
-        long totalWeight = byteString.size() + elementOverhead;
-
-        return new WeightedList<>(rvals, totalWeight);
+        return rvals;
       } catch (IOException e) {
         throw new IllegalStateException(e);
       }

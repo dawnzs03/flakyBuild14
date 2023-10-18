@@ -511,10 +511,8 @@ class SlidingWindows(NonMergingWindowFn):
     timestamp = context.timestamp
     start = timestamp - ((timestamp - self.offset) % self.period)
     return [
-        IntervalWindow(
-            (interval_start := Timestamp(micros=s)),
-            interval_start + self.size,
-        ) for s in range(
+        IntervalWindow(Timestamp(micros=s), Timestamp(micros=s) + self.size)
+        for s in range(
             start.micros,
             timestamp.micros - self.size.micros,
             -self.period.micros)

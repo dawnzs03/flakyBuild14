@@ -393,8 +393,7 @@ func (c *control) handleInstruction(ctx context.Context, req *fnpb.InstructionRe
 		c.mu.Unlock()
 
 		if err != nil {
-			c.failed[instID] = err
-			return fail(ctx, instID, "ProcessBundle failed: %v", err)
+			return fail(ctx, instID, "Failed: %v", err)
 		}
 
 		tokens := msg.GetCacheTokens()
@@ -428,7 +427,6 @@ func (c *control) handleInstruction(ctx context.Context, req *fnpb.InstructionRe
 			// If there was an error on the data channel reads, fail this bundle
 			// since we may have had a short read.
 			c.failed[instID] = dataError
-			err = dataError
 		} else {
 			// Non failure plans should either be moved to the finalized state
 			// or to plans so they can be re-used.
@@ -708,6 +706,6 @@ func fail(ctx context.Context, id instructionID, format string, args ...any) *fn
 // dial to the specified endpoint. if timeout <=0, call blocks until
 // grpc.Dial succeeds.
 func dial(ctx context.Context, endpoint, purpose string, timeout time.Duration) (*grpc.ClientConn, error) {
-	log.Output(ctx, log.SevDebug, 1, fmt.Sprintf("Connecting via grpc @ %s for %s ...", endpoint, purpose))
+	log.Infof(ctx, "Connecting via grpc @ %s for %s ...", endpoint, purpose)
 	return grpcx.Dial(ctx, endpoint, timeout)
 }

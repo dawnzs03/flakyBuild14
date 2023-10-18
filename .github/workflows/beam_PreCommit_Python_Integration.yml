@@ -14,6 +14,7 @@
 # limitations under the License.
 
 name: PreCommit Python Integration
+
 on:
   push:
     branches: [ beam ]
@@ -50,32 +51,37 @@ on:
 
 
 
-
 jobs:
   beam_PreCommit_Python_Integration:
-    name: ${{matrix.job_name}} (${{matrix.job_phrase}} ${{matrix.python_version}})
-    runs-on: [self-hosted, ubuntu-20.04, main]
-    timeout-minutes: 180
+    name: beam_PreCommit_Python_Integration
     strategy:
       fail-fast: false
       matrix:
-        job_name: ['beam_PreCommit_Python_Integration']
-        job_phrase: ['Run Python_Integration PreCommit']
         python_version: ['3.8', '3.11']
     if: |
-      github.event_name == 'push' ||
-      github.event_name == 'pull_request_target' ||
-      github.event_name == 'schedule' ||
-      github.event_name == 'workflow_dispatch' ||
-      startsWith(github.event.comment.body, 'Run Python_Integration PreCommit')
+      github.event_name == 'push' || 
+      github.event_name == 'pull_request_target' || 
+      startsWith(github.event.comment.body, 'Run Python_Integration PreCommit') || 
+      github.event_name == 'schedule'
+    runs-on: [self-hosted, ubuntu-20.04, main]
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup repository
-        uses: ./.github/actions/setup-action
+      - name: Check out repository code
+        uses: actions/checkout@v3
         with:
-          comment_phrase: ${{ matrix.job_phrase }} ${{ matrix.python_version }}
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Set comment body with matrix
+        id: set_comment_body
+        run: |
+          echo "comment_body=Run Python_Integration PreCommit (${{ matrix.python_version }})" >> $GITHUB_OUTPUT
+      - name: Rerun on comment
+        if: github.event.comment.body == steps.set_comment_body.outputs.comment_body
+        uses: ./.github/actions/rerun-job-action
+        with:
+          pull_request_url: ${{ github.event.issue.pull_request.url }}
+          github_repository: ${{ github.repository }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }} ${{ matrix.python_version }})
+          github_job: "${{ github.job }} (${{ matrix.python_version }})"
+          github_current_run_id: ${{ github.run_id }}
       - name: Install Python
         uses: actions/setup-python@v4
         with:
@@ -89,26 +95,14 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           cache-read-only: false
-      - name: Set PY_VER_CLEAN
-        id: set_py_ver_clean
+      - name: run Python Integration PreCommit batch script
         run: |
           PY_VER=${{ matrix.python_version }}
-          PY_VER_CLEAN=${PY_VER//.}
-          echo "py_ver_clean=$PY_VER_CLEAN" >> $GITHUB_OUTPUT
-      - name: run Python Integration PreCommit batch script
-        uses: ./.github/actions/gradle-command-self-hosted-action
-        with:
-          gradle-command: :sdks:python:test-suites:dataflow:py${{steps.set_py_ver_clean.outputs.py_ver_clean}}:preCommitIT_batch
-          arguments: |
-            -PuseWheelDistribution \
-            -PpythonVersion=${{ matrix.python_version }} \
+          ./gradlew :sdks:python:test-suites:dataflow:py${PY_VER//.}:preCommitIT_batch -PuseWheelDistribution -PpythonVersion=${PY_VER}
       - name: run Python Integration PreCommit streaming script
-        uses: ./.github/actions/gradle-command-self-hosted-action
-        with:
-          gradle-command: :sdks:python:test-suites:dataflow:py${{steps.set_py_ver_clean.outputs.py_ver_clean}}:preCommitIT_streaming
-          arguments: |
-            -PuseWheelDistribution \
-            -PpythonVersion=${{ matrix.python_version }} \
+        run: |
+          PY_VER=${{ matrix.python_version }}
+          ./gradlew :sdks:python:test-suites:dataflow:py${PY_VER//.}:preCommitIT_streaming -PuseWheelDistribution -PpythonVersion=${PY_VER}
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
         with:

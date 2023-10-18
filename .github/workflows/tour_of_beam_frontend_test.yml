@@ -64,7 +64,7 @@ jobs:
           cd playground/frontend/playground_components_dev && flutter pub get && cd -
           cd learning/tour-of-beam/frontend && flutter pub get && cd -
 
-      - uses: nanasess/setup-chromedriver@v2
+      - uses: nanasess/setup-chromedriver@v1
 
       - name: 'Integration tests'
         run: |

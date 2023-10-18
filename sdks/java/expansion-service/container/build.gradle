@@ -60,9 +60,6 @@ task copyConfigFile(type: Copy) {
     into "build/target"
 }
 
-def useBuildx = project.containerPlatforms() != [project.nativeArchitecture()]
-def pushContainers = project.rootProject.hasProperty(["isRelease"]) || project.rootProject.hasProperty("push-containers")
-
 docker {
     name containerImageName(
             name: project.docker_image_default_repo_prefix + "java_expansion_service",
@@ -74,10 +71,8 @@ docker {
     // tags used by dockerTag task
     tags containerImageTags()
     files "./build"
-    buildx useBuildx
+    buildx project.containerPlatforms() != [project.nativeArchitecture()]
     platform(*project.containerPlatforms())
-    load useBuildx && !pushContainers
-    push pushContainers
 }
 
 dockerPrepare.dependsOn goBuild

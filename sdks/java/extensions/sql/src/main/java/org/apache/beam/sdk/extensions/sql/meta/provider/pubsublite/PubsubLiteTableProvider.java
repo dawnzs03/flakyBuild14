@@ -18,16 +18,15 @@
 package org.apache.beam.sdk.extensions.sql.meta.provider.pubsublite;
 
 import static org.apache.beam.sdk.util.Preconditions.checkArgumentNotNull;
-import static org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Preconditions.checkArgument;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.alibaba.fastjson.JSONObject;
 import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoOneOf;
 import com.google.cloud.pubsublite.SubscriptionPath;
 import com.google.cloud.pubsublite.TopicPath;
 import com.google.cloud.pubsublite.proto.PubSubMessage;
 import java.util.Optional;
-import org.apache.beam.sdk.extensions.sql.TableUtils;
 import org.apache.beam.sdk.extensions.sql.meta.BeamSqlTable;
 import org.apache.beam.sdk.extensions.sql.meta.Table;
 import org.apache.beam.sdk.extensions.sql.meta.provider.InMemoryMetaTableProvider;
@@ -79,16 +78,15 @@ public class PubsubLiteTableProvider extends InMemoryMetaTableProvider {
     return "pubsublite";
   }
 
-  private static Optional<PayloadSerializer> getSerializer(Schema schema, ObjectNode properties) {
+  private static Optional<PayloadSerializer> getSerializer(Schema schema, JSONObject properties) {
     if (schema.getField("payload").getType().equals(FieldType.BYTES)) {
       checkArgument(
-          !properties.has("format"),
+          !properties.containsKey("format"),
           "Must not set the 'format' property if not unpacking payload.");
       return Optional.empty();
     }
-    String format = properties.path("format").asText("json");
-    return Optional.of(
-        PayloadSerializers.getSerializer(format, schema, TableUtils.convertNode2Map(properties)));
+    String format = properties.containsKey("format") ? properties.getString("format") : "json";
+    return Optional.of(PayloadSerializers.getSerializer(format, schema, properties.getInnerMap()));
   }
 
   private static void checkFieldHasType(Field field, FieldType type) {
@@ -167,9 +165,9 @@ public class PubsubLiteTableProvider extends InMemoryMetaTableProvider {
 
   private static <InputT, OutputT>
       PTransform<PCollection<? extends InputT>, PCollection<OutputT>> addDlqIfPresent(
-          SimpleFunction<InputT, OutputT> transform, ObjectNode properties) {
-    if (properties.has("deadLetterQueue")) {
-      return new DeadLetteredTransform<>(transform, properties.get("deadLetterQueue").asText());
+          SimpleFunction<InputT, OutputT> transform, JSONObject properties) {
+    if (properties.containsKey("deadLetterQueue")) {
+      return new DeadLetteredTransform<>(transform, properties.getString("deadLetterQueue"));
     }
     return MapElements.via(transform);
   }

@@ -32,7 +32,6 @@ import (
 	_ "github.com/apache/beam/sdks/v2/go/pkg/beam/runners/direct"
 	_ "github.com/apache/beam/sdks/v2/go/pkg/beam/runners/dot"
 	_ "github.com/apache/beam/sdks/v2/go/pkg/beam/runners/flink"
-	_ "github.com/apache/beam/sdks/v2/go/pkg/beam/runners/prism"
 	_ "github.com/apache/beam/sdks/v2/go/pkg/beam/runners/samza"
 	_ "github.com/apache/beam/sdks/v2/go/pkg/beam/runners/spark"
 	_ "github.com/apache/beam/sdks/v2/go/pkg/beam/runners/universal"
@@ -40,7 +39,7 @@ import (
 
 var (
 	runner        = runners.Runner
-	defaultRunner = "prism"
+	defaultRunner = "direct"
 )
 
 func getRunner() string {
@@ -52,7 +51,7 @@ func getRunner() string {
 }
 
 // Run invokes beam.Run with the runner supplied by the flag "runner". It
-// defaults to the prism runner, but all beam-distributed runners and textio
+// defaults to the direct runner, but all beam-distributed runners and textio
 // filesystems are implicitly registered.
 func Run(ctx context.Context, p *beam.Pipeline) error {
 	_, err := beam.Run(ctx, getRunner(), p)

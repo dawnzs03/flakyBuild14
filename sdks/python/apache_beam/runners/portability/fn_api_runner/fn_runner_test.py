@@ -1354,7 +1354,8 @@ class FnApiRunnerTest(unittest.TestCase):
     with self.create_pipeline() as p:
       _ = p | beam.Create([10, 20, 30]) | PackableCombines()
 
-    res = p.result
+    res = p.run()
+    res.wait_until_finish()
 
     packed_step_name_regex = (
         r'.*Packed.*PackableMin.*CombinePerKey.*PackableMax.*CombinePerKey.*' +
@@ -1373,15 +1374,6 @@ class FnApiRunnerTest(unittest.TestCase):
 
   def test_pack_combiners(self):
     self._test_pack_combiners(assert_using_counter_names=True)
-
-  def test_group_by_key_with_empty_pcoll_elements(self):
-    with self.create_pipeline() as p:
-      res = (
-          p
-          | beam.Create([('test_key', 'test_value')])
-          | beam.Filter(lambda x: False)
-          | beam.GroupByKey())
-      assert_that(res, equal_to([]))
 
 
 # These tests are kept in a separate group so that they are

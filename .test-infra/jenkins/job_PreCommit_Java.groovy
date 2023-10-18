@@ -34,7 +34,6 @@ def excludePaths = [
   'io/elasticsearch',
   'io/elasticsearch-tests',
   'io/file-schema-transform',
-  'io/google-ads',
   'io/google-cloud-platform',
   'io/hadoop-common',
   'io/hadoop-file-system',

@@ -99,7 +99,6 @@ public class ResumeFromPreviousPipelineActionTest {
         new MetadataTableAdminDao(
             adminClient, null, changeStreamId, MetadataTableAdminDao.DEFAULT_METADATA_TABLE_NAME);
     metadataTableAdminDao.createMetadataTable();
-    metadataTableAdminDao.cleanUpPrefix();
     metadataTableDao =
         new MetadataTableDao(
             dataClient,

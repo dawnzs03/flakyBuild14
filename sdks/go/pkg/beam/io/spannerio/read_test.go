@@ -27,10 +27,6 @@ import (
 	spannertest "github.com/apache/beam/sdks/v2/go/test/integration/io/spannerio"
 )
 
-func TestMain(m *testing.M) {
-	ptest.Main(m)
-}
-
 func TestRead(t *testing.T) {
 	ctx := context.Background()
 
@@ -106,7 +102,7 @@ func TestRead(t *testing.T) {
 
 			p, s := beam.NewPipelineWithRoot()
 			fn := newQueryFn(testCase.database, "SELECT * from "+testCase.table, reflect.TypeOf(TestDto{}), queryOptions{})
-			fn.TestEndpoint = srv.Addr
+			fn.endpoint = srv.Addr
 
 			imp := beam.Impulse(s)
 			rows := beam.ParDo(s, fn, imp, beam.TypeDefinition{Var: beam.XType, T: reflect.TypeOf(TestDto{})})

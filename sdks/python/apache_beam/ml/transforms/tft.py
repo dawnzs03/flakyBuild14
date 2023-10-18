@@ -101,7 +101,6 @@ class TFTOperation(BaseOperation[common_types.TensorType,
     """
     return {}
 
-  @tf.function
   def _split_string_with_delimiter(self, data, delimiter):
     """
     only applicable to string columns.
@@ -126,10 +125,6 @@ class TFTOperation(BaseOperation[common_types.TensorType,
     # to preserve the original column name.
     data = tf.sparse.SparseTensor(
         indices=data.indices, values=data.values, dense_shape=data.dense_shape)
-    # for list of string, batch dimensions becomes inverted after tf.map_fn,
-    #  transpose the data to get the original shape.
-    if tf.shape(data)[1] == 1:
-      data = tf.sparse.transpose(data)
     return data
 
 
@@ -182,11 +177,9 @@ class ComputeAndApplyVocabulary(TFTOperation):
   def apply_transform(
       self, data: common_types.TensorType,
       output_column_name: str) -> Dict[str, common_types.TensorType]:
-
     if self.split_string_by_delimiter:
       data = self._split_string_with_delimiter(
           data, self.split_string_by_delimiter)
-
     return {
         output_column_name: tft.compute_and_apply_vocabulary(
             x=data,
@@ -448,8 +441,7 @@ class TFIDF(TFTOperation):
     self.tfidf_weight = None
 
   def apply_transform(
-      self, data: common_types.TensorType,
-      output_column_name: str) -> common_types.TensorType:
+      self, data: tf.SparseTensor, output_column_name: str) -> tf.SparseTensor:
 
     if self.vocab_size is None:
       try:
@@ -508,8 +500,7 @@ class ScaleByMinMax(TFTOperation):
       raise ValueError('max_value must be greater than min_value')
 
   def apply_transform(
-      self, data: common_types.TensorType,
-      output_column_name: str) -> common_types.TensorType:
+      self, data: tf.Tensor, output_column_name: str) -> tf.Tensor:
 
     output = tft.scale_by_min_max(
         x=data, output_min=self.min_value, output_max=self.max_value)
@@ -547,9 +538,8 @@ class NGrams(TFTOperation):
     self.name = name
     self.split_string_by_delimiter = split_string_by_delimiter
 
-  def apply_transform(
-      self, data: common_types.TensorType,
-      output_column_name: str) -> Dict[str, common_types.TensorType]:
+  def apply_transform(self, data: tf.SparseTensor,
+                      output_column_name: str) -> Dict[str, tf.SparseTensor]:
     if self.split_string_by_delimiter:
       data = self._split_string_with_delimiter(
           data, self.split_string_by_delimiter)

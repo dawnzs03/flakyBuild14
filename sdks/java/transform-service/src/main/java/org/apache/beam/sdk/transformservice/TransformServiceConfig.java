@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("nullness")
 @AutoValue
 public abstract class TransformServiceConfig {
   public abstract List<String> getExpansionservices();

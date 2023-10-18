@@ -1,5 +1,5 @@
 ---
-title: "Try Beam Playground"
+title: "Try Beam Playground (Beta)"
 ---
 <!--
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Try Beam Playground
+# Try Beam Playground (Beta)
 
 Beam Playground is an interactive environment to try out Beam transforms and examples
 without having to install Apache Beam in your environment.

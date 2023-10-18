@@ -34,7 +34,7 @@ func queryMetrics(pr beam.PipelineResult, ns, n string) metrics.QueryResults {
 
 // [END metrics_query]
 
-var runner = "prism"
+var runner = "direct"
 
 // [START metrics_pipeline]
 

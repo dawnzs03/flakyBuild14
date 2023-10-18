@@ -70,13 +70,6 @@ def parse_known_args(argv):
       dest='model_path',
       required=True,
       help='Path to load the Tensorflow model for Inference.')
-  parser.add_argument(
-      '--large_model',
-      action='store_true',
-      dest='large_model',
-      default=False,
-      help='Set to true if your model is large enough to run into memory '
-      'pressure if you load multiple copies.')
   return parser.parse_known_args(argv)
 
 
@@ -96,9 +89,7 @@ def run(
   # Therefore, we use KeyedModelHandler wrapper over TFModelHandlerNumpy.
   model_loader = KeyedModelHandler(
       TFModelHandlerNumpy(
-          model_uri=known_args.model_path,
-          model_type=ModelType.SAVED_MODEL,
-          large_model=known_args.large_model))
+          model_uri=known_args.model_path, model_type=ModelType.SAVED_MODEL))
 
   pipeline = test_pipeline
   if not test_pipeline:

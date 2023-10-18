@@ -17,7 +17,7 @@
  */
 package org.apache.beam.sdk.io.gcp.bigquery;
 
-import static org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Preconditions.checkArgument;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutures;
@@ -29,7 +29,6 @@ import com.google.cloud.bigquery.storage.v1.ProtoRows;
 import com.google.cloud.bigquery.storage.v1.TableSchema;
 import com.google.cloud.bigquery.storage.v1.WriteStream.Type;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.DescriptorProtos;
 import io.grpc.Status;
 import io.grpc.Status.Code;
 import java.io.IOException;
@@ -89,14 +88,14 @@ import org.apache.beam.sdk.values.PCollectionTuple;
 import org.apache.beam.sdk.values.TupleTag;
 import org.apache.beam.sdk.values.TupleTagList;
 import org.apache.beam.sdk.values.TypeDescriptor;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.MoreObjects;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Strings;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.cache.Cache;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.cache.CacheBuilder;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.cache.RemovalNotification;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.Iterables;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.Lists;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.Maps;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.MoreObjects;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Strings;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.cache.Cache;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.cache.CacheBuilder;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.cache.RemovalNotification;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.Iterables;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.Lists;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.Maps;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.joda.time.Duration;
@@ -441,12 +440,10 @@ public class StorageApiWritesShardedRecords<DestinationT extends @NonNull Object
       Coder<DestinationT> destinationCoder = dynamicDestinations.getDestinationCoder();
       Callable<Boolean> tryCreateTable =
           () -> {
-            DestinationT dest = element.getKey().getKey();
             CreateTableHelpers.possiblyCreateTable(
                 c.getPipelineOptions().as(BigQueryOptions.class),
                 tableDestination,
-                () -> dynamicDestinations.getSchema(dest),
-                () -> dynamicDestinations.getTableConstraints(dest),
+                () -> dynamicDestinations.getSchema(element.getKey().getKey()),
                 createDisposition,
                 destinationCoder,
                 kmsKey,
@@ -461,28 +458,21 @@ public class StorageApiWritesShardedRecords<DestinationT extends @NonNull Object
       Callable<AppendClientInfo> getAppendClientInfo =
           () -> {
             @Nullable TableSchema tableSchema;
-            DescriptorProtos.DescriptorProto descriptor;
-            TableSchema updatedSchemaValue = updatedSchema.read();
-            if (autoUpdateSchema && updatedSchemaValue != null) {
-              // We've seen an updated schema, so we use that instead of querying the
-              // MessageConverter.
-              tableSchema = updatedSchemaValue;
-              descriptor =
-                  TableRowToStorageApiProto.descriptorSchemaFromTableSchema(
-                      tableSchema, true, false);
+            if (autoUpdateSchema && updatedSchema.read() != null) {
+              // We've seen an updated schema, so we use that.
+              tableSchema = updatedSchema.read();
             } else {
               // Start off with the base schema. As we get notified of schema updates, we
-              // will update the descriptor.
-              StorageApiDynamicDestinations.MessageConverter<?> converter =
-                  messageConverters.get(
-                      element.getKey().getKey(), dynamicDestinations, datasetService);
-              tableSchema = converter.getTableSchema();
-              descriptor = converter.getDescriptor(false);
+              // will update the
+              // descriptor.
+              tableSchema =
+                  messageConverters
+                      .get(element.getKey().getKey(), dynamicDestinations, datasetService)
+                      .getTableSchema();
             }
             AppendClientInfo info =
                 AppendClientInfo.of(
                         Preconditions.checkStateNotNull(tableSchema),
-                        descriptor,
                         // Make sure that the client is always closed in a different thread
                         // to
                         // avoid blocking.
@@ -493,7 +483,8 @@ public class StorageApiWritesShardedRecords<DestinationT extends @NonNull Object
                                   // Remove the pin that is "owned" by the cache.
                                   client.unpin();
                                   client.close();
-                                }))
+                                }),
+                        false)
                     .withAppendClient(datasetService, getOrCreateStream, false);
             // This pin is "owned" by the cache.
             Preconditions.checkStateNotNull(info.getStreamAppendClient()).pin();

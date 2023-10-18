@@ -41,11 +41,7 @@ spec:
       %{~ for label in labels ~}
         - ${label}
       %{~ endfor ~}
-      env:
-      - name: POD_UID
-        valueFrom:
-          fieldRef:
-            fieldPath: metadata.uid
+      env: []
       resources:
         requests:
           cpu: ${requests.cpu}

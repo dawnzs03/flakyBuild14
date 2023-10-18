@@ -17,7 +17,9 @@
  */
 package org.apache.beam.sdk.extensions.sql.meta.provider.bigquery;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.MoreObjects.firstNonNull;
+
+import com.alibaba.fastjson.JSONObject;
 import com.google.auto.service.AutoService;
 import org.apache.beam.sdk.extensions.sql.meta.BeamSqlTable;
 import org.apache.beam.sdk.extensions.sql.meta.Table;
@@ -54,10 +56,10 @@ public class BigQueryTableProvider extends InMemoryMetaTableProvider {
     return new BigQueryTable(table, getConversionOptions(table.getProperties()));
   }
 
-  protected static ConversionOptions getConversionOptions(ObjectNode properties) {
+  protected static ConversionOptions getConversionOptions(JSONObject properties) {
     return ConversionOptions.builder()
         .setTruncateTimestamps(
-            properties.path("truncateTimestamps").asBoolean(false)
+            firstNonNull(properties.getBoolean("truncateTimestamps"), false)
                 ? TruncateTimestamps.TRUNCATE
                 : TruncateTimestamps.REJECT)
         .build();

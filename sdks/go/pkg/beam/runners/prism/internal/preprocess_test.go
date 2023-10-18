@@ -20,7 +20,6 @@ import (
 
 	pipepb "github.com/apache/beam/sdks/v2/go/pkg/beam/model/pipeline_v1"
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
@@ -74,10 +73,7 @@ func Test_preprocessor_preProcessGraph(t *testing.T) {
 				Environments:        map[string]*pipepb.Environment{},
 			},
 
-			wantStages: []*stage{
-				{transforms: []string{"e1_early"}, envID: "env1",
-					outputs: []link{{transform: "e1_early", local: "i0", global: "pcol1"}}},
-				{transforms: []string{"e1_late"}, envID: "env1", primaryInput: "pcol1"}},
+			wantStages: []*stage{{transforms: []string{"e1_early"}}, {transforms: []string{"e1_late"}}},
 			wantComponents: &pipepb.Components{
 				Transforms: map[string]*pipepb.PTransform{
 					// Original is always kept
@@ -128,11 +124,11 @@ func Test_preprocessor_preProcessGraph(t *testing.T) {
 			pre := newPreprocessor([]transformPreparer{&testPreparer{}})
 
 			gotStages := pre.preProcessGraph(test.input)
-			if diff := cmp.Diff(test.wantStages, gotStages, cmp.AllowUnexported(stage{}, link{}), cmpopts.EquateEmpty()); diff != "" {
+			if diff := cmp.Diff(test.wantStages, gotStages, cmp.AllowUnexported(stage{})); diff != "" {
 				t.Errorf("preProcessGraph(%q) stages diff (-want,+got)\n%v", test.name, diff)
 			}
 
-			if diff := cmp.Diff(test.wantComponents, test.input, protocmp.Transform()); diff != "" {
+			if diff := cmp.Diff(test.input, test.wantComponents, protocmp.Transform()); diff != "" {
 				t.Errorf("preProcessGraph(%q) components diff (-want,+got)\n%v", test.name, diff)
 			}
 		})

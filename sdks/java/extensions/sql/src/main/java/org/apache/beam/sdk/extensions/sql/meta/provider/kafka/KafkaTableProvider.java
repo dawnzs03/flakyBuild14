@@ -19,14 +19,12 @@ package org.apache.beam.sdk.extensions.sql.meta.provider.kafka;
 
 import static org.apache.beam.sdk.extensions.sql.meta.provider.kafka.Schemas.PAYLOAD_FIELD;
 import static org.apache.beam.sdk.util.Preconditions.checkArgumentNotNull;
-import static org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Preconditions.checkArgument;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.alibaba.fastjson.JSONObject;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Optional;
-import org.apache.beam.sdk.extensions.sql.TableUtils;
 import org.apache.beam.sdk.extensions.sql.meta.BeamSqlTable;
 import org.apache.beam.sdk.extensions.sql.meta.Table;
 import org.apache.beam.sdk.extensions.sql.meta.provider.InMemoryMetaTableProvider;
@@ -34,10 +32,10 @@ import org.apache.beam.sdk.extensions.sql.meta.provider.TableProvider;
 import org.apache.beam.sdk.schemas.Schema;
 import org.apache.beam.sdk.schemas.io.payloads.PayloadSerializer;
 import org.apache.beam.sdk.schemas.io.payloads.PayloadSerializers;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Splitter;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Strings;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.ImmutableList;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.Iterables;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Splitter;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Strings;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableList;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.Iterables;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -82,11 +80,11 @@ public class KafkaTableProvider extends InMemoryMetaTableProvider {
     return parsed;
   }
 
-  private static List<String> mergeParam(Optional<String> initial, @Nullable ArrayNode toMerge) {
+  private static List<String> mergeParam(Optional<String> initial, @Nullable List<Object> toMerge) {
     ImmutableList.Builder<String> merged = ImmutableList.builder();
     initial.ifPresent(merged::add);
     if (toMerge != null) {
-      toMerge.forEach(o -> merged.add(o.asText()));
+      toMerge.forEach(o -> merged.add(o.toString()));
     }
     return merged.build();
   }
@@ -94,23 +92,23 @@ public class KafkaTableProvider extends InMemoryMetaTableProvider {
   @Override
   public BeamSqlTable buildBeamSqlTable(Table table) {
     Schema schema = table.getSchema();
-    ObjectNode properties = table.getProperties();
+    JSONObject properties = table.getProperties();
 
     Optional<ParsedLocation> parsedLocation = Optional.empty();
     if (!Strings.isNullOrEmpty(table.getLocation())) {
       parsedLocation = Optional.of(parseLocation(checkArgumentNotNull(table.getLocation())));
     }
     List<String> topics =
-        mergeParam(parsedLocation.map(loc -> loc.topic), (ArrayNode) properties.get("topics"));
+        mergeParam(parsedLocation.map(loc -> loc.topic), properties.getJSONArray("topics"));
     List<String> allBootstrapServers =
         mergeParam(
             parsedLocation.map(loc -> loc.brokerLocation),
-            (ArrayNode) properties.get("bootstrap_servers"));
+            properties.getJSONArray("bootstrap_servers"));
     String bootstrapServers = String.join(",", allBootstrapServers);
 
     Optional<String> payloadFormat =
-        properties.has("format")
-            ? Optional.of(properties.get("format").asText())
+        properties.containsKey("format")
+            ? Optional.of(properties.getString("format"))
             : Optional.empty();
     if (Schemas.isNestedSchema(schema)) {
       Optional<PayloadSerializer> serializer =
@@ -119,7 +117,7 @@ public class KafkaTableProvider extends InMemoryMetaTableProvider {
                   PayloadSerializers.getSerializer(
                       format,
                       checkArgumentNotNull(schema.getField(PAYLOAD_FIELD).getType().getRowSchema()),
-                      TableUtils.convertNode2Map(properties)));
+                      properties.getInnerMap()));
       return new NestedPayloadKafkaTable(schema, bootstrapServers, topics, serializer);
     } else {
       /*
@@ -132,8 +130,7 @@ public class KafkaTableProvider extends InMemoryMetaTableProvider {
         return new BeamKafkaCSVTable(schema, bootstrapServers, topics);
       }
       PayloadSerializer serializer =
-          PayloadSerializers.getSerializer(
-              payloadFormat.get(), schema, TableUtils.convertNode2Map(properties));
+          PayloadSerializers.getSerializer(payloadFormat.get(), schema, properties.getInnerMap());
       return new PayloadSerializerKafkaTable(schema, bootstrapServers, topics, serializer);
     }
   }

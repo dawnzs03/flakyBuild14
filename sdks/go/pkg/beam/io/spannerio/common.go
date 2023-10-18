@@ -18,10 +18,9 @@
 package spannerio
 
 import (
+	"cloud.google.com/go/spanner"
 	"context"
 	"fmt"
-
-	"cloud.google.com/go/spanner"
 	"google.golang.org/api/option"
 	"google.golang.org/api/option/internaloption"
 	"google.golang.org/grpc"
@@ -29,9 +28,9 @@ import (
 )
 
 type spannerFn struct {
-	Database     string          `json:"database"` // Database is the spanner connection string
-	TestEndpoint string          // Optional endpoint override for local testing. Not required for production pipelines.
-	client       *spanner.Client // Spanner Client
+	Database string          `json:"database"` // Database is the spanner connection string
+	endpoint string          // Override spanner endpoint in tests
+	client   *spanner.Client // Spanner Client
 }
 
 func newSpannerFn(db string) spannerFn {
@@ -49,9 +48,9 @@ func (f *spannerFn) Setup(ctx context.Context) error {
 		var opts []option.ClientOption
 
 		// Append emulator options assuming endpoint is local (for testing).
-		if f.TestEndpoint != "" {
+		if f.endpoint != "" {
 			opts = []option.ClientOption{
-				option.WithEndpoint(f.TestEndpoint),
+				option.WithEndpoint(f.endpoint),
 				option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())),
 				option.WithoutAuthentication(),
 				internaloption.SkipDialSettingsValidation(),

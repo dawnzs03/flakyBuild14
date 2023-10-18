@@ -38,7 +38,6 @@ public class PeriodicImpulse extends PTransform<PBegin, PCollection<Instant>> {
   Instant stopTimestamp = BoundedWindow.TIMESTAMP_MAX_VALUE;
   Duration fireInterval = Duration.standardMinutes(1);
   boolean applyWindowing = false;
-  boolean catchUpToNow = true;
 
   private PeriodicImpulse() {}
 
@@ -66,16 +65,6 @@ public class PeriodicImpulse extends PTransform<PBegin, PCollection<Instant>> {
     return this;
   }
 
-  /**
-   * The default behavior is that PeriodicImpulse emits all instants until Instant.now(), then
-   * starts firing at the specified interval. If this is set to false, the PeriodicImpulse will
-   * perform the interval wait before firing each instant.
-   */
-  public PeriodicImpulse catchUpToNow(boolean catchUpToNow) {
-    this.catchUpToNow = catchUpToNow;
-    return this;
-  }
-
   @Override
   public PCollection<Instant> expand(PBegin input) {
     PCollection<Instant> result =
@@ -83,7 +72,7 @@ public class PeriodicImpulse extends PTransform<PBegin, PCollection<Instant>> {
             .apply(
                 Create.<PeriodicSequence.SequenceDefinition>of(
                     new PeriodicSequence.SequenceDefinition(
-                        startTimestamp, stopTimestamp, fireInterval, catchUpToNow)))
+                        startTimestamp, stopTimestamp, fireInterval)))
             .apply(PeriodicSequence.create());
 
     if (this.applyWindowing) {

@@ -22,10 +22,7 @@ from google.auth.transport import requests
 
 
 class DicomApiHttpClient:
-  """Creates a client that communicates with the GCP Healthcare API
-  (https://cloud.google.com/healthcare-api), over HTTP.
-  Note that this client strictly uses v1 of this API."""
-
+  """DICOM api client that talk to api via http request"""
   healthcare_base_url = "https://healthcare.googleapis.com/v1"
   session = None
 
@@ -49,9 +46,9 @@ class DicomApiHttpClient:
       search_type,
       params=None,
       credential=None):
-    """Function for searching a DICOM store"""
+    """function for searching a DICOM store"""
 
-    # Sends a request to the GCP HCLS API v1.
+    # sending request to the REST healthcare api.
     api_endpoint = "{}/projects/{}/locations/{}".format(
         self.healthcare_base_url, project_id, region)
 
@@ -108,7 +105,7 @@ class DicomApiHttpClient:
       dicom_store_id,
       dcm_file,
       credential=None):
-    """Function for storing a DICOM instance."""
+    """function for storing an instance."""
 
     api_endpoint = "{}/projects/{}/locations/{}".format(
         self.healthcare_base_url, project_id, region)

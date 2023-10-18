@@ -17,6 +17,8 @@
  */
 package org.apache.beam.sdk.extensions.sql.meta.provider.bigquery;
 
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.MoreObjects.firstNonNull;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.beam.sdk.extensions.sql.meta.BeamSqlTable;
@@ -57,7 +59,7 @@ public class BigQueryTestTableProvider extends BigQueryTableProvider {
             table,
             BigQueryUtils.ConversionOptions.builder()
                 .setTruncateTimestamps(
-                    table.getProperties().path("truncateTimestamps").asBoolean(false)
+                    firstNonNull(table.getProperties().getBoolean("truncateTimestamps"), false)
                         ? BigQueryUtils.ConversionOptions.TruncateTimestamps.TRUNCATE
                         : BigQueryUtils.ConversionOptions.TruncateTimestamps.REJECT)
                 .build());

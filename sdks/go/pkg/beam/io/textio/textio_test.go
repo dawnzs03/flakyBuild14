@@ -17,6 +17,7 @@
 package textio
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -24,18 +25,9 @@ import (
 
 	"github.com/apache/beam/sdks/v2/go/pkg/beam"
 	_ "github.com/apache/beam/sdks/v2/go/pkg/beam/io/filesystem/local"
-	"github.com/apache/beam/sdks/v2/go/pkg/beam/register"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/testing/passert"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/testing/ptest"
 )
-
-func TestMain(m *testing.M) {
-	ptest.Main(m)
-}
-
-func init() {
-	register.Function2x1(toKV)
-}
 
 const testDir = "../../../../data"
 
@@ -152,7 +144,9 @@ func TestReadSdf(t *testing.T) {
 	lines := ReadSdf(s, testFilePath)
 	passert.Count(s, lines, "NumLines", 1)
 
-	ptest.RunAndValidate(t, p)
+	if _, err := beam.Run(context.Background(), "direct", p); err != nil {
+		t.Fatalf("Failed to execute job: %v", err)
+	}
 }
 
 func TestReadAllSdf(t *testing.T) {
@@ -161,5 +155,7 @@ func TestReadAllSdf(t *testing.T) {
 	lines := ReadAllSdf(s, files)
 	passert.Count(s, lines, "NumLines", 1)
 
-	ptest.RunAndValidate(t, p)
+	if _, err := beam.Run(context.Background(), "direct", p); err != nil {
+		t.Fatalf("Failed to execute job: %v", err)
+	}
 }

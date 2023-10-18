@@ -27,8 +27,6 @@ import (
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/internal/errors"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/log"
 	fnpb "github.com/apache/beam/sdks/v2/go/pkg/beam/model/fnexecution_v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -130,12 +128,7 @@ func (m *DataChannelManager) Open(ctx context.Context, port exec.Port) (*DataCha
 		return nil, err
 	}
 	ch.forceRecreate = func(id string, err error) {
-		switch status.Code(err) {
-		case codes.Canceled:
-			// Don't log on context canceled path.
-		default:
-			log.Warnf(ctx, "forcing DataChannel[%v] reconnection on port %v due to %v", id, port, err)
-		}
+		log.Warnf(ctx, "forcing DataChannel[%v] reconnection on port %v due to %v", id, port, err)
 		m.mu.Lock()
 		delete(m.ports, port.URL)
 		m.mu.Unlock()
@@ -378,8 +371,7 @@ func (c *DataChannel) read(ctx context.Context) {
 			c.terminateStreamOnError(err)
 			c.mu.Unlock()
 
-			st := status.Code(err)
-			if st == codes.Canceled || err == io.EOF {
+			if err == io.EOF {
 				return
 			}
 			log.Errorf(ctx, "DataChannel.read %v bad: %v", c.id, err)

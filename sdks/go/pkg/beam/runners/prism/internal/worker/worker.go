@@ -23,8 +23,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"strconv"
-	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -97,7 +95,7 @@ func New(id string) *W {
 
 		D: &DataService{},
 	}
-	slog.Debug("Serving Worker components", slog.String("endpoint", wk.Endpoint()))
+	slog.Info("Serving Worker components", slog.String("endpoint", wk.Endpoint()))
 	fnpb.RegisterBeamFnControlServer(wk.server, wk)
 	fnpb.RegisterBeamFnDataServer(wk.server, wk)
 	fnpb.RegisterBeamFnLoggingServer(wk.server, wk)
@@ -193,18 +191,8 @@ func (wk *W) Logging(stream fnpb.BeamFnLogging_LoggingServer) error {
 			if l.Severity >= minsev {
 				// TODO: Connect to the associated Job for this worker instead of
 				// logging locally for SDK side logging.
-				file := l.GetLogLocation()
-				i := strings.LastIndex(file, ":")
-				line, _ := strconv.Atoi(file[i+1:])
-				if i > 0 {
-					file = file[:i]
-				}
-
 				slog.LogAttrs(context.TODO(), toSlogSev(l.GetSeverity()), l.GetMessage(),
-					slog.Any(slog.SourceKey, &slog.Source{
-						File: file,
-						Line: line,
-					}),
+					slog.String(slog.SourceKey, l.GetLogLocation()),
 					slog.Time(slog.TimeKey, l.GetTimestamp().AsTime()),
 					slog.Any("worker", wk),
 				)
@@ -268,6 +256,11 @@ func (wk *W) Control(ctrl fnpb.BeamFnControl_ControlServer) error {
 			// TODO: Do more than assume these are ProcessBundleResponses.
 			wk.mu.Lock()
 			if b, ok := wk.activeInstructions[resp.GetInstructionId()]; ok {
+				// TODO. Better pipeline error handling.
+				if resp.Error != "" {
+					slog.LogAttrs(ctrl.Context(), slog.LevelError, "ctrl.Recv pipeline error",
+						slog.String("error", resp.GetError()))
+				}
 				b.Respond(resp)
 			} else {
 				slog.Debug("ctrl.Recv: %v", resp)
@@ -279,10 +272,7 @@ func (wk *W) Control(ctrl fnpb.BeamFnControl_ControlServer) error {
 	for {
 		select {
 		case req := <-wk.InstReqs:
-			err := ctrl.Send(req)
-			if err != nil {
-				return err
-			}
+			ctrl.Send(req)
 		case <-ctrl.Context().Done():
 			slog.Debug("Control context canceled")
 			return ctrl.Context().Err()
@@ -336,20 +326,13 @@ func (wk *W) Data(data fnpb.BeamFnData_DataServer) error {
 			wk.mu.Unlock()
 		}
 	}()
-	for {
-		select {
-		case req, ok := <-wk.DataReqs:
-			if !ok {
-				return nil
-			}
-			if err := data.Send(req); err != nil {
-				slog.LogAttrs(context.TODO(), slog.LevelDebug, "data.Send error", slog.Any("error", err))
-			}
-		case <-data.Context().Done():
-			slog.Debug("Data context canceled")
-			return data.Context().Err()
+
+	for req := range wk.DataReqs {
+		if err := data.Send(req); err != nil {
+			slog.LogAttrs(context.TODO(), slog.LevelDebug, "data.Send error", slog.Any("error", err))
 		}
 	}
+	return nil
 }
 
 // State relays elements and timer bytes to SDKs and back again, coordinated via

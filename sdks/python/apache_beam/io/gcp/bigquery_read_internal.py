@@ -63,7 +63,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def bigquery_export_destination_uri(
-    gcs_location_vp: Union[str, Optional[ValueProvider]],
+    gcs_location_vp: Optional[ValueProvider],
     temp_location: Optional[str],
     unique_id: str,
     directory_only: bool = False,
@@ -75,10 +75,7 @@ def bigquery_export_destination_uri(
 
   gcs_location = None
   if gcs_location_vp is not None:
-    if isinstance(gcs_location_vp, ValueProvider):
-      gcs_location = gcs_location_vp.get()
-    else:
-      gcs_location = gcs_location_vp
+    gcs_location = gcs_location_vp.get()
 
   if gcs_location is not None:
     gcs_base = gcs_location
@@ -147,16 +144,13 @@ class _PassThroughThenCleanupTempDatasets(PTransform):
     self.side_input = side_input
 
   def expand(self, input):
-    pipeline_options = input.pipeline.options
-
     class PassThrough(beam.DoFn):
       def process(self, element):
         yield element
 
     class CleanUpProjects(beam.DoFn):
       def process(self, unused_element, unused_signal, pipeline_details):
-        bq = bigquery_tools.BigQueryWrapper.from_pipeline_options(
-            pipeline_options)
+        bq = bigquery_tools.BigQueryWrapper()
         pipeline_details = pipeline_details[0]
         if 'temp_table_ref' in pipeline_details.keys():
           temp_table_ref = pipeline_details['temp_table_ref']
@@ -236,8 +230,7 @@ class _BigQueryReadSplit(beam.transforms.DoFn):
   def process(self,
               element: 'ReadFromBigQueryRequest') -> Iterable[BoundedSource]:
     bq = bigquery_tools.BigQueryWrapper(
-        temp_dataset_id=self._get_temp_dataset().datasetId,
-        client=bigquery_tools.BigQueryWrapper._bigquery_client(self.options))
+        temp_dataset_id=self._get_temp_dataset().datasetId)
 
     if element.query is not None:
       self._setup_temporary_dataset(bq, element)

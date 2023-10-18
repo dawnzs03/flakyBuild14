@@ -28,28 +28,11 @@ task dataflowValidatesRunner() {
   group = "Verification"
 
   dependsOn ":sdks:go:test:goBuild"
-
-  doLast {
-    def options = [
-        "--runner dataflow",
-    ]
-    exec {
-      executable "sh"
-      args "-c", "./run_validatesrunner_tests.sh ${options.join(' ')}"
-    }
-  }
-}
-
-// ValidatesRunner tests for Dataflow. Runs tests in the integration directory
-// with Dataflow to validate that the runner behaves as expected, on arm64 machines.
-task dataflowValidatesRunnerARM64() {
-  group = "Verification"
-
-  dependsOn ":sdks:go:test:goBuild"
+  dependsOn ":sdks:java:testing:expansion-service:buildTestExpansionServiceJar"
 
   doLast {
     def pipelineOptions = [  // Pipeline options piped directly to Go SDK flags.
-        "--machine_type=t2a-standard-1",
+        "--expansion_jar=test:${project(":sdks:java:testing:expansion-service").buildTestExpansionServiceJar.archivePath}",
     ]
     def options = [
         "--runner dataflow",
@@ -200,7 +183,6 @@ ext.goIoValidatesRunnerTask = { proj, name, scriptOpts, pipelineOpts ->
           "--expansion_jar=debeziumio:${debeziumIoExpJar}",
           "--expansion_jar=gcpio:${gcpIoExpJar}",
           "--bq_dataset=apache-beam-testing.beam_bigquery_io_test_temp",
-          "--bt_instance=projects/apache-beam-testing/instances/beam-test"
       ]
       pipelineOptions.addAll(pipelineOpts)
       def options = [

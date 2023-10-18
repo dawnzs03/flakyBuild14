@@ -21,19 +21,21 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * A lock which can always be acquired. It should not be used when a proper lock is required, but it
  * is useful as a performance optimization when locking is not necessary but the code paths have to
  * be shared between the locking and the non-locking variant.
  */
+@SuppressWarnings({
+  "nullness" // TODO(https://github.com/apache/beam/issues/20497)
+})
 public class NoopLock implements Lock, Serializable {
 
-  private static @MonotonicNonNull NoopLock instance;
+  private static NoopLock instance;
 
-  public static @NonNull NoopLock get() {
+  public static NoopLock get() {
     if (instance == null) {
       instance = new NoopLock();
     }
@@ -54,13 +56,14 @@ public class NoopLock implements Lock, Serializable {
   }
 
   @Override
-  public boolean tryLock(long time, TimeUnit unit) {
+  public boolean tryLock(long time, @Nonnull TimeUnit unit) {
     return true;
   }
 
   @Override
   public void unlock() {}
 
+  @Nonnull
   @Override
   public Condition newCondition() {
     throw new UnsupportedOperationException("Not implemented");
