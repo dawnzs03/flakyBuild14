@@ -1,141 +1,126 @@
-[![JanusGraph logo](janusgraph.png)](https://janusgraph.org/)
+<!--
 
-JanusGraph is a highly scalable [graph database](https://en.wikipedia.org/wiki/Graph_database)
-optimized for storing and querying large graphs with billions of vertices and edges
-distributed across a multi-machine cluster. JanusGraph is a transactional database that
-can support thousands of concurrent users, complex traversals, and analytic graph queries.
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-[![Downloads][downloads-shield]][downloads-link]
-[![Docker pulls][docker-pulls-img]][docker-hub-url]
-[![Maven][maven-shield]][maven-link]
-[![Javadoc][javadoc-shield]][javadoc-link]
-[![GitHub Workflow Status][actions-shield]][actions-link]
-[![Codecov][codecov-shield]][codecov-link]
-[![Mentioned in Awesome Bigtable][awesome-shield]][awesome-link]
-[![CII Best Practices][bestpractices-shield]][bestpractices-link]
-[![Codacy Badge][codacy-shield]][codacy-link]
+      http://www.apache.org/licenses/LICENSE-2.0
 
-[actions-shield]: https://img.shields.io/github/actions/workflow/status/JanusGraph/janusgraph/ci-core.yml?branch=master
-[actions-link]: https://github.com/JanusGraph/janusgraph/actions
-[awesome-shield]: https://awesome.re/mentioned-badge-flat.svg
-[awesome-link]: https://github.com/zrosenbauer/awesome-bigtable
-[bestpractices-shield]: https://bestpractices.coreinfrastructure.org/projects/5064/badge
-[bestpractices-link]: https://bestpractices.coreinfrastructure.org/projects/5064
-[codacy-shield]: https://app.codacy.com/project/badge/Grade/850c7549ea72424486664ffc4f64f526
-[codacy-link]: https://www.codacy.com/gh/JanusGraph/janusgraph/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=JanusGraph/janusgraph&amp;utm_campaign=Badge_Grade
-[maven-shield]: https://img.shields.io/maven-central/v/org.janusgraph/janusgraph-core.svg
-[maven-link]: https://central.sonatype.com/search?q=org.janusgraph
-[javadoc-shield]: https://javadoc.io/badge/org.janusgraph/janusgraph-core.svg?color=blue
-[javadoc-link]: https://javadoc.io/doc/org.janusgraph/janusgraph-core
-[downloads-shield]: https://img.shields.io/github/downloads/JanusGraph/janusgraph/total.svg
-[downloads-link]: https://github.com/JanusGraph/janusgraph/releases
-[codecov-shield]:https://codecov.io/gh/JanusGraph/janusgraph/branch/master/graph/badge.svg
-[codecov-link]:https://codecov.io/gh/JanusGraph/janusgraph
-[docker-pulls-img]: https://img.shields.io/docker/pulls/janusgraph/janusgraph.svg
-[docker-hub-url]: https://hub.docker.com/r/janusgraph/janusgraph
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 
-## Learn More
+-->
+<div align="center">
+    
+<img src="https://imgur.com/GNevDZ0.png" align="center" alt="Apache Pinot"/>
 
-The [project homepage](https://janusgraph.org) contains more information on JanusGraph and
-provides links to documentation, getting-started guides and release downloads.
+---------------------------------------
+[![Build Status](https://github.com/apache/pinot/actions/workflows/pinot_tests.yml/badge.svg?event=push)](https://github.com/apache/pinot/actions/workflows/pinot_tests.yml)
+[![Release](https://img.shields.io/github/release/apache/pinot/all.svg)](https://pinot.apache.org/download/)
+[![codecov.io](https://codecov.io/github/apache/pinot/branch/master/graph/badge.svg)](https://codecov.io/github/apache/pinot)
+[![Join the chat at https://communityinviter.com/apps/apache-pinot/apache-pinot](https://img.shields.io/badge/slack-apache--pinot-brightgreen?logo=slack)](https://communityinviter.com/apps/apache-pinot/apache-pinot)
+[![Twitter Follow](https://img.shields.io/twitter/follow/apachepinot.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=apachepinot)
+[![License](https://img.shields.io/github/license/apache/pinot.svg)](LICENSE)
 
-## Visualization
+</div>
 
-To visualize graphs stored in JanusGraph, you can use any of the following
-tools:
+- [What is Apache Pinot?](#what-is-apache-pinot)
+- [Features](#features)
+- [When should I use Pinot?](#when-should-i-use-pinot)
+- [Building Pinot](#building-pinot)
+- [Deploying Pinot to Kubernetes](#deploying-pinot-to-kubernetes)
+- [Join the Community](#join-the-community)
+- [Documentation](#documentation)
+- [License](#license)
 
-* [Arcade Analytics](https://arcadeanalytics.com/usermanual/#arcade-analytics)
-* [Cytoscape](https://www.cytoscape.org/)
-* [Gephi](https://tinkerpop.apache.org/docs/current/reference/#gephi-plugin)
-  plugin for Apache TinkerPop
-* [Graphexp](https://github.com/bricaud/graphexp)
-* [Graph Explorer](https://github.com/invanalabs/graph-explorer)
-* [Gremlin-Visualizer](https://github.com/prabushitha/gremlin-visualizer)
-* [G.V() - Gremlin IDE](https://gdotv.com)
-* [KeyLines by Cambridge Intelligence](https://cambridge-intelligence.com/keylines/janusgraph/)
-* [Ogma by Linkurious](https://doc.linkurious.com/ogma/latest/tutorials/janusgraph/)
-* [ReGraph by Cambridge Intelligence](https://cambridge-intelligence.com/regraph/)
-* [Tom Sawyer Perspectives](https://www.tomsawyer.com/perspectives/)
+# What is Apache Pinot?
 
-## Community
+[Apache Pinot](https://pinot.apache.org) is a real-time distributed OLAP datastore, built to deliver scalable real-time analytics with low latency. It can ingest from batch data sources (such as Hadoop HDFS, Amazon S3, Azure ADLS, Google Cloud Storage) as well as stream data sources (such as Apache Kafka).
 
-* GitHub Discussions: see [`GitHub Discussions`](https://github.com/JanusGraph/janusgraph/discussions)
-  for all general discussions and questions about JanusGraph
+Pinot was built by engineers at LinkedIn and Uber and is designed to scale up and out with no upper bound. Performance always remains constant based on the size of your cluster and an expected query per second (QPS) threshold.
 
-* Discord for interactive discussions and questions about JanusGraph: [Join the server](https://discord.gg/5n4fjv4QAf)
+For getting started guides, deployment recipes, tutorials, and more, please visit our project documentation at [https://docs.pinot.apache.org](https://docs.pinot.apache.org).
 
-* Stack Overflow: see the
-  [`janusgraph`](https://stackoverflow.com/questions/tagged/janusgraph) tag
+<img src="https://gblobscdn.gitbook.com/assets%2F-LtH6nl58DdnZnelPdTc%2F-M69C48fK2BhCoou1REr%2F-M69DbDfcATcZOAgyX7k%2Fpinot-overview-graphic.png?alt=media&token=3552722e-8d1d-4397-972e-a81917ced182" align="center" alt="Apache Pinot"/>
 
-* Twitter: follow [@JanusGraph](https://twitter.com/JanusGraph) for news and
-  updates
+## Features
 
-* LinkedIn: follow [JanusGraph](https://www.linkedin.com/company/janusgraph) for news and
-  updates
+Pinot was originally built at LinkedIn to power rich interactive real-time analytic applications such as [Who Viewed Profile](https://www.linkedin.com/me/profile-views/urn:li:wvmp:summary/),  [Company Analytics](https://www.linkedin.com/company/linkedin/insights/),  [Talent Insights](https://business.linkedin.com/talent-solutions/talent-insights), and many more. [UberEats Restaurant Manager](https://eng.uber.com/restaurant-manager/) is another example of a customer facing Analytics App. At LinkedIn, Pinot powers 50+ user-facing products, ingesting millions of events per second and serving 100k+ queries per second at millisecond latency.
 
-* Mailing lists:
+* **Column-oriented**: a column-oriented database with various compression schemes such as Run Length, Fixed Bit Length.
 
-  * **janusgraph-users (at) lists.lfaidata.foundation**
-    ([archives](https://lists.lfaidata.foundation/g/janusgraph-users/topics))
-    for questions about using JanusGraph, installation, configuration, integrations
+* [**Pluggable indexing**](https://docs.pinot.apache.org/basics/indexing): pluggable indexing technologies Sorted Index, Bitmap Index, Inverted Index.
 
-    To join with a LF AI & Data account, use the [web
-    UI](https://lists.lfaidata.foundation/g/janusgraph-users/join); to
-    subscribe/unsubscribe with an arbitrary email address, send an email to:
+* **Query optimization**: ability to optimize query/execution plan based on query and segment metadata.
 
-    * janusgraph-users+subscribe (at) lists.lfaidata.foundation
-    * janusgraph-users+unsubscribe (at) lists.lfaidata.foundation
+* **Stream and batch ingest**: near real time ingestion from streams and batch ingestion from Hadoop.
 
-  * **janusgraph-dev (at) lists.lfaidata.foundation**
-    ([archives](https://lists.lfaidata.foundation/g/janusgraph-dev/topics))
-    for internal implementation of JanusGraph itself
+* **Query:** SQL based query execution engine.
 
-    To join with a LF AI & Data account, use the [web
-    UI](https://lists.lfaidata.foundation/g/janusgraph-dev/join); to
-    subscribe/unsubscribe with an arbitrary email address, send an email to:
+* **Upsert during real-time ingestion**: update the data at-scale with consistency
 
-    * janusgraph-dev+subscribe (at) lists.lfaidata.foundation
-    * janusgraph-dev+unsubscribe (at) lists.lfaidata.foundation
+* **Multi-valued fields:** support for multi-valued fields, allowing you to query fields as comma separated values.
 
-  * **janusgraph-announce (at) lists.lfaidata.foundation**
-    ([archives](https://lists.lfaidata.foundation/g/janusgraph-announce/topics))
-    for new releases and news announcements
+* **Cloud-native on Kubernetes**: Helm chart provides a horizontally scalable and fault-tolerant clustered deployment that is easy to manage using Kubernetes.
 
-    To join with a LF AI & Data account, use the [web
-    UI](https://lists.lfaidata.foundation/g/janusgraph-announce/join); to
-    subscribe/unsubscribe with an arbitrary email address, send an email to:
+<a href="https://docs.pinot.apache.org/basics/getting-started"><img src="https://gblobscdn.gitbook.com/assets%2F-LtH6nl58DdnZnelPdTc%2F-MKaPf2qveUt5cg0dMbM%2F-MKaPmS1fuBs2CHnx9-Z%2Fpinot-ui-width-1000.gif?alt=media&token=53e4c5a8-a9cd-4610-a338-d54ea036c090" align="center" alt="Apache Pinot query console"/></a>
 
-    * janusgraph-announce+subscribe (at) lists.lfaidata.foundation
-    * janusgraph-announce+unsubscribe (at) lists.lfaidata.foundation
+## When should I use Pinot?
 
-## Contributing
+Pinot is designed to execute real-time OLAP queries with low latency on massive amounts of data and events. In addition to real-time stream ingestion, Pinot also supports batch use cases with the same low latency guarantees. It is suited in contexts where fast analytics, such as aggregations, are needed on immutable data, possibly, with real-time data ingestion. Pinot works very well for querying time series data with lots of dimensions and metrics.
 
-Please see [`CONTRIBUTING.md`](CONTRIBUTING.md) for more information, including
-CLAs and best practices for working with GitHub.
+Example query:
+```SQL
+SELECT sum(clicks), sum(impressions) FROM AdAnalyticsTable
+  WHERE
+       ((daysSinceEpoch >= 17849 AND daysSinceEpoch <= 17856)) AND
+       accountId IN (123456789)
+  GROUP BY
+       daysSinceEpoch TOP 100
+```
 
-## Powered by JanusGraph
+Pinot is not a replacement for database i.e it cannot be used as source of truth store, cannot mutate data. While Pinot [supports text search](https://docs.pinot.apache.org/basics/features/text-search-support), it's not a replacement for a search engine. Also, Pinot queries cannot span across multiple tables by default. You can use the [Trino-Pinot Connector](https://trino.io/docs/current/connector/pinot.html) or [Presto-Pinot Connector](https://prestodb.io/docs/current/connector/pinot.html) to achieve table joins and other features.
 
-* [Apache Atlas](https://github.com/apache/atlas) - metadata management for governance ([website](https://atlas.apache.org/))
-* [Eclipse Keti](https://github.com/eclipse/keti) - access control service to protect RESTful APIs ([website](https://projects.eclipse.org/projects/iot.keti))
-* [Exakat](https://github.com/exakat/exakat) - PHP static analysis ([website](https://www.exakat.io/))
-* [Open Network Automation Platform (ONAP)](https://www.onap.org/) - automation and orchestration for Software-Defined Networks
-- [Uber Knowledge Graph](https://www.youtube.com/watch?v=C01Gh0g01JE) ([event info](https://leap.ai/events/2017/08/06/uber_knowledge_graph))
-- [Express-Cassandra](https://github.com/masumsoft/express-cassandra) - Cassandra ORM/ODM/OGM for Node.js with optional support for Elassandra & JanusGraph
-* [Windup](https://github.com/windup/windup) by RedHat - application migration and assessment tool ([website](https://developers.redhat.com/products/rhamt/overview/))
+## Building Pinot
+More detailed instructions can be found at [Quick Demo](https://docs.pinot.apache.org/basics/getting-started/quick-start) section in the documentation.
+```
+# Clone a repo
+$ git clone https://github.com/apache/pinot.git
+$ cd pinot
 
-## Users
+# Build Pinot
+$ mvn clean install -DskipTests -Pbin-dist
 
-The following users have deployed JanusGraph in production.
+# Run the Quick Demo
+$ cd build/
+$ bin/quick-start-batch.sh
+```
 
-* [CELUM](https://www.celum.com/)
-* [Crédit Agricole CIB](https://www.ca-cib.com/) - [use case](https://github.com/JanusGraph/janusgraph/discussions/2734)
-* [eBay](https://www.ebay.com/) - [video](https://youtu.be/EtB1BPG00PE)
-* [FiNC](https://finc.com)
-* [G DATA](https://gdatasoftware.com) - [blog post series about malware analysis use case](https://www.gdatasoftware.com/blog/2018/11/31203-malware-analysis-with-a-graph-database)
-* [Netflix](https://www.netflix.com) -
-  [video](https://youtu.be/KSmAdtMJYEo?t=1h2m17s) and
-  [slides](https://www.slideshare.net/RoopaTangirala/polyglot-persistence-netflix-cde-meetup-90955706#86) (graph discussion starts at #86)
-* [Qihoo 360](https://www.360.cn/) ([about](https://en.wikipedia.org/wiki/Qihoo_360))
-* [Red Hat](https://www.redhat.com/) - [application migration and assessment tool](https://developers.redhat.com/products/rhamt/overview/) built on [Windup](https://github.com/windup/windup)
-* [Times Internet](https://timesinternet.in)
-* [Uber](https://uber.com)
+## Deploying Pinot to Kubernetes
+Please refer to [Running Pinot on Kubernetes](https://docs.pinot.apache.org/basics/getting-started/kubernetes-quickstart) in our project documentation. Pinot also provides Kubernetes integrations with the interactive query engine, [Trino](https://docs.pinot.apache.org/integrations/trino) [Presto](https://docs.pinot.apache.org/integrations/presto), and the data visualization tool, [Apache Superset](kubernetes/helm/superset.yaml).
+
+## Join the Community
+ - Ask questions on [Apache Pinot Slack](https://join.slack.com/t/apache-pinot/shared_invite/zt-5z7pav2f-yYtjZdVA~EDmrGkho87Vzw)
+ - Please join Apache Pinot mailing lists  
+   dev-subscribe@pinot.apache.org (subscribe to pinot-dev mailing list)  
+   dev@pinot.apache.org (posting to pinot-dev mailing list)  
+   users-subscribe@pinot.apache.org (subscribe to pinot-user mailing list)  
+   users@pinot.apache.org (posting to pinot-user mailing list)
+ - Apache Pinot Meetup Group: https://www.meetup.com/apache-pinot/
+
+## Documentation
+Check out [Pinot documentation](https://docs.pinot.apache.org/) for a complete description of Pinot's features.
+- [Quick Demo](https://docs.pinot.apache.org/getting-started/running-pinot-locally)
+- [Pinot Architecture](https://docs.pinot.apache.org/basics/architecture)
+- [Pinot Query Language](https://docs.pinot.apache.org/users/user-guide-query/pinot-query-language)
+
+## License
+Apache Pinot is under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
