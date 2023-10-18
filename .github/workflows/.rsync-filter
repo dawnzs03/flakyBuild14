@@ -1,4 +1,0 @@
-- corretto.yml
-  push:
-    branches: [ micronaut-core ]
-- .rsync-filter

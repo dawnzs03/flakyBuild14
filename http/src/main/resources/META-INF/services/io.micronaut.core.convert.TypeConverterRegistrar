@@ -1,2 +1,0 @@
-io.micronaut.http.MediaTypeConvertersRegistrar
-io.micronaut.http.converters.SharedHttpConvertersRegistrar

@@ -1,16 +1,9 @@
 # Security Policy
 
-We release patches for security vulnerabilities. Which versions are eligible
-receiving such patches depend on the CVSS v3.0 Rating:
+## Supported Versions
 
-| CVSS v3.0 | Supported Versions                        |
-| --------- | ----------------------------------------- |
-| 9.0-10.0  | Releases within the previous three months |
-| 4.0-8.9   | Most recent release                       |
+Only the latest version is guaranteed to be secure. For this purpose, Byte Buddy maintains backwards compatibility. Please note the [readme of the project](https://github.com/raphw/byte-buddy/blob/master/README.md) for further information.
 
 ## Reporting a Vulnerability
 
-Please responsibly disclose (suspected) security vulnerabilities to
-**[The Micronaut Foundation](foundation@micronaut.io)**. You will receive a response from
-us within 48 hours. If the issue is confirmed, we will release a patch as soon
-as possible depending on complexity but historically within a few days.
+Please disclose responsibly by [contacting the maintainer](mailto:rafael.wth@gmail.com). After a fix is released, any vulnerability will be publicly disclosed and registered. As of today, no vulnerabilities are known to exists.
