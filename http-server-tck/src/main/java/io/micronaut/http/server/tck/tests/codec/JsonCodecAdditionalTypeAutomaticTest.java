@@ -68,15 +68,13 @@ public class JsonCodecAdditionalTypeAutomaticTest {
         @Produces(MediaType.APPLICATION_JSON_FEED)
         @Get("/json-additional-codec")
         String index() {
-            return """
-                {
-                    "version": "https://jsonfeed.org/version/1",
-                    "title": "My Example Feed",
-                    "home_page_url": "https://example.org/",
-                    "feed_url": "https://example.org/feed.json",
-                    ]
-                }\
-                """;
+            return "{\n" +
+                "    \"version\": \"https://jsonfeed.org/version/1\",\n" +
+                "    \"title\": \"My Example Feed\",\n" +
+                "    \"home_page_url\": \"https://example.org/\",\n" +
+                "    \"feed_url\": \"https://example.org/feed.json\",\n" +
+                "    ]\n" +
+                "}";
         }
 
         @Produces(MediaType.APPLICATION_JSON_FEED)

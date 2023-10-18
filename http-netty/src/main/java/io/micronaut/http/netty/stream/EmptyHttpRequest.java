@@ -65,8 +65,8 @@ public class EmptyHttpRequest extends DelegateHttpRequest implements FullHttpReq
 
     @Override
     public FullHttpRequest copy() {
-        if (request instanceof FullHttpRequest httpRequest) {
-            return new EmptyHttpRequest(httpRequest.copy());
+        if (request instanceof FullHttpRequest) {
+            return new EmptyHttpRequest(((FullHttpRequest) request).copy());
         } else {
             DefaultHttpRequest copy = new DefaultHttpRequest(protocolVersion(), method(), uri());
             copy.headers().set(headers());
@@ -88,8 +88,8 @@ public class EmptyHttpRequest extends DelegateHttpRequest implements FullHttpReq
 
     @Override
     public FullHttpRequest touch() {
-        if (request instanceof FullHttpRequest httpRequest) {
-            return httpRequest.touch();
+        if (request instanceof FullHttpRequest) {
+            return ((FullHttpRequest) request).touch();
         } else {
             return this;
         }
@@ -97,8 +97,8 @@ public class EmptyHttpRequest extends DelegateHttpRequest implements FullHttpReq
 
     @Override
     public FullHttpRequest touch(Object o) {
-        if (request instanceof FullHttpRequest httpRequest) {
-            return httpRequest.touch(o);
+        if (request instanceof FullHttpRequest) {
+            return ((FullHttpRequest) request).touch(o);
         } else {
             return this;
         }
@@ -111,8 +111,8 @@ public class EmptyHttpRequest extends DelegateHttpRequest implements FullHttpReq
 
     @Override
     public FullHttpRequest duplicate() {
-        if (request instanceof FullHttpRequest httpRequest) {
-            return httpRequest.duplicate();
+        if (request instanceof FullHttpRequest) {
+            return ((FullHttpRequest) request).duplicate();
         } else {
             return this;
         }
@@ -120,8 +120,8 @@ public class EmptyHttpRequest extends DelegateHttpRequest implements FullHttpReq
 
     @Override
     public FullHttpRequest retainedDuplicate() {
-        if (request instanceof FullHttpRequest httpRequest) {
-            return httpRequest.retainedDuplicate();
+        if (request instanceof FullHttpRequest) {
+            return ((FullHttpRequest) request).retainedDuplicate();
         } else {
             return this;
         }
@@ -143,8 +143,8 @@ public class EmptyHttpRequest extends DelegateHttpRequest implements FullHttpReq
 
     @Override
     public int refCnt() {
-        if (message instanceof ReferenceCounted counted) {
-            return counted.refCnt();
+        if (message instanceof ReferenceCounted) {
+            return ((ReferenceCounted) message).refCnt();
         } else {
             return 1;
         }

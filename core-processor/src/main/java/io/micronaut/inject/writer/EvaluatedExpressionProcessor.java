@@ -82,7 +82,7 @@ public final class EvaluatedExpressionProcessor {
                 ExpressionCompilationContext evaluationContext = expressionCompilationContextFactory.buildContext(expressionReference, thisElement);
                 return new ExpressionWithContext(expressionReference, evaluationContext);
             })
-            .forEach(this::addExpression);
+            .forEach(evaluatedExpressions::add);
     }
 
     public void processEvaluatedExpressions(MethodElement methodElement) {
@@ -94,13 +94,7 @@ public final class EvaluatedExpressionProcessor {
                 ExpressionCompilationContext evaluationContext = expressionCompilationContextFactory.buildContextForMethod(expression, methodElement);
                 return new ExpressionWithContext(expression, evaluationContext);
             })
-            .forEach(this::addExpression);
-    }
-
-    private void addExpression(ExpressionWithContext ee) {
-        if (!evaluatedExpressions.contains(ee)) {
-            evaluatedExpressions.add(ee);
-        }
+            .forEach(evaluatedExpressions::add);
     }
 
     public Collection<ExpressionWithContext> getEvaluatedExpressions() {

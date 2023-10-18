@@ -154,8 +154,8 @@ final class KotlinInterceptedMethodImpl implements io.micronaut.aop.kotlin.Kotli
     @Override
     public Object handleResult(Object result) {
         CompletionStage<?> completionStageResult;
-        if (result instanceof CompletionStage stage) {
-            completionStageResult = stage;
+        if (result instanceof CompletionStage) {
+            completionStageResult = (CompletionStage<?>) result;
         } else {
             throw new IllegalStateException("Cannot convert " + result + "  to 'java.util.concurrent.CompletionStage'");
         }

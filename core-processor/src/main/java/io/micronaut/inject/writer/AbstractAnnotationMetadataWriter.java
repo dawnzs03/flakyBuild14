@@ -112,7 +112,8 @@ public abstract class AbstractAnnotationMetadataWriter extends AbstractClassFile
         AnnotationMetadata annotationMetadata = this.annotationMetadata.getTargetAnnotationMetadata();
         if (annotationMetadata.isEmpty()) {
             annotationMetadataMethod.getStatic(Type.getType(AnnotationMetadata.class), FIELD_EMPTY_METADATA, Type.getType(AnnotationMetadata.class));
-        } else if (annotationMetadata instanceof AnnotationMetadataReference reference) {
+        } else if (annotationMetadata instanceof AnnotationMetadataReference) {
+            AnnotationMetadataReference reference = (AnnotationMetadataReference) annotationMetadata;
             String className = reference.getClassName();
             annotationMetadataMethod.getStatic(getTypeReferenceForName(className), AbstractAnnotationMetadataWriter.FIELD_ANNOTATION_METADATA, Type.getType(AnnotationMetadata.class));
         } else {

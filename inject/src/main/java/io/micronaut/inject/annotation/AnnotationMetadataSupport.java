@@ -394,8 +394,8 @@ public final class AnnotationMetadataSupport {
         }
 
         private AnnotationValue<?> getAnnotationValues(Annotation other) {
-            if (other instanceof AnnotationProxyHandler handler) {
-                return handler.annotationValue;
+            if (other instanceof AnnotationProxyHandler) {
+                return ((AnnotationProxyHandler) other).annotationValue;
             }
             return null;
         }

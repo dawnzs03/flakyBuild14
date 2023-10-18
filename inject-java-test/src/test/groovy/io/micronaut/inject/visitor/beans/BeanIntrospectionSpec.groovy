@@ -50,6 +50,7 @@ import java.util.stream.Collectors
 import java.util.stream.IntStream
 
 class BeanIntrospectionSpec extends AbstractTypeElementSpec {
+
     void "test expressions in introspection properties with type use"() {
         given:
         def introspection = buildBeanIntrospection('mixed.Test', '''

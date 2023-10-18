@@ -123,7 +123,8 @@ public class ClassPathAnnotationScanner implements AnnotationScanner {
                     }
                 } else if (includeJars && Arrays.asList("jar", "zip", "war").contains(protocol)) {
                     URLConnection con = url.openConnection();
-                    if (con instanceof JarURLConnection jarCon) {
+                    if (con instanceof JarURLConnection) {
+                        JarURLConnection jarCon = (JarURLConnection) con;
                         JarFile jarFile = jarCon.getJarFile();
                         jarFile.stream()
                             .filter(entry -> {

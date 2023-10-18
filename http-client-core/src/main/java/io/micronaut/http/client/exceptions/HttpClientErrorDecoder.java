@@ -48,11 +48,11 @@ public interface HttpClientErrorDecoder {
         if (error == null) {
             return Optional.empty();
         }
-        if (error instanceof JsonError jsonError) {
-            return Optional.ofNullable(jsonError.getMessage());
+        if (error instanceof JsonError) {
+            return Optional.ofNullable(((JsonError) error).getMessage());
         } else {
-            if (error instanceof Described described) {
-                return Optional.ofNullable(described.getDescription());
+            if (error instanceof Described) {
+                return Optional.ofNullable(((Described) error).getDescription());
             } else {
                 return Optional.of(error.toString());
             }

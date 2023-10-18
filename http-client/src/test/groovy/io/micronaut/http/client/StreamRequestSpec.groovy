@@ -32,7 +32,6 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Header
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.client.annotation.Client
-import io.micronaut.http.client.exceptions.ResponseClosedException
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
@@ -188,9 +187,6 @@ class StreamRequestSpec extends Specification {
     }
 
     void "test json stream post request with POJOs flowable error"() {
-        // this test can hit *two* failure types non-deterministically: Either a closed channel before / during the
-        // headers, or a closed channel mid-body. Both should yield the same failure
-
         when:
         int i = 0
         List<Book> result = Flux.from(client.jsonStream(HttpRequest.POST('/stream/request/pojo-flowable-error', Flux.create(emitter -> {
@@ -203,8 +199,9 @@ class StreamRequestSpec extends Specification {
         )), Book)).collectList().block()
 
         then:
-        def e= thrown(ResponseClosedException)
+        def e= thrown(RuntimeException) // TODO: this should be HttpClientException
         e != null
+
     }
 
     void "test manually setting the content length does not chunked encoding"() {

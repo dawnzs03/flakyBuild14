@@ -48,7 +48,7 @@ public class LogbookNettyClientCustomizer
         @Override
         public void onRequestPipelineBuilt() {
             channel.pipeline().addBefore( // <5>
-                ChannelPipelineCustomizer.HANDLER_MICRONAUT_HTTP_RESPONSE,
+                ChannelPipelineCustomizer.HANDLER_HTTP_STREAM,
                 "logbook",
                 new LogbookClientHandler(logbook)
             );

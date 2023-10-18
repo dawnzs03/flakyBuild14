@@ -145,8 +145,8 @@ public class TextStreamCodec implements MediaTypeCodec {
     @Override
     public <T, B> ByteBuffer<B> encode(T object, ByteBufferFactory<?, B> allocator) {
         Event<Object> event;
-        if (object instanceof Event event1) {
-            event = event1;
+        if (object instanceof Event) {
+            event = (Event<Object>) object;
         } else {
             event = Event.of(object);
         }

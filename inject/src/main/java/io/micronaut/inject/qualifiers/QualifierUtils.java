@@ -74,8 +74,8 @@ final class QualifierUtils {
      */
     static <T> boolean matchByCandidateName(BeanType<T> candidate, Class<T> beanType, String value) {
         String definedCandidateName;
-        if (candidate instanceof NameResolver resolver) {
-            Optional<String> resolvedName = resolver.resolveName();
+        if (candidate instanceof NameResolver) {
+            Optional<String> resolvedName = ((NameResolver) candidate).resolveName();
             definedCandidateName = resolvedName.orElse(candidate.getBeanType().getSimpleName());
         } else {
             definedCandidateName = candidate.getBeanType().getSimpleName();
@@ -104,17 +104,21 @@ final class QualifierUtils {
 
     @Nullable
     private static Map.Entry<String, Map<CharSequence, Object>> extractAnnotationAndBindingValues(@NonNull Object o) {
-        if (o instanceof NamedAnnotationStereotypeQualifier that) {
+        if (o instanceof NamedAnnotationStereotypeQualifier) {
+            NamedAnnotationStereotypeQualifier<?> that = (NamedAnnotationStereotypeQualifier<?>) o;
             return new AbstractMap.SimpleEntry<>(that.stereotype, null);
-        } else if (o instanceof AnnotationStereotypeQualifier that) {
+        } else if (o instanceof AnnotationStereotypeQualifier) {
+            AnnotationStereotypeQualifier<?> that = (AnnotationStereotypeQualifier<?>) o;
             return new AbstractMap.SimpleEntry<>(that.stereotype.getName(), null);
-        } else if (o instanceof AnnotationMetadataQualifier that) {
+        } else if (o instanceof AnnotationMetadataQualifier) {
+            AnnotationMetadataQualifier<?> that = (AnnotationMetadataQualifier<?>) o;
             if (that.qualifierAnn == null) {
                 return new AbstractMap.SimpleEntry<>(that.annotationName, null);
             } else {
                 return new AbstractMap.SimpleEntry<>(that.annotationName, that.qualifierAnn.getValues());
             }
-        } else if (o instanceof AnnotationQualifier that) {
+        } else if (o instanceof AnnotationQualifier) {
+            AnnotationQualifier<?> that = (AnnotationQualifier<?>) o;
             return new AbstractMap.SimpleEntry<>(that.annotation.annotationType().getName(), null);
         }
         return null;

@@ -157,9 +157,9 @@ class DefaultFieldInjectionPoint<B, T> implements FieldInjectionPoint<B, T>, Env
     }
 
     private AnnotationMetadata initAnnotationMetadata(@Nullable AnnotationMetadata annotationMetadata) {
-        if (annotationMetadata instanceof DefaultAnnotationMetadata metadata) {
+        if (annotationMetadata instanceof DefaultAnnotationMetadata) {
             if (annotationMetadata.hasPropertyExpressions()) {
-                return new FieldAnnotationMetadata(metadata);
+                return new FieldAnnotationMetadata((DefaultAnnotationMetadata) annotationMetadata);
             } else {
                 return annotationMetadata;
             }

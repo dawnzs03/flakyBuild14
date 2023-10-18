@@ -24,6 +24,7 @@ import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.bind.DefaultRequestBinderRegistry;
 import io.micronaut.http.bind.RequestBinderRegistry;
 import io.micronaut.http.client.BlockingHttpClient;
@@ -32,39 +33,37 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.HttpClientConfiguration;
 import io.micronaut.http.client.HttpVersionSelection;
 import io.micronaut.http.client.LoadBalancer;
-import io.micronaut.http.client.filter.ClientFilterResolutionContext;
+import io.micronaut.http.client.exceptions.HttpClientExceptionUtils;
+import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.http.client.jdk.cookie.CompositeCookieDecoder;
 import io.micronaut.http.client.jdk.cookie.CookieDecoder;
 import io.micronaut.http.client.jdk.cookie.DefaultCookieDecoder;
 import io.micronaut.http.codec.MediaTypeCodecRegistry;
-import io.micronaut.http.filter.HttpClientFilterResolver;
-import io.micronaut.http.filter.HttpFilterResolver;
 import io.micronaut.json.JsonMapper;
 import io.micronaut.json.codec.JsonMediaTypeCodec;
 import io.micronaut.json.codec.JsonStreamMediaTypeCodec;
 import io.micronaut.runtime.ApplicationConfiguration;
 import org.reactivestreams.Publisher;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.List;
 
 /**
  * {@link HttpClient} implementation for {@literal java.net.http.*} HTTP Client.
- *
  * @author Sergio del Amo
  * @since 4.0.0
  */
 @Internal
 @Experimental
 public class DefaultJdkHttpClient extends AbstractJdkHttpClient implements JdkHttpClient {
+
     public DefaultJdkHttpClient(
         @Nullable LoadBalancer loadBalancer,
         HttpVersionSelection httpVersion,
         @NonNull HttpClientConfiguration configuration,
         @Nullable String contextPath,
-        @Nullable HttpClientFilterResolver<ClientFilterResolutionContext> filterResolver,
-        @Nullable List<HttpFilterResolver.FilterEntry> clientFilterEntries,
         MediaTypeCodecRegistry mediaTypeCodecRegistry,
         RequestBinderRegistry requestBinderRegistry,
         String clientId,
@@ -78,8 +77,6 @@ public class DefaultJdkHttpClient extends AbstractJdkHttpClient implements JdkHt
             httpVersion,
             configuration,
             contextPath,
-            filterResolver,
-            clientFilterEntries,
             mediaTypeCodecRegistry,
             requestBinderRegistry,
             clientId,
@@ -94,8 +91,6 @@ public class DefaultJdkHttpClient extends AbstractJdkHttpClient implements JdkHt
             uri == null ? null : LoadBalancer.fixed(uri),
             null,
             new DefaultHttpClientConfiguration(),
-            null,
-            null,
             null,
             createDefaultMediaTypeRegistry(),
             new DefaultRequestBinderRegistry(conversionService),
@@ -117,8 +112,6 @@ public class DefaultJdkHttpClient extends AbstractJdkHttpClient implements JdkHt
             null,
             configuration,
             null,
-            null,
-            null,
             mediaTypeCodecRegistry,
             new DefaultRequestBinderRegistry(conversionService),
             null,
@@ -139,25 +132,33 @@ public class DefaultJdkHttpClient extends AbstractJdkHttpClient implements JdkHt
 
     @Override
     public BlockingHttpClient toBlocking() {
-        return new JdkBlockingHttpClient(
-            loadBalancer,
-            httpVersion,
-            configuration,
-            contextPath,
-            filterResolver,
-            clientFilterEntries,
-            mediaTypeCodecRegistry,
-            requestBinderRegistry,
-            clientId,
-            conversionService,
-            sslBuilder,
-            cookieDecoder
-        );
+        return new JdkBlockingHttpClient(loadBalancer, httpVersion, configuration, contextPath, mediaTypeCodecRegistry, requestBinderRegistry, clientId, conversionService, sslBuilder, cookieDecoder);
     }
 
     @Override
     public <I, O, E> Publisher<HttpResponse<O>> exchange(@NonNull HttpRequest<I> request, @NonNull Argument<O> bodyType, @NonNull Argument<E> errorType) {
-        return exchangeImpl(request, bodyType);
+        return mapToHttpRequest(request, bodyType)
+            .map(httpRequest -> {
+                if (log.isDebugEnabled()) {
+                    log.debug("Client {} Sending HTTP Request: {}", clientId, httpRequest);
+                }
+                if (log.isTraceEnabled()) {
+                    httpRequest.headers().map().forEach((k, v) -> log.trace("Client {} Sending HTTP Request Header: {}={}", clientId, k, v));
+                }
+                return client.sendAsync(httpRequest, java.net.http.HttpResponse.BodyHandlers.ofByteArray());
+            })
+            .flatMap(Mono::fromCompletionStage)
+            .map(netResponse -> {
+                if (log.isDebugEnabled()) {
+                    log.debug("Client {} Received HTTP Response: {} {}", clientId, netResponse.statusCode(), netResponse.uri());
+                }
+                boolean errorStatus = netResponse.statusCode() >= 400;
+                if (errorStatus && configuration.isExceptionOnErrorStatus()) {
+                    throw HttpClientExceptionUtils.populateServiceId(new HttpClientResponseException(HttpStatus.valueOf(netResponse.statusCode()).getReason(),
+                        response(netResponse, bodyType)), clientId, configuration);
+                }
+                return response(netResponse, bodyType);
+            });
     }
 
     @Override

@@ -53,11 +53,13 @@ class EnvironmentAnnotationValue<A extends Annotation> extends AnnotationValue<A
                 target.getValues()
         ), environment != null ? o -> {
             PropertyPlaceholderResolver resolver = environment.getPlaceholderResolver();
-            if (o instanceof String v) {
+            if (o instanceof String) {
+                String v = (String) o;
                 if (v.contains(resolver.getPrefix())) {
                     return resolver.resolveRequiredPlaceholders(v);
                 }
-            } else if (o instanceof String[] values) {
+            } else if (o instanceof String[]) {
+                String[] values = (String[]) o;
                 String[] resolvedValues = Arrays.copyOf(values, values.length);
                 boolean expandValues = false;
                 for (int i = 0; i < values.length; i++) {

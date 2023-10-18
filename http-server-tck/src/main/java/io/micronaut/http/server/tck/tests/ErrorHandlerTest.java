@@ -17,6 +17,7 @@ package io.micronaut.http.server.tck.tests;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpHeaders;
@@ -145,6 +146,21 @@ public class ErrorHandlerTest {
                 HttpResponseAssertion.builder()
                     .status(HttpStatus.BAD_REQUEST)
                     .headers(Collections.singletonMap(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                    .build()
+            ));
+    }
+
+    @Test
+    void jsonSyntaxErrorBodyAccessible() throws IOException {
+        asserts(SPEC_NAME,
+            CollectionUtils.mapOf(
+                PROPERTY_MICRONAUT_SERVER_CORS_CONFIGURATIONS_WEB_ALLOWED_ORIGINS, Collections.singletonList("http://localhost:8080"),
+                PROPERTY_MICRONAUT_SERVER_CORS_ENABLED, StringUtils.TRUE),
+            HttpRequest.POST("/json/jsonBody", "{\"numberField\": \"textInsteadOf"),
+            (server, request) -> AssertionUtils.assertThrows(server, request,
+                HttpResponseAssertion.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Syntax error: {\"numberField\": \"textInsteadOf")
                     .build()
             ));
     }
@@ -285,6 +301,13 @@ public class ErrorHandlerTest {
         @Post("/jsonBody")
         String jsonBody(@Valid @Body RequestObject data) {
             return "blah";
+        }
+
+        @Error
+        @Produces(MediaType.APPLICATION_JSON) // it's a lie!
+        @Status(HttpStatus.BAD_REQUEST)
+        String syntaxErrorHandler(@Body @Nullable String body) {
+            return "Syntax error: " + body;
         }
     }
 

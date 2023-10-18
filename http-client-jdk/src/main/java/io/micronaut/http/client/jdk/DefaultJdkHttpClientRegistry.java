@@ -42,13 +42,11 @@ import io.micronaut.http.client.LoadBalancer;
 import io.micronaut.http.client.LoadBalancerResolver;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientException;
-import io.micronaut.http.client.filter.ClientFilterResolutionContext;
 import io.micronaut.http.client.jdk.cookie.CompositeCookieDecoder;
 import io.micronaut.http.client.jdk.cookie.CookieDecoder;
 import io.micronaut.http.client.jdk.cookie.DefaultCookieDecoder;
 import io.micronaut.http.codec.MediaTypeCodec;
 import io.micronaut.http.codec.MediaTypeCodecRegistry;
-import io.micronaut.http.filter.HttpClientFilterResolver;
 import io.micronaut.inject.InjectionPoint;
 import io.micronaut.inject.qualifiers.Qualifiers;
 import io.micronaut.json.JsonFeatures;
@@ -58,7 +56,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -89,13 +86,10 @@ public final class DefaultJdkHttpClientRegistry implements AutoCloseable, HttpCl
     private final BeanProvider<RequestBinderRegistry> requestBinderRegistryProvider;
     private final JdkClientSslBuilder jdkClientSslBuilder;
     private final CookieDecoder cookieDecoder;
-    private final HttpClientFilterResolver<ClientFilterResolutionContext> clientFilterResolver;
 
     public DefaultJdkHttpClientRegistry(
         BeanContext beanContext,
-        LoadBalancerResolver loadBalancerResolver,
-        HttpClientConfiguration defaultHttpClientConfiguration,
-        HttpClientFilterResolver<ClientFilterResolutionContext> httpClientFilterResolver,
+        LoadBalancerResolver loadBalancerResolver, HttpClientConfiguration defaultHttpClientConfiguration,
         JsonMapper jsonMapper,
         @Nullable MediaTypeCodecRegistry mediaTypeCodecRegistry,
         BeanProvider<RequestBinderRegistry> requestBinderRegistryProvider,
@@ -105,7 +99,6 @@ public final class DefaultJdkHttpClientRegistry implements AutoCloseable, HttpCl
         this.beanContext = beanContext;
         this.loadBalancerResolver = loadBalancerResolver;
         this.defaultHttpClientConfiguration = defaultHttpClientConfiguration;
-        this.clientFilterResolver = httpClientFilterResolver;
         this.jsonMapper = jsonMapper;
         this.mediaTypeCodecRegistry = mediaTypeCodecRegistry;
         this.requestBinderRegistryProvider = requestBinderRegistryProvider;
@@ -159,8 +152,7 @@ public final class DefaultJdkHttpClientRegistry implements AutoCloseable, HttpCl
                 configuration,
                 null,
                 loadBalancer.getContextPath().orElse(null),
-                beanContext,
-                AnnotationMetadata.EMPTY_METADATA
+                beanContext
             );
         } else {
             return getClient(injectionPoint != null ? injectionPoint.getAnnotationMetadata() : AnnotationMetadata.EMPTY_METADATA);
@@ -170,7 +162,7 @@ public final class DefaultJdkHttpClientRegistry implements AutoCloseable, HttpCl
     @Override
     public DefaultJdkHttpClient getClient(AnnotationMetadata annotationMetadata) {
         final ClientKey key = getClientKey(annotationMetadata);
-        return getClient(key, annotationMetadata);
+        return getClient(key);
     }
 
     private ClientKey getClientKey(AnnotationMetadata metadata) {
@@ -186,7 +178,7 @@ public final class DefaultJdkHttpClientRegistry implements AutoCloseable, HttpCl
         return new ClientKey(httpVersionSelection, clientId, filterAnnotation, path, configurationClass, jsonFeatures);
     }
 
-    private DefaultJdkHttpClient getClient(ClientKey key, AnnotationMetadata annotationMetadata) {
+    private DefaultJdkHttpClient getClient(ClientKey key) {
         return clients.computeIfAbsent(key, clientKey -> {
             DefaultJdkHttpClient clientBean = null;
             final String clientId = clientKey.clientId;
@@ -236,15 +228,7 @@ public final class DefaultJdkHttpClientRegistry implements AutoCloseable, HttpCl
                 }
             }
 
-            DefaultJdkHttpClient client = buildClient(
-                loadBalancer,
-                clientKey.httpVersion,
-                configuration,
-                clientId,
-                contextPath,
-                beanContext,
-                annotationMetadata
-            );
+            DefaultJdkHttpClient client = buildClient(loadBalancer, clientKey.httpVersion, configuration, clientId, contextPath, beanContext);
 
             final JsonFeatures jsonFeatures = clientKey.jsonFeatures;
             if (jsonFeatures != null) {
@@ -272,8 +256,7 @@ public final class DefaultJdkHttpClientRegistry implements AutoCloseable, HttpCl
         HttpClientConfiguration configuration,
         String clientId,
         String contextPath,
-        BeanContext beanContext,
-        AnnotationMetadata annotationMetadata
+        BeanContext beanContext
     ) {
         ConversionService conversionService = beanContext.getBean(ConversionService.class);
         return new DefaultJdkHttpClient(
@@ -281,11 +264,6 @@ public final class DefaultJdkHttpClientRegistry implements AutoCloseable, HttpCl
             httpVersion,
             configuration,
             contextPath,
-            clientFilterResolver,
-            clientFilterResolver.resolveFilterEntries(new ClientFilterResolutionContext(
-                clientId == null ? null : Collections.singletonList(clientId),
-                annotationMetadata
-            )),
             mediaTypeCodecRegistry,
             requestBinderRegistryProvider.orElse(new DefaultRequestBinderRegistry(conversionService)),
             clientId,
@@ -305,7 +283,7 @@ public final class DefaultJdkHttpClientRegistry implements AutoCloseable, HttpCl
             null,
             null
         );
-        return getClient(key, AnnotationMetadata.EMPTY_METADATA);
+        return getClient(key);
     }
 
     @Override

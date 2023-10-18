@@ -194,7 +194,6 @@ internal open class KotlinVisitorContext(
     }
 
     override fun getElementFactory(): KotlinElementFactory = elementFactory
-
     override fun getElementAnnotationMetadataFactory(): ElementAnnotationMetadataFactory {
         return elementAnnotationMetadataFactory
     }
@@ -205,10 +204,6 @@ internal open class KotlinVisitorContext(
 
     override fun getAnnotationMetadataBuilder(): AbstractAnnotationMetadataBuilder<*, *> {
         return annotationMetadataBuilder
-    }
-
-    override fun getOptions(): Map<String, String> {
-        return environment.options
     }
 
     override fun info(message: String, element: Element?) {

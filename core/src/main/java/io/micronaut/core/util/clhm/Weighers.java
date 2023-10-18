@@ -263,8 +263,8 @@ public final class Weighers {
 
         @Override
         public int weightOf(Iterable<?> values) {
-            if (values instanceof Collection<?> collection) {
-                return collection.size();
+            if (values instanceof Collection<?>) {
+                return ((Collection<?>) values).size();
             }
             int size = 0;
             for (Iterator<?> i = values.iterator(); i.hasNext();) {

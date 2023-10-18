@@ -27,19 +27,19 @@ public class BookController {
     BookService bookService;
 
     public String show(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     public String showArray(Long[] id) {
-        return "%d - The Stand".formatted(id[0]);
+        return String.format("%d - The Stand", id[0]);
     }
 
     public String showPrimitive(long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     public String showPrimitiveArray(long[] id) {
-        return "%d - The Stand".formatted(id[0]);
+        return String.format("%d - The Stand", id[0]);
     }
 
     public void showVoidReturn(List<String> jobNames) {
@@ -52,22 +52,22 @@ public class BookController {
 
     @Executable
     public static String showStatic(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     @Executable
     public static String showArrayStatic(Long[] id) {
-        return "%d - The Stand".formatted(id[0]);
+        return String.format("%d - The Stand", id[0]);
     }
 
     @Executable
     public static String showPrimitiveStatic(long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     @Executable
     public static String showPrimitiveArrayStatic(long[] id) {
-        return "%d - The Stand".formatted(id[0]);
+        return String.format("%d - The Stand", id[0]);
     }
 
     @Executable
@@ -81,51 +81,51 @@ public class BookController {
     }
 
     String showPackageProtected(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     protected String showProtected(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     private String showPrivate(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     @ReflectiveAccess
     protected String showProtectedReflectiveAccess(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     @ReflectiveAccess
     private String showPrivateReflectiveAccess(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     @Executable
     static String showPackageProtectedStatic(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     @Executable
     static protected String showProtectedStatic(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     static private String showPrivateStatic(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     @ReflectiveAccess
     @Executable
     static protected String showProtectedReflectiveAccessStatic(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
     @ReflectiveAccess
     @Executable
     static private String showPrivateReflectiveAccessStatic(Long id) {
-        return "%d - The Stand".formatted(id);
+        return String.format("%d - The Stand", id);
     }
 
 }

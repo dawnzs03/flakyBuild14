@@ -17,13 +17,11 @@ package io.micronaut.inject.annotation.internal;
 
 import io.micronaut.core.annotation.AnnotationUtil;
 import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.annotation.AnnotationValueBuilder;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.inject.annotation.NamedAnnotationTransformer;
 import io.micronaut.inject.visitor.VisitorContext;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.Inherited;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,14 +41,8 @@ public class CoreNonNullTransformer implements NamedAnnotationTransformer {
 
     @Override
     public List<AnnotationValue<?>> transform(AnnotationValue<Annotation> annotation, VisitorContext visitorContext) {
-        AnnotationValueBuilder<Annotation> builder = AnnotationValue.builder(AnnotationUtil.NON_NULL);
-        annotation.booleanValue("inherited").ifPresent(b -> {
-            if (Boolean.TRUE.equals(b)) {
-                builder.stereotype(AnnotationValue.builder(Inherited.class).build());
-            }
-        });
         return Collections.singletonList(
-                builder.build()
+                AnnotationValue.builder(AnnotationUtil.NON_NULL).build()
         );
     }
 }

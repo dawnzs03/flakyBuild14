@@ -134,10 +134,10 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
         ElementAnnotationMetadataFactory elementAnnotationMetadataFactory) {
         this.originatingElement = originatingElement;
         this.elementAnnotationMetadataFactory = elementAnnotationMetadataFactory;
-        if (originatingElement instanceof MethodElement element) {
-            this.originatingType = element.getDeclaringType();
-        } else if (originatingElement instanceof ClassElement element) {
-            this.originatingType = element;
+        if (originatingElement instanceof MethodElement) {
+            this.originatingType = ((MethodElement) originatingElement).getDeclaringType();
+        } else if (originatingElement instanceof ClassElement) {
+            this.originatingType = (ClassElement) originatingElement;
         } else {
             throw new IllegalArgumentException("Invalid originating element: " + originatingElement);
         }
@@ -505,14 +505,16 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
                 .modifiers(modifiers -> modifiers.contains(ElementModifier.PUBLIC));
         final List<E> enclosedElements = this.beanType.getEnclosedElements(methodsOrFields);
         for (E enclosedElement : enclosedElements) {
-            if (enclosedElement instanceof FieldElement fe) {
+            if (enclosedElement instanceof FieldElement) {
+                FieldElement fe = (FieldElement) enclosedElement;
                 final ClassElement type = fe.getGenericField().getType();
                 if (type.isPublic() && !type.isPrimitive()) {
                     addChildBean(fe, childBeanBuilder);
                 }
             }
 
-            if (enclosedElement instanceof MethodElement me && !(enclosedElement instanceof ConstructorElement)) {
+            if (enclosedElement instanceof MethodElement && !(enclosedElement instanceof ConstructorElement)) {
+                MethodElement me = (MethodElement) enclosedElement;
                 final ClassElement type = me.getGenericReturnType().getType();
                 if (type.isPublic() && !type.isPrimitive()) {
                     addChildBean(me, childBeanBuilder);
@@ -589,7 +591,7 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
         } else {
             BeanDefinitionVisitor parentVisitor = beanWriter.getBeanDefinitionVisitor();
             AnnotationMetadata thisAnnotationMetadata = getAnnotationMetadata();
-            if (isIntercepted() && parentVisitor instanceof BeanDefinitionWriter beanDefinitionWriter) {
+            if (isIntercepted() && parentVisitor instanceof BeanDefinitionWriter) {
                 return new BeanClassWriter() {
                     @Override
                     public BeanDefinitionVisitor getBeanDefinitionVisitor() {
@@ -598,6 +600,7 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
 
                     @Override
                     public void accept(ClassWriterOutputVisitor classWriterOutputVisitor) throws IOException {
+                        BeanDefinitionWriter beanDefinitionWriter = (BeanDefinitionWriter) parentVisitor;
                         BeanDefinitionVisitor aopProxyWriter = AbstractBeanDefinitionBuilder.this.createAopWriter(beanDefinitionWriter, thisAnnotationMetadata);
 
 

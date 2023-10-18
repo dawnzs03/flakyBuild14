@@ -126,7 +126,7 @@ public abstract class EnclosedElementsQuery<C, N> {
                 if (element.isPrivate() || element.getName().startsWith("$")) {
                     return false;
                 }
-                if (element instanceof MemberElement memberElement && !memberElement.isAccessible()) {
+                if (element instanceof MemberElement && !((MemberElement) element).isAccessible()) {
                     return false;
                 }
             }
@@ -270,6 +270,7 @@ public abstract class EnclosedElementsQuery<C, N> {
         }
         return elements;
     }
+
 
     /**
      * Gets the element name.

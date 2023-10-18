@@ -219,9 +219,11 @@ public class InterceptorChain<B, R> extends AbstractInterceptorChain<B, R> imple
     }
 
     private static void instrumentAnnotationMetadata(BeanContext beanContext, ExecutableMethod<?, ?> method) {
-        if (beanContext instanceof ApplicationContext context && method instanceof EnvironmentConfigurable m) {
+        if (beanContext instanceof ApplicationContext && method instanceof EnvironmentConfigurable) {
+            // ensure metadata is environment aware
+            final EnvironmentConfigurable m = (EnvironmentConfigurable) method;
             if (m.hasPropertyExpressions()) {
-                m.configure(context.getEnvironment());
+                m.configure(((ApplicationContext) beanContext).getEnvironment());
             }
         }
     }

@@ -252,7 +252,8 @@ public interface TypeInformation<T> extends TypeVariableResolver, AnnotationMeta
 
             @Override
             public boolean equals(Object o) {
-                if (o instanceof ParameterizedType that) {
+                if (o instanceof ParameterizedType) {
+                    ParameterizedType that = (ParameterizedType) o;
                     if (this == that) {
                         return true;
                     }

@@ -121,8 +121,8 @@ sealed class PublisherInterceptedMethod implements InterceptedMethod permits Rea
         if (result == null) {
             return Publishers.empty();
         }
-        if (result instanceof Publisher publisher) {
-            return publisher;
+        if (result instanceof Publisher) {
+            return (Publisher<?>) result;
         }
         return conversionService
                 .convert(result, Publisher.class)

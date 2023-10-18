@@ -169,7 +169,8 @@ final class JsonBeanPropertyBinder implements BeanPropertyBinder {
                 }
 
                 if (!tokenIterator.hasNext()) {
-                    if (current instanceof ObjectBuilder objectNode) {
+                    if (current instanceof ObjectBuilder) {
+                        ObjectBuilder objectNode = (ObjectBuilder) current;
                         if (index != null) {
                             ValueBuilder existing = objectNode.values.get(index);
                             if (!(existing instanceof ObjectBuilder)) {
@@ -182,7 +183,8 @@ final class JsonBeanPropertyBinder implements BeanPropertyBinder {
                         } else {
                             objectNode.values.put(token, new FixedValue(jsonMapper.writeValueToTree(value)));
                         }
-                    } else if (current instanceof ArrayBuilder arrayNode && index != null) {
+                    } else if (current instanceof ArrayBuilder && index != null) {
+                        ArrayBuilder arrayNode = (ArrayBuilder) current;
                         int arrayIndex = Integer.parseInt(index);
                         if (arrayIndex < arraySizeThreshhold) {
 
@@ -199,7 +201,8 @@ final class JsonBeanPropertyBinder implements BeanPropertyBinder {
                         index = null;
                     }
                 } else {
-                    if (current instanceof ObjectBuilder objectNode) {
+                    if (current instanceof ObjectBuilder) {
+                        ObjectBuilder objectNode = (ObjectBuilder) current;
                         ValueBuilder existing = objectNode.values.get(token);
                         if (index != null) {
                             ValueBuilder jsonNode;
@@ -235,7 +238,8 @@ final class JsonBeanPropertyBinder implements BeanPropertyBinder {
                             }
                             current = existing;
                         }
-                    } else if (current instanceof ArrayBuilder arrayNode && StringUtils.isDigits(index)) {
+                    } else if (current instanceof ArrayBuilder && StringUtils.isDigits(index)) {
+                        ArrayBuilder arrayNode = (ArrayBuilder) current;
                         int arrayIndex = Integer.parseInt(index);
                         expandArrayToThreshold(arrayIndex, arrayNode);
                         ObjectBuilder jsonNode = getOrCreateNodeAtIndex(arrayNode, arrayIndex);

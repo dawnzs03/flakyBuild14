@@ -43,13 +43,11 @@ ioc:
     accessKind: Bean Fields
     atCreator: Constructor Methods
     staticAtCreator: Static Creator Methods
-    introspectionBuilders: Builders
     introspectionEnums: Introspect Enums
     introspectedAnnotationOnAConfigurationClass: Use the @Introspected Annotation on a Configuration Class
     introspectExistingAnnotations: Write an AnnotationMapper to Introspect Existing Annotations
     beanWrapperApi: The BeanWrapper API
     jacksonAndBeanIntrospection: Jackson and Bean Introspection
-  beanMappers: Bean Mappers
   beanValidation: Bean Validation
   annotationMetadata: Bean Annotation Metadata
   beanImport: Importing Beans from Libraries

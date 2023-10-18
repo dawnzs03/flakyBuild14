@@ -193,7 +193,8 @@ public class BeanDefinitionReferenceWriter extends AbstractAnnotationMetadataWri
         // 3: annotationMetadata
         if (annotationMetadata == AnnotationMetadata.EMPTY_METADATA || annotationMetadata.isEmpty()) {
             cv.getStatic(Type.getType(AnnotationMetadata.class), "EMPTY_METADATA", Type.getType(AnnotationMetadata.class));
-        } else if (annotationMetadata instanceof AnnotationMetadataReference reference) {
+        } else if (annotationMetadata instanceof AnnotationMetadataReference) {
+            AnnotationMetadataReference reference = (AnnotationMetadataReference) annotationMetadata;
             String className = reference.getClassName();
             cv.getStatic(getTypeReferenceForName(className), AbstractAnnotationMetadataWriter.FIELD_ANNOTATION_METADATA, Type.getType(AnnotationMetadata.class));
         } else {

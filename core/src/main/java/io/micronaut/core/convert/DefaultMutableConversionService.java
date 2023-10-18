@@ -56,8 +56,6 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -331,7 +329,7 @@ public class DefaultMutableConversionService implements MutableConversionService
 
         // Reader -> String
         addConverter(Reader.class, String.class, (object, targetType, context) -> {
-            BufferedReader reader = object instanceof BufferedReader br ? br : new BufferedReader(object);
+            BufferedReader reader = object instanceof BufferedReader ? (BufferedReader) object : new BufferedReader(object);
             try {
                 return Optional.of(IOUtils.readText(reader));
             } catch (IOException e) {
@@ -403,20 +401,6 @@ public class DefaultMutableConversionService implements MutableConversionService
                     SimpleDateFormat format = resolveFormat(context);
                     return Optional.of(format.format(object));
                 }
-        );
-
-        // Number -> CharSequence
-        addConverter(
-            Number.class,
-            CharSequence.class,
-            (object, targetType, context) -> {
-                NumberFormat format = resolveNumberFormat(context);
-                if (format != null) {
-                    return Optional.of(format.format(object));
-                } else {
-                    return Optional.of(object.toString());
-                }
-            }
         );
 
         // String -> Path
@@ -652,9 +636,9 @@ public class DefaultMutableConversionService implements MutableConversionService
 
         // String -> Array
         addConverter(CharSequence.class, Object[].class, (CharSequence object, Class<Object[]> targetType, ConversionContext context) -> {
-            if (object instanceof AnnotationClassValue value && targetType.equals(AnnotationClassValue[].class)) {
+            if (object instanceof AnnotationClassValue && targetType.equals(AnnotationClassValue[].class)) {
                 AnnotationClassValue[] array = new AnnotationClassValue[1];
-                array[0] = value;
+                array[0] = (AnnotationClassValue) object;
                 return Optional.of(array);
             }
 
@@ -756,8 +740,8 @@ public class DefaultMutableConversionService implements MutableConversionService
                 return Optional.of(object.doubleValue());
             }
             if (targetNumberType == BigInteger.class) {
-                if (object instanceof BigDecimal decimal) {
-                    return Optional.of(decimal.toBigInteger());
+                if (object instanceof BigDecimal) {
+                    return Optional.of(((BigDecimal) object).toBigInteger());
                 }
                 return Optional.of(BigInteger.valueOf(object.longValue()));
             }
@@ -1027,17 +1011,10 @@ public class DefaultMutableConversionService implements MutableConversionService
             .orElseGet(() -> new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", context.getLocale()));
     }
 
-    private NumberFormat resolveNumberFormat(ConversionContext context) {
-        AnnotationMetadata annotationMetadata = context.getAnnotationMetadata();
-        Optional<String> format = annotationMetadata.stringValue(Format.class);
-
-        return format.map(DecimalFormat::new).orElse(null);
-    }
-
     private <S, T> ConvertiblePair newPair(Class<S> sourceType, Class<T> targetType, TypeConverter<S, T> typeConverter) {
         ConvertiblePair pair;
-        if (typeConverter instanceof FormattingTypeConverter converter) {
-            pair = new ConvertiblePair(sourceType, targetType, converter.annotationType().getName());
+        if (typeConverter instanceof FormattingTypeConverter) {
+            pair = new ConvertiblePair(sourceType, targetType, ((FormattingTypeConverter) typeConverter).annotationType().getName());
         } else {
             pair = new ConvertiblePair(sourceType, targetType);
         }

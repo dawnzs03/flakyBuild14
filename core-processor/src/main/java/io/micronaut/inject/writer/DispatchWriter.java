@@ -21,7 +21,6 @@ import io.micronaut.core.reflect.ReflectionUtils;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.FieldElement;
-import io.micronaut.inject.ast.KotlinParameterElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
@@ -41,7 +40,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.Map;
 
 /**
@@ -356,39 +354,6 @@ public final class DispatchWriter extends AbstractClassFileWriter implements Opc
     }
 
     /**
-     * Computes Kotlin default method mask.
-     *
-     * @param writer          The writer
-     * @param argumentsPusher The argument pusher
-     * @param parameters      The arguments
-     * @return The mask
-     */
-    public static int computeKotlinDefaultsMask(GeneratorAdapter writer,
-                                                BiConsumer<Integer, ParameterElement> argumentsPusher,
-                                                List<ParameterElement> parameters) {
-        int maskLocal = writer.newLocal(Type.INT_TYPE);
-        writer.push(0);
-        writer.storeLocal(maskLocal);
-        int maskIndex = 1;
-        int paramIndex = 0;
-        for (ParameterElement parameter : parameters) {
-            if (parameter instanceof KotlinParameterElement kp && kp.hasDefault() && !kp.getType().isPrimitive()) {
-                Label elseLabel = writer.newLabel();
-                argumentsPusher.accept(paramIndex, parameter);
-                writer.ifNonNull(elseLabel);
-                writer.push(maskIndex);
-                writer.loadLocal(maskLocal, Type.INT_TYPE);
-                writer.math(GeneratorAdapter.OR, Type.INT_TYPE);
-                writer.storeLocal(maskLocal);
-                writer.visitLabel(elseLabel);
-            }
-            maskIndex *= 2;
-            paramIndex++;
-        }
-        return maskLocal;
-    }
-
-    /**
      * Dispatch target implementation writer.
      */
     @Internal
@@ -585,8 +550,7 @@ public final class DispatchWriter extends AbstractClassFileWriter implements Opc
         final boolean oneDispatch;
         final boolean multiDispatch;
 
-        private MethodDispatchTarget(Type dispatchSuperType,
-                                     TypedElement declaringType,
+        private MethodDispatchTarget(Type dispatchSuperType, TypedElement declaringType,
                                      MethodElement methodElement,
                                      boolean oneDispatch,
                                      boolean multiDispatch) {
@@ -626,7 +590,6 @@ public final class DispatchWriter extends AbstractClassFileWriter implements Opc
 
             List<ParameterElement> argumentTypes = Arrays.asList(methodElement.getSuspendParameters());
             Type declaringTypeObject = JavaModelUtils.getTypeReference(declaringType);
-            boolean isKotlinDefault = argumentTypes.stream().anyMatch(p -> p instanceof KotlinParameterElement kp && kp.hasDefault());
 
             final boolean reflectionRequired = methodElement.isReflectionRequired();
             ClassElement returnType = methodElement.isSuspend() ? ClassElement.of(Object.class) : methodElement.getReturnType();
@@ -635,14 +598,12 @@ public final class DispatchWriter extends AbstractClassFileWriter implements Opc
             boolean hasArgs = !argumentTypes.isEmpty();
 
             // load this
-            boolean isStaticMethodInvocation = methodElement.isStatic() || isKotlinDefault;
-
-            if (!isStaticMethodInvocation) {
+            if (!methodElement.isStatic()) {
                 writer.loadArg(1);
             }
 
             if (reflectionRequired) {
-                if (isStaticMethodInvocation) {
+                if (methodElement.isStatic()) {
                     writer.push((String) null);
                 }
                 writer.loadThis();
@@ -664,20 +625,10 @@ public final class DispatchWriter extends AbstractClassFileWriter implements Opc
                 }
                 writer.invokeStatic(TYPE_REFLECTION_UTILS, METHOD_INVOKE_METHOD);
             } else {
-                if (!isStaticMethodInvocation) {
+                if (!methodElement.isStatic()) {
                     pushCastToType(writer, declaringTypeObject);
                 }
-                int defaultsMaskLocal = -1;
                 if (hasArgs) {
-                    if (isKotlinDefault) {
-                        writer.loadArg(1); // First parameter is the current instance
-                        pushCastToType(writer, declaringTypeObject);
-                        defaultsMaskLocal = computeKotlinDefaultsMask(writer, (paramIndex, parameterElement) -> {
-                            writer.loadArg(2);
-                            writer.push(paramIndex);
-                            writer.visitInsn(AALOAD);
-                        }, argumentTypes);
-                    }
                     if (isMulti) {
                         int argCount = argumentTypes.size();
                         Iterator<ParameterElement> argIterator = argumentTypes.iterator();
@@ -694,20 +645,13 @@ public final class DispatchWriter extends AbstractClassFileWriter implements Opc
                         pushCastToType(writer, argumentTypes.iterator().next());
                     }
                 }
-                Method method = new Method(methodName, getMethodDescriptor(returnType, argumentTypes));
-                if (isKotlinDefault) {
-                    method = asDefaultKotlinMethod(method, declaringTypeObject);
-                    writer.loadLocal(defaultsMaskLocal, Type.INT_TYPE); // Bit mask of defaults
-                    writer.push((String) null); // Last parameter is just a marker and is always null
-                    writer.invokeStatic(declaringTypeObject, method);
+                String methodDescriptor = getMethodDescriptor(returnType, argumentTypes);
+                if (methodElement.isStatic()) {
+                    writer.invokeStatic(declaringTypeObject, new Method(methodName, methodDescriptor));
                 } else {
-                    if (isStaticMethodInvocation) {
-                        writer.invokeStatic(declaringTypeObject, method);
-                    } else {
-                        writer.visitMethodInsn(isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL,
-                            declaringTypeObject.getInternalName(), method.getName(),
-                            method.getDescriptor(), isInterface);
-                    }
+                    writer.visitMethodInsn(isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL,
+                        declaringTypeObject.getInternalName(), methodName,
+                        methodDescriptor, isInterface);
                 }
             }
 
@@ -716,17 +660,6 @@ public final class DispatchWriter extends AbstractClassFileWriter implements Opc
             } else if (!reflectionRequired) {
                 pushBoxPrimitiveIfNecessary(returnType, writer);
             }
-        }
-
-        private Method asDefaultKotlinMethod(Method method, Type declaringTypeObject) {
-            Type[] argumentTypes = method.getArgumentTypes();
-            int length = argumentTypes.length;
-            Type[] newArgumentTypes = new Type[length + 3];
-            System.arraycopy(argumentTypes, 0, newArgumentTypes, 1, length);
-            newArgumentTypes[0] = declaringTypeObject;
-            newArgumentTypes[length + 1] = Type.INT_TYPE;
-            newArgumentTypes[length + 2] = Type.getObjectType("java/lang/Object");
-            return new Method(method.getName() + "$default", method.getReturnType(), newArgumentTypes);
         }
 
     }
@@ -754,8 +687,13 @@ public final class DispatchWriter extends AbstractClassFileWriter implements Opc
 
         @Override
         public void writeDispatchMulti(GeneratorAdapter writer, int methodIndex) {
+            String methodName = methodElement.getName();
+
             List<ParameterElement> argumentTypes = Arrays.asList(methodElement.getSuspendParameters());
+            Type declaringTypeObject = JavaModelUtils.getTypeReference(declaringType);
+
             ClassElement returnType = methodElement.isSuspend() ? ClassElement.of(Object.class) : methodElement.getReturnType();
+            boolean isInterface = declaringType.getType().isInterface();
             Type returnTypeObject = JavaModelUtils.getTypeReference(returnType);
 
             // load this
@@ -810,7 +748,29 @@ public final class DispatchWriter extends AbstractClassFileWriter implements Opc
             // remove parent
             writer.pop();
 
-            super.writeDispatchMulti(writer, methodIndex);
+            pushCastToType(writer, declaringTypeObject);
+            boolean hasArgs = !argumentTypes.isEmpty();
+            if (hasArgs) {
+                int argCount = argumentTypes.size();
+                Iterator<ParameterElement> argIterator = argumentTypes.iterator();
+                for (int i = 0; i < argCount; i++) {
+                    writer.loadArg(2);
+                    writer.push(i);
+                    writer.visitInsn(AALOAD);
+                    // cast the return value to the correct type
+                    pushCastToType(writer, argIterator.next());
+                }
+            }
+
+            writer.visitMethodInsn(isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL,
+                    declaringTypeObject.getInternalName(), methodName,
+                    methodDescriptor, isInterface);
+
+            if (returnTypeObject.equals(Type.VOID_TYPE)) {
+                writer.visitInsn(ACONST_NULL);
+            } else {
+                pushBoxPrimitiveIfNecessary(returnType, writer);
+            }
         }
     }
 

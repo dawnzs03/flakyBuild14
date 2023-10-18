@@ -1203,9 +1203,9 @@ public class DefaultBeanContext implements InitializableBeanContext {
                 }
             }
         }
-        if (beanToDestroy instanceof LifeCycle cycle) {
+        if (beanToDestroy instanceof LifeCycle) {
             try {
-                cycle.stop();
+                ((LifeCycle<?>) beanToDestroy).stop();
             } catch (Exception e) {
                 throw new BeanDestructionException(definition, e);
             }
@@ -2016,8 +2016,8 @@ public class DefaultBeanContext implements InitializableBeanContext {
                 List<BeanDefinitionMethodReference<?, ?>> methods = entry.getValue();
                 streamOfType(ExecutableMethodProcessor.class, Qualifiers.byTypeArguments(annotationType))
                     .forEach(processor -> {
-                        if (processor instanceof LifeCycle<?> cycle) {
-                            cycle.start();
+                        if (processor instanceof LifeCycle<?>) {
+                            ((LifeCycle<?>) processor).start();
                         }
                         for (BeanDefinitionMethodReference<?, ?> method : methods) {
 
@@ -2046,8 +2046,8 @@ public class DefaultBeanContext implements InitializableBeanContext {
                             }
                         }
 
-                        if (processor instanceof LifeCycle<?> cycle) {
-                            cycle.stop();
+                        if (processor instanceof LifeCycle<?>) {
+                            ((LifeCycle<?>) processor).stop();
                         }
 
                     });
@@ -2591,7 +2591,7 @@ public class DefaultBeanContext implements InitializableBeanContext {
             return Qualifiers.<T>byStereotype(qualifierClass).qualify(replacedBeanType, Stream.of(definitionToBeReplaced))
                 .isPresent();
         } else {
-            throw new ConfigurationException("Default qualifier value was used while replacing %s".formatted(replacedBeanType));
+            throw new ConfigurationException(String.format("Default qualifier value was used while replacing %s", replacedBeanType));
         }
     }
 
@@ -3534,7 +3534,8 @@ public class DefaultBeanContext implements InitializableBeanContext {
                 if (container instanceof Object[] array) {
                     container = Arrays.asList(array);
                 }
-                if (container instanceof Iterable iterable) {
+                if (container instanceof Iterable) {
+                    Iterable<Object> iterable = (Iterable<Object>) container;
                     int i = 0;
                     for (Object o : iterable) {
                         if (o == null || !beanType.isInstance(o)) {

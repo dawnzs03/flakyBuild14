@@ -108,7 +108,8 @@ public class ServiceHttpClientFactory {
                                 URI healthCheckURI = originalURI.resolve(configuration.getHealthCheckUri());
                                 return Flux.from(httpClient.exchange(HttpRequest.GET(healthCheckURI)))
                                         .onErrorResume(throwable -> {
-                                            if (throwable instanceof HttpClientResponseException responseException) {
+                                            if (throwable instanceof HttpClientResponseException) {
+                                                HttpClientResponseException responseException = (HttpClientResponseException) throwable;
                                                 return Flux.just((HttpResponse<ByteBuffer>) responseException.getResponse());
                                             }
                                             return Flux.just(HttpResponse.serverError());

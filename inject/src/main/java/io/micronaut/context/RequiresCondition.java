@@ -234,7 +234,8 @@ public class RequiresCondition implements Condition {
             if (StringUtils.isNotEmpty(property)) {
                 String value = requirements.stringValue().orElse(null);
                 BeanContext beanContext = context.getBeanContext();
-                if (beanContext instanceof PropertyResolver propertyResolver) {
+                if (beanContext instanceof PropertyResolver) {
+                    PropertyResolver propertyResolver = (PropertyResolver) beanContext;
                     String defaultValue = requirements.stringValue(MEMBER_DEFAULT_VALUE).orElse(null);
                     if (!propertyResolver.containsProperties(property) && StringUtils.isEmpty(defaultValue)) {
                         boolean hasNotEquals = requirements.contains(MEMBER_NOT_EQUALS);
@@ -289,7 +290,8 @@ public class RequiresCondition implements Condition {
             String property = requirements.stringValue(MEMBER_MISSING_PROPERTY).orElse(null);
             if (StringUtils.isNotEmpty(property)) {
                 BeanContext beanContext = context.getBeanContext();
-                if (beanContext instanceof PropertyResolver propertyResolver) {
+                if (beanContext instanceof PropertyResolver) {
+                    PropertyResolver propertyResolver = (PropertyResolver) beanContext;
                     if (propertyResolver.containsProperties(property)) {
                         context.fail("Property [" + property + "] present");
                         return false;
@@ -371,8 +373,8 @@ public class RequiresCondition implements Condition {
                 Optional<Method> method = ReflectionUtils.findMethod(obj.getClass(), "call", ConditionContext.class);
                 if (method.isPresent()) {
                     Object result = ReflectionUtils.invokeMethod(obj, method.get(), context);
-                    if (result instanceof Boolean boolean1) {
-                        return Optional.of(boolean1);
+                    if (result instanceof Boolean) {
+                        return Optional.of((Boolean) result);
                     }
                 }
                 return Optional.empty();
@@ -536,7 +538,8 @@ public class RequiresCondition implements Condition {
             AnnotationClassValue<?>[] classNames = annotationValue.annotationClassValues(MEMBER_ENTITIES);
             if (ArrayUtils.isNotEmpty(classNames)) {
                 BeanContext beanContext = context.getBeanContext();
-                if (beanContext instanceof ApplicationContext applicationContext) {
+                if (beanContext instanceof ApplicationContext) {
+                    ApplicationContext applicationContext = (ApplicationContext) beanContext;
                     for (AnnotationClassValue<?> classValue : classNames) {
                         final Optional<? extends Class<?>> entityType = classValue.getType();
                         if (entityType.isEmpty()) {
@@ -583,7 +586,8 @@ public class RequiresCondition implements Condition {
         if (requirements.contains(MEMBER_MISSING_BEANS)) {
             Class<?>[] missingBeans = requirements.classValues(MEMBER_MISSING_BEANS);
             AnnotationMetadataProvider component = context.getComponent();
-            if (ArrayUtils.isNotEmpty(missingBeans) && component instanceof BeanDefinition bd) {
+            if (ArrayUtils.isNotEmpty(missingBeans) && component instanceof BeanDefinition) {
+                BeanDefinition bd = (BeanDefinition) component;
                 DefaultBeanContext beanContext = (DefaultBeanContext) context.getBeanContext();
 
                 for (Class<?> type : missingBeans) {
@@ -612,8 +616,8 @@ public class RequiresCondition implements Condition {
                 final BeanContext beanContext = context.getBeanContext();
                 ResourceResolver resolver;
                 final List<ResourceLoader> resourceLoaders;
-                if (beanContext instanceof ApplicationContext applicationContext) {
-                    ResourceLoader resourceLoader = applicationContext.getEnvironment();
+                if (beanContext instanceof ApplicationContext) {
+                    ResourceLoader resourceLoader = ((ApplicationContext) beanContext).getEnvironment();
                     resourceLoaders = Arrays.asList(resourceLoader, FileSystemResourceLoader.defaultLoader());
                 } else {
                     resourceLoaders = Arrays.asList(

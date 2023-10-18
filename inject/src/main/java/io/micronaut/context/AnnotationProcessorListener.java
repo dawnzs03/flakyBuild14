@@ -49,9 +49,9 @@ class AnnotationProcessorListener implements BeanCreatedEventListener<Annotation
         AnnotationProcessor processor = event.getBean();
         BeanDefinition<AnnotationProcessor> processorDefinition = event.getBeanDefinition();
         BeanContext beanContext = event.getSource();
-        if (processor instanceof LifeCycle cycle) {
+        if (processor instanceof LifeCycle) {
             try {
-                cycle.start();
+                ((LifeCycle<?>) processor).start();
             } catch (Exception e) {
                 throw new BeanContextException("Error starting bean processing: " + e.getMessage(), e);
             }
@@ -103,7 +103,8 @@ class AnnotationProcessorListener implements BeanCreatedEventListener<Annotation
                     }
                 }
             }
-        } else if (processor instanceof BeanDefinitionProcessor beanDefinitionProcessor) {
+        } else if (processor instanceof BeanDefinitionProcessor) {
+            BeanDefinitionProcessor beanDefinitionProcessor = (BeanDefinitionProcessor) processor;
             final List<Argument<?>> typeArguments = processorDefinition.getTypeArguments(BeanDefinitionProcessor.class);
             if (typeArguments.size() == 1) {
                 final Argument<?> annotation = typeArguments.get(0);
@@ -122,9 +123,9 @@ class AnnotationProcessorListener implements BeanCreatedEventListener<Annotation
             }
         }
 
-        if (processor instanceof LifeCycle cycle) {
+        if (processor instanceof LifeCycle) {
             try {
-                cycle.stop();
+                ((LifeCycle<?>) processor).stop();
             } catch (Exception e) {
                 throw new BeanContextException("Error finalizing bean processing: " + e.getMessage(), e);
             }

@@ -878,8 +878,8 @@ public abstract class AbstractInitializableBeanDefinition<T> extends AbstractBea
                                                         @Nullable Object beanPropertyValue,
                                                         @Nullable String requiredValue,
                                                         @Nullable String notEqualsValue) {
-        if (beanPropertyValue instanceof Optional optional) {
-            beanPropertyValue = optional.orElse(null);
+        if (beanPropertyValue instanceof Optional) {
+            beanPropertyValue = ((Optional<?>) beanPropertyValue).orElse(null);
         }
 
         String convertedValue = ConversionService.SHARED.convert(beanPropertyValue, String.class).orElse(null);
@@ -922,8 +922,8 @@ public abstract class AbstractInitializableBeanDefinition<T> extends AbstractBea
             method.setAccessible(true);
             ReflectionUtils.invokeMethod(bean, method, methodArgs);
         } catch (Throwable e) {
-            if (e instanceof BeanContextException exception) {
-                throw exception;
+            if (e instanceof BeanContextException) {
+                throw (BeanContextException) e;
             } else {
                 throw new DependencyInjectionException(resolutionContext, "Error invoking method: " + methodRef.methodName, e);
             }
@@ -951,8 +951,8 @@ public abstract class AbstractInitializableBeanDefinition<T> extends AbstractBea
             field.setAccessible(true);
             field.set(object, value);
         } catch (Throwable e) {
-            if (e instanceof BeanContextException exception) {
-                throw exception;
+            if (e instanceof BeanContextException) {
+                throw (BeanContextException) e;
             } else {
                 throw new DependencyInjectionException(resolutionContext, "Error setting field value: " + e.getMessage(), e);
             }
@@ -1762,7 +1762,8 @@ public abstract class AbstractInitializableBeanDefinition<T> extends AbstractBea
             BeanContext context,
             Argument<T1> propertyType,
             String propertyPath) {
-        if (context instanceof PropertyResolver propertyResolver) {
+        if (context instanceof PropertyResolver) {
+            PropertyResolver propertyResolver = (PropertyResolver) context;
             String valString = substituteWildCards(resolutionContext, propertyPath);
 
             return propertyResolver.getProperty(valString, ConversionContext.of(propertyType));
@@ -2054,11 +2055,11 @@ public abstract class AbstractInitializableBeanDefinition<T> extends AbstractBea
                 if (wrapperType) {
                     final Object v = value.orElse(null);
                     if (OptionalInt.class == argumentJavaType) {
-                        return v instanceof Integer i ? OptionalInt.of(i) : OptionalInt.empty();
+                        return v instanceof Integer ? OptionalInt.of((Integer) v) : OptionalInt.empty();
                     } else if (OptionalLong.class == argumentJavaType) {
-                        return v instanceof Long l ? OptionalLong.of(l) : OptionalLong.empty();
+                        return v instanceof Long ? OptionalLong.of((Long) v) : OptionalLong.empty();
                     } else if (OptionalDouble.class == argumentJavaType) {
-                        return v instanceof Double d ? OptionalDouble.of(d) : OptionalDouble.empty();
+                        return v instanceof Double ? OptionalDouble.of((Double) v) : OptionalDouble.empty();
                     }
                 }
                 if (value.isPresent()) {
@@ -2126,11 +2127,11 @@ public abstract class AbstractInitializableBeanDefinition<T> extends AbstractBea
             if (wrapperType != null) {
                 final Object v = value.orElse(null);
                 if (OptionalInt.class == wrapperType) {
-                    return v instanceof Integer i ? OptionalInt.of(i) : OptionalInt.empty();
+                    return v instanceof Integer ? OptionalInt.of((Integer) v) : OptionalInt.empty();
                 } else if (OptionalLong.class == wrapperType) {
-                    return v instanceof Long l ? OptionalLong.of(l) : OptionalLong.empty();
+                    return v instanceof Long ? OptionalLong.of((Long) v) : OptionalLong.empty();
                 } else if (OptionalDouble.class == wrapperType) {
-                    return v instanceof Double d ? OptionalDouble.of(d) : OptionalDouble.empty();
+                    return v instanceof Double ? OptionalDouble.of((Double) v) : OptionalDouble.empty();
                 }
             }
             if (value.isPresent()) {

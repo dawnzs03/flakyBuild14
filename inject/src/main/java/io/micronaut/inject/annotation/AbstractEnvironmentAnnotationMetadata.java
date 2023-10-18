@@ -51,8 +51,8 @@ public abstract class AbstractEnvironmentAnnotationMetadata implements Annotatio
      * @param targetMetadata The target annotation metadata
      */
     protected AbstractEnvironmentAnnotationMetadata(AnnotationMetadata targetMetadata) {
-        if (targetMetadata instanceof EnvironmentAnnotationMetadata metadata) {
-            this.environmentAnnotationMetadata = metadata;
+        if (targetMetadata instanceof EnvironmentAnnotationMetadata) {
+            this.environmentAnnotationMetadata = (EnvironmentAnnotationMetadata) targetMetadata;
         } else {
             this.environmentAnnotationMetadata = new AnnotationMetadataHierarchy(targetMetadata);
         }
@@ -88,12 +88,13 @@ public abstract class AbstractEnvironmentAnnotationMetadata implements Annotatio
         if (environment != null) {
             return environmentAnnotationMetadata.getValue(annotation, member, requiredType, o -> {
                 PropertyPlaceholderResolver placeholderResolver = environment.getPlaceholderResolver();
-                if (o instanceof String v) {
+                if (o instanceof String) {
+                    String v = (String) o;
                     if (v.contains("${")) {
                         return placeholderResolver.resolveRequiredPlaceholders(v);
                     }
-                } else if (o instanceof String[] strings) {
-                    return AnnotationValue.resolveStringArray(strings, o1 -> {
+                } else if (o instanceof String[]) {
+                    return AnnotationValue.resolveStringArray((String[]) o, o1 -> {
                         String v = (String) o1;
                         if (v.contains("${")) {
                             return placeholderResolver.resolveRequiredPlaceholders(v);
@@ -123,7 +124,8 @@ public abstract class AbstractEnvironmentAnnotationMetadata implements Annotatio
         Environment environment = getEnvironment();
         if (environment != null) {
             return environmentAnnotationMetadata.isTrue(annotation, member, o -> {
-                if (o instanceof String v) {
+                if (o instanceof String) {
+                    String v = (String) o;
                     if (v.contains("${")) {
                         return environment.getPlaceholderResolver().resolveRequiredPlaceholders(v);
                     }
@@ -140,7 +142,8 @@ public abstract class AbstractEnvironmentAnnotationMetadata implements Annotatio
         Environment environment = getEnvironment();
         if (environment != null) {
             return !environmentAnnotationMetadata.isTrue(annotation, member, o -> {
-                if (o instanceof String v) {
+                if (o instanceof String) {
+                    String v = (String) o;
                     if (v.contains("${")) {
                         return environment.getPlaceholderResolver().resolveRequiredPlaceholders(v);
                     }
@@ -227,8 +230,8 @@ public abstract class AbstractEnvironmentAnnotationMetadata implements Annotatio
                 String[] values;
                 if (val instanceof CharSequence) {
                     values = new String[] { val.toString() };
-                } else if (val instanceof String[] strings) {
-                    values = strings;
+                } else if (val instanceof String[]) {
+                    values = (String[]) val;
                 } else {
                     return null;
                 }
@@ -470,7 +473,8 @@ public abstract class AbstractEnvironmentAnnotationMetadata implements Annotatio
                     Collections.singleton(environmentAnnotationMetadata),
                     environment
             );
-        } else if (environmentAnnotationMetadata instanceof AnnotationMetadataHierarchy hierarchy) {
+        } else if (environmentAnnotationMetadata instanceof AnnotationMetadataHierarchy) {
+            AnnotationMetadataHierarchy hierarchy = (AnnotationMetadataHierarchy) environmentAnnotationMetadata;
             Environment environment = getEnvironment();
             return resolveOptionalValuesForEnvironment(
                     annotation,
@@ -517,7 +521,8 @@ public abstract class AbstractEnvironmentAnnotationMetadata implements Annotatio
         Environment env = getEnvironment();
         if (env != null) {
             return o -> {
-                if (o instanceof String v) {
+                if (o instanceof String) {
+                    String v = (String) o;
                     if (v.contains("${")) {
                         return env.getPlaceholderResolver().resolveRequiredPlaceholders(v);
                     }
@@ -536,10 +541,10 @@ public abstract class AbstractEnvironmentAnnotationMetadata implements Annotatio
 
         Map<CharSequence, Object> finalValues = new LinkedHashMap<>();
         for (AnnotationMetadata annotationMetadata : metadata) {
-            if (annotationMetadata instanceof DefaultAnnotationMetadata defaultAnnotationMetadata) {
+            if (annotationMetadata instanceof DefaultAnnotationMetadata) {
 
-                Map<String, Map<CharSequence, Object>> allAnnotations = defaultAnnotationMetadata.allAnnotations;
-                Map<String, Map<CharSequence, Object>> allStereotypes = defaultAnnotationMetadata.allStereotypes;
+                Map<String, Map<CharSequence, Object>> allAnnotations = ((DefaultAnnotationMetadata) annotationMetadata).allAnnotations;
+                Map<String, Map<CharSequence, Object>> allStereotypes = ((DefaultAnnotationMetadata) annotationMetadata).allStereotypes;
                 if (allAnnotations != null && StringUtils.isNotEmpty(annotation)) {
                     processMap(annotation, finalValues, allStereotypes);
                     processMap(annotation, finalValues, allAnnotations);

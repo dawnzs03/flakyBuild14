@@ -16,7 +16,6 @@
 package io.micronaut.inject.writer;
 
 import io.micronaut.core.annotation.AnnotationMetadata;
-import io.micronaut.core.annotation.AnnotationUtil;
 import io.micronaut.core.annotation.Generated;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
@@ -33,7 +32,6 @@ import io.micronaut.inject.annotation.MutableAnnotationMetadata;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.GenericPlaceholderElement;
-import io.micronaut.inject.ast.KotlinParameterElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
@@ -561,17 +559,10 @@ public abstract class AbstractClassFileWriter implements Opcodes, OriginatingEle
             );
 
             String argumentName = entry.getName();
-            MutableAnnotationMetadata annotationMetadata = new AnnotationMetadataHierarchy(
+            AnnotationMetadata annotationMetadata = new AnnotationMetadataHierarchy(
                 entry.getAnnotationMetadata(),
                 genericType.getTypeAnnotationMetadata()
             ).merge();
-
-            if (entry instanceof KotlinParameterElement kp && kp.hasDefault()) {
-                annotationMetadata.removeAnnotation(AnnotationUtil.NON_NULL);
-                annotationMetadata.addAnnotation(AnnotationUtil.NULLABLE, Map.of());
-                annotationMetadata.addDeclaredAnnotation(AnnotationUtil.NULLABLE, Map.of());
-            }
-
             Map<String, ClassElement> typeArguments = genericType.getTypeArguments();
             pushCreateArgument(
                     annotationMetadataWithDefaults,
@@ -1215,12 +1206,12 @@ public abstract class AbstractClassFileWriter implements Opcodes, OriginatingEle
      * @return The {@link Type} for the object type
      */
     protected static Type getObjectType(Object type) {
-        if (type instanceof TypedElement element) {
-            String name = element.getType().getName();
+        if (type instanceof TypedElement) {
+            String name = ((TypedElement) type).getType().getName();
             String internalName = getTypeDescriptor(name);
             return Type.getType(internalName);
-        } else if (type instanceof Class class1) {
-            return Type.getType(class1);
+        } else if (type instanceof Class) {
+            return Type.getType((Class) type);
         } else if (type instanceof String) {
             String className = type.toString();
 

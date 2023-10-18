@@ -261,7 +261,7 @@ abstract class AbstractInjectAnnotationProcessor extends AbstractProcessor {
             illegalState();
             return;
         }
-        messager.printMessage(Diagnostic.Kind.ERROR, msg.formatted(args), e);
+        messager.printMessage(Diagnostic.Kind.ERROR, String.format(msg, args), e);
     }
 
     /**
@@ -274,7 +274,7 @@ abstract class AbstractInjectAnnotationProcessor extends AbstractProcessor {
         if (messager == null) {
             illegalState();
         }
-        messager.printMessage(Diagnostic.Kind.ERROR, msg.formatted(args));
+        messager.printMessage(Diagnostic.Kind.ERROR, String.format(msg, args));
     }
 
     /**
@@ -288,7 +288,7 @@ abstract class AbstractInjectAnnotationProcessor extends AbstractProcessor {
         if (messager == null) {
             illegalState();
         }
-        messager.printMessage(Diagnostic.Kind.WARNING, msg.formatted(args), e);
+        messager.printMessage(Diagnostic.Kind.WARNING, String.format(msg, args), e);
     }
 
     /**
@@ -302,7 +302,7 @@ abstract class AbstractInjectAnnotationProcessor extends AbstractProcessor {
         if (messager == null) {
             illegalState();
         }
-        messager.printMessage(Diagnostic.Kind.WARNING, msg.formatted(args));
+        messager.printMessage(Diagnostic.Kind.WARNING, String.format(msg, args));
     }
 
     /**
@@ -316,7 +316,7 @@ abstract class AbstractInjectAnnotationProcessor extends AbstractProcessor {
         if (messager == null) {
             illegalState();
         }
-        messager.printMessage(Diagnostic.Kind.NOTE, msg.formatted(args), e);
+        messager.printMessage(Diagnostic.Kind.NOTE, String.format(msg, args), e);
     }
 
     /**
@@ -329,7 +329,7 @@ abstract class AbstractInjectAnnotationProcessor extends AbstractProcessor {
         if (messager == null) {
             illegalState();
         }
-        messager.printMessage(Diagnostic.Kind.NOTE, msg.formatted(args));
+        messager.printMessage(Diagnostic.Kind.NOTE, String.format(msg, args));
     }
 
     private void illegalState() {

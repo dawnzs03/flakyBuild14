@@ -23,7 +23,7 @@ import io.micronaut.inject.ast.annotation.ElementAnnotationMetadataFactory
 @OptIn(KspExperimental::class)
 internal open class KotlinMethodElement(
     owningType: ClassElement,
-    override val declaration: KSFunctionDeclaration,
+    val declaration: KSFunctionDeclaration,
     private val presetParameters: List<ParameterElement>?,
     elementAnnotationMetadataFactory: ElementAnnotationMetadataFactory,
     visitorContext: KotlinVisitorContext
@@ -47,10 +47,6 @@ internal open class KotlinMethodElement(
         elementAnnotationMetadataFactory,
         visitorContext
     )
-
-    override val overridee: KSDeclaration? by lazy {
-        declaration.findOverridee()
-    }
 
     override val internalDeclaringType: ClassElement by lazy {
         resolveDeclaringType(declaration, owningType)

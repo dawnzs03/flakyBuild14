@@ -288,8 +288,8 @@ public abstract class AbstractNettyWebSocketHandler extends SimpleChannelInbound
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
-        if (msg instanceof WebSocketFrame frame) {
-            handleWebSocketFrame(ctx, frame);
+        if (msg instanceof WebSocketFrame) {
+            handleWebSocketFrame(ctx, (WebSocketFrame) msg);
         } else {
             ctx.fireChannelRead(msg);
         }
@@ -439,7 +439,8 @@ public abstract class AbstractNettyWebSocketHandler extends SimpleChannelInbound
                     exceptionCaught(ctx, e);
                 }
             }
-        } else if (msg instanceof CloseWebSocketFrame cwsf) {
+        } else if (msg instanceof CloseWebSocketFrame) {
+            CloseWebSocketFrame cwsf = (CloseWebSocketFrame) msg;
             handleCloseFrame(ctx, cwsf);
         } else {
             writeCloseFrameAndTerminate(

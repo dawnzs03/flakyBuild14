@@ -52,8 +52,8 @@ final class MutableHttpRequestWrapper<B> extends HttpRequestWrapper<B> implement
     }
 
     static MutableHttpRequest<?> wrapIfNecessary(ConversionService conversionService, HttpRequest<?> request) {
-        if (request instanceof MutableHttpRequest<?> httpRequest) {
-            return httpRequest;
+        if (request instanceof MutableHttpRequest<?>) {
+            return (MutableHttpRequest<?>) request;
         } else {
             return new MutableHttpRequestWrapper<>(conversionService, request);
         }

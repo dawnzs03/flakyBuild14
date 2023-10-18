@@ -190,7 +190,7 @@ public class GroovyMethodElement extends AbstractGroovyElement implements Method
 
     @Override
     public boolean isDefault() {
-        return methodNode.isDefault() || (!isAbstract() && getDeclaringType().isInterface());
+        return !isAbstract() && getDeclaringType().isInterface();
     }
 
     @Override

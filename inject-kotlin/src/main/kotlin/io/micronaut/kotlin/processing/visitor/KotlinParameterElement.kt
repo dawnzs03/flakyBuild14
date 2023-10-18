@@ -32,7 +32,7 @@ internal class KotlinParameterElement(
     KotlinMethodParameterNativeElement(parameter, methodElement.nativeType),
     elementAnnotationMetadataFactory,
     visitorContext
-), io.micronaut.inject.ast.KotlinParameterElement {
+), ParameterElement {
 
     private val internalName: String by lazy {
         parameter.name!!.asString()
@@ -56,12 +56,6 @@ internal class KotlinParameterElement(
             newClassElement(nativeType, parameter.type.resolve(), methodElement.typeArguments)
         }
     }
-
-    override fun isNonNull() = !hasDefault() && super<AbstractKotlinElement>.isNonNull()
-
-    override fun isNullable() = hasDefault() || super<AbstractKotlinElement>.isNullable()
-
-    override fun hasDefault() = parameter.hasDefault
 
     override fun isPrimitive() = internalType.isPrimitive
 

@@ -16,7 +16,6 @@
 package io.micronaut.http.netty.stream;
 
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.http.netty.reactive.HotObservable;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -33,7 +32,7 @@ import org.reactivestreams.Subscriber;
  * @since 1.0
  */
 @Internal
-public class DefaultStreamedHttpResponse extends DefaultHttpResponse implements StreamedHttpResponse, HotObservable<HttpContent> {
+public class DefaultStreamedHttpResponse extends DefaultHttpResponse implements StreamedHttpResponse {
 
     private final Publisher<HttpContent> stream;
 
@@ -74,10 +73,4 @@ public class DefaultStreamedHttpResponse extends DefaultHttpResponse implements 
         stream.subscribe(subscriber);
     }
 
-    @Override
-    public void closeIfNoSubscriber() {
-        if (stream instanceof HotObservable<HttpContent> ho) {
-            ho.closeIfNoSubscriber();
-        }
-    }
 }

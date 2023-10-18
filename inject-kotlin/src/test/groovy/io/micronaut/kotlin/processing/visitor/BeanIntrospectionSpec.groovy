@@ -49,52 +49,6 @@ class Test
         introspection.instantiate().class.name == "test.Test"
     }
 
-    void "test default introspection"() {
-        when:
-            def introspection = buildBeanIntrospection("test.Test", """
-package test
-
-import io.micronaut.core.annotation.Introspected
-
-@Introspected
-data class Test(val firstName: String = "Denis",
-               val lastName: String,
-               val job: String? = "IT",
-               val age: Int)
-""")
-
-        then:
-            noExceptionThrown()
-            introspection != null
-            introspection.getConstructorArguments()[0].isDeclaredNullable()
-            introspection.getConstructorArguments()[0].isNullable()
-            !introspection.getConstructorArguments()[1].isDeclaredNullable()
-            introspection.getConstructorArguments()[2].isDeclaredNullable()
-            !introspection.getConstructorArguments()[3].isDeclaredNullable()
-            !introspection.getProperty("firstName").get().isNullable()
-            !introspection.getProperty("lastName").get().isNullable()
-            introspection.getProperty("job").get().isNullable()
-            !introspection.getProperty("age").get().isNullable()
-    }
-
-    void "test data class introspection"() {
-        when:
-        def introspection = buildBeanIntrospection("test.ContactEntity", """
-package test
-
-import io.micronaut.core.annotation.Introspected
-
-@Introspected
-data class ContactEntity(var id: Long? = null, val firstName: String, val lastName: String)
-""")
-
-
-        then:
-        noExceptionThrown()
-        introspection != null
-        introspection.beanProperties.size() == 3
-    }
-
     void "test non-null and null introspection"() {
         when:
         def introspection = buildBeanIntrospection("test.Test", """
@@ -111,7 +65,6 @@ data class Test(
         then:
         noExceptionThrown()
         introspection != null
-
         introspection.constructorArguments.size() == 2
         introspection.constructorArguments[0].isNonNull()
         introspection.constructorArguments[1].isNullable()
@@ -144,7 +97,6 @@ annotation class MyAnn {
         introspection.instantiate().class.name == "test.Test"
         introspection.hasAnnotation('test.MyAnn')
         introspection.hasStereotype('test.MyAnn$InnerAnn')
-
     }
 
     void "test generics in arrays don't stack overflow"() {

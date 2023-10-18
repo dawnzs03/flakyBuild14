@@ -123,7 +123,8 @@ public class NettyClientHttpRequest<B> implements MutableHttpRequest<B>, NettyHt
 
     @Override
     public MutableHttpRequest<B> cookie(Cookie cookie) {
-        if (cookie instanceof NettyCookie nettyCookie) {
+        if (cookie instanceof NettyCookie) {
+            NettyCookie nettyCookie = (NettyCookie) cookie;
             String value = ClientCookieEncoder.LAX.encode(nettyCookie.getNettyCookie());
             cookies.put(cookie.getName(), value);
             String headerValue;
@@ -143,7 +144,8 @@ public class NettyClientHttpRequest<B> implements MutableHttpRequest<B>, NettyHt
     public MutableHttpRequest<B> cookies(Set<Cookie> cookies) {
         if (cookies.size() > 1) {
             for (Cookie cookie: cookies) {
-                if (cookie instanceof NettyCookie nettyCookie) {
+                if (cookie instanceof NettyCookie) {
+                    NettyCookie nettyCookie = (NettyCookie) cookie;
                     String value = ClientCookieEncoder.LAX.encode(nettyCookie.getNettyCookie());
                     this.cookies.put(cookie.getName(), value);
                 } else {
@@ -269,12 +271,12 @@ public class NettyClientHttpRequest<B> implements MutableHttpRequest<B>, NettyHt
         io.netty.handler.codec.http.HttpMethod method = getMethod(httpMethodName);
         DefaultFullHttpRequest req;
         if (body != null) {
-            if (body instanceof ByteBuf buf) {
+            if (body instanceof ByteBuf) {
                 req = new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1,
                         method,
                         uriStr,
-                        buf,
+                        (ByteBuf) body,
                         headers.getNettyHeaders(),
                         EmptyHttpHeaders.INSTANCE
                 );
