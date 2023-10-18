@@ -1330,10 +1330,7 @@ class AppliedPTransform(object):
 
     # Iterate over inputs and outputs by sorted key order, so that ids are
     # consistently generated for multiple runs of the same pipeline.
-    try:
-      transform_spec = transform_to_runner_api(self.transform, context)
-    except Exception as exn:
-      raise RuntimeError(f'Unable to translate {self.full_label}') from exn
+    transform_spec = transform_to_runner_api(self.transform, context)
     environment_id = self.environment_id
     transform_urn = transform_spec.urn if transform_spec else None
     if (not environment_id and

@@ -1,5 +1,5 @@
 ---
-title: "Data exploration"
+title: "Data processing"
 ---
 <!--
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Data exploration
+# Data processing
 
 Several types of Apache Beam data processing are applicable to AI/ML projects:
 - Data exploration: Learn about your data (properties, distributions, statistics) when you start to deploy your project or when the data changes.

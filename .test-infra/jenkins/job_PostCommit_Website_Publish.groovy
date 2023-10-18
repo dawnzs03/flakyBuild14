@@ -15,23 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.sdk.extensions.sql;
 
-import java.io.Serializable;
-import java.util.List;
-import org.apache.beam.sdk.values.Row;
+import CommonJobProperties as commonJobProperties
+import PostcommitJobBuilder
 
-/**
- * A seekable table converts a JOIN operator to an inline lookup. It's triggered by {@code SELECT *
- * FROM FACT_TABLE JOIN LOOKUP_TABLE ON ...}.
- */
-public interface BeamSqlSeekableTable extends Serializable {
-  /** prepare the instance. */
-  default void setUp() {};
 
-  /** return a list of {@code Row} with given key set. */
-  List<Row> seekRow(Row lookupSubRow);
+// This job builds and publishes the website into the asf-site branch of the beam repo.
+PostcommitJobBuilder.postCommitJob('beam_PostCommit_Website_Publish', '',
+    'Website Publish', this) {
 
-  /** cleanup resources of the instance. */
-  default void tearDown() {};
-}
+      description('Publish generated website content into asf-site branch for hosting.')
+
+      // Set common parameters.
+      commonJobProperties.setTopLevelMainJobProperties(delegate, 'master', 30, true, 'git-websites')
+
+      // Gradle goals for this job.
+      steps {
+        gradle {
+          rootBuildScriptDir(commonJobProperties.checkoutDir)
+          tasks(':website:clean')
+          tasks(':website:publishWebsite')
+          commonJobProperties.setGradleSwitches(delegate)
+        }
+      }
+    }

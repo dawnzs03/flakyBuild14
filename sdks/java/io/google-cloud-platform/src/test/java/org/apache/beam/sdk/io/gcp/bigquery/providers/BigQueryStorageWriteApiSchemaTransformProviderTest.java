@@ -48,11 +48,9 @@ import org.apache.beam.sdk.schemas.logicaltypes.SqlTypes;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionRowTuple;
 import org.apache.beam.sdk.values.Row;
-import org.apache.beam.sdk.values.TypeDescriptors;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -213,13 +211,7 @@ public class BigQueryStorageWriteApiSchemaTransformProviderTest {
   public void testFailedRows() throws Exception {
     String tableSpec = "project:dataset.write_with_fail";
     BigQueryStorageWriteApiSchemaTransformConfiguration config =
-        BigQueryStorageWriteApiSchemaTransformConfiguration.builder()
-            .setTable(tableSpec)
-            .setErrorHandling(
-                BigQueryStorageWriteApiSchemaTransformConfiguration.ErrorHandling.builder()
-                    .setOutput("FailedRows")
-                    .build())
-            .build();
+        BigQueryStorageWriteApiSchemaTransformConfiguration.builder().setTable(tableSpec).build();
 
     String failValue = "fail_me";
 
@@ -242,15 +234,7 @@ public class BigQueryStorageWriteApiSchemaTransformProviderTest {
     fakeDatasetService.setShouldFailRow(shouldFailRow);
 
     PCollectionRowTuple result = runWithConfig(config, totalRows);
-    PCollection<Row> failedRows =
-        result
-            .get("FailedRows")
-            .apply(
-                "ExtractFailedRows",
-                MapElements.into(TypeDescriptors.rows())
-                    .via((rowAndError) -> rowAndError.<Row>getValue("failed_row")))
-            .setRowSchema(SCHEMA);
-    ;
+    PCollection<Row> failedRows = result.get("FailedRows");
 
     PAssert.that(failedRows).containsInAnyOrder(expectedFailedRows);
     p.run().waitUntilFinish();
@@ -266,13 +250,7 @@ public class BigQueryStorageWriteApiSchemaTransformProviderTest {
   public void testErrorCount() throws Exception {
     String tableSpec = "project:dataset.error_count";
     BigQueryStorageWriteApiSchemaTransformConfiguration config =
-        BigQueryStorageWriteApiSchemaTransformConfiguration.builder()
-            .setTable(tableSpec)
-            .setErrorHandling(
-                BigQueryStorageWriteApiSchemaTransformConfiguration.ErrorHandling.builder()
-                    .setOutput("FailedRows")
-                    .build())
-            .build();
+        BigQueryStorageWriteApiSchemaTransformConfiguration.builder().setTable(tableSpec).build();
 
     Function<TableRow, Boolean> shouldFailRow =
         (Function<TableRow, Boolean> & Serializable) tr -> tr.get("name").equals("a");

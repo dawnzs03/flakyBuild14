@@ -33,7 +33,6 @@ import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO.Write.CreateDisposition;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO.Write.Method;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO.Write.WriteDisposition;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryServices;
-import org.apache.beam.sdk.io.gcp.bigquery.BigQueryStorageApiInsertError;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryUtils;
 import org.apache.beam.sdk.io.gcp.bigquery.WriteResult;
 import org.apache.beam.sdk.io.gcp.bigquery.providers.BigQueryStorageWriteApiSchemaTransformProvider.BigQueryStorageWriteApiSchemaTransformConfiguration;
@@ -95,7 +94,7 @@ public class BigQueryStorageWriteApiSchemaTransformProvider
 
   @Override
   public String identifier() {
-    return String.format("beam:schematransform:org.apache.beam:bigquery_storage_write:v2");
+    return String.format("beam:schematransform:org.apache.beam:bigquery_storage_write:v1");
   }
 
   @Override
@@ -126,24 +125,6 @@ public class BigQueryStorageWriteApiSchemaTransformProvider
             .put(WriteDisposition.WRITE_APPEND.name(), WriteDisposition.WRITE_APPEND)
             .build();
 
-    @AutoValue
-    public abstract static class ErrorHandling {
-      @SchemaFieldDescription("The name of the output PCollection containing failed writes.")
-      public abstract String getOutput();
-
-      public static Builder builder() {
-        return new AutoValue_BigQueryStorageWriteApiSchemaTransformProvider_BigQueryStorageWriteApiSchemaTransformConfiguration_ErrorHandling
-            .Builder();
-      }
-
-      @AutoValue.Builder
-      public abstract static class Builder {
-        public abstract Builder setOutput(String output);
-
-        public abstract ErrorHandling build();
-      }
-    }
-
     public void validate() {
       String invalidConfigMessage = "Invalid BigQuery Storage Write configuration: ";
 
@@ -169,12 +150,6 @@ public class BigQueryStorageWriteApiSchemaTransformProvider
                 + "Invalid write disposition (%s) was specified. Available dispositions are: %s",
             this.getWriteDisposition(),
             WRITE_DISPOSITIONS.keySet());
-      }
-
-      if (this.getErrorHandling() != null) {
-        checkArgument(
-            !Strings.isNullOrEmpty(this.getErrorHandling().getOutput()),
-            invalidConfigMessage + "Output must not be empty if error handling specified.");
       }
     }
 
@@ -223,10 +198,6 @@ public class BigQueryStorageWriteApiSchemaTransformProvider
     @Nullable
     public abstract Boolean getAutoSharding();
 
-    @SchemaFieldDescription("This option specifies whether and where to output unwritable rows.")
-    @Nullable
-    public abstract ErrorHandling getErrorHandling();
-
     /** Builder for {@link BigQueryStorageWriteApiSchemaTransformConfiguration}. */
     @AutoValue.Builder
     public abstract static class Builder {
@@ -242,8 +213,6 @@ public class BigQueryStorageWriteApiSchemaTransformProvider
       public abstract Builder setUseAtLeastOnceSemantics(Boolean use);
 
       public abstract Builder setAutoSharding(Boolean autoSharding);
-
-      public abstract Builder setErrorHandling(ErrorHandling errorHandling);
 
       /** Builds a {@link BigQueryStorageWriteApiSchemaTransformConfiguration} instance. */
       public abstract BigQueryStorageWriteApiSchemaTransformProvider
@@ -275,7 +244,7 @@ public class BigQueryStorageWriteApiSchemaTransformProvider
 
     // A generic counter for PCollection of Row. Will be initialized with the given
     // name argument. Performs element-wise counter of the input PCollection.
-    private static class ElementCounterFn<T> extends DoFn<T, T> {
+    private static class ElementCounterFn extends DoFn<Row, Row> {
 
       private Counter bqGenericElementCounter;
       private Long elementsInBundle = 0L;
@@ -296,18 +265,6 @@ public class BigQueryStorageWriteApiSchemaTransformProvider
         this.bqGenericElementCounter.inc(this.elementsInBundle);
         this.elementsInBundle = 0L;
       }
-    }
-
-    private static class FailOnError extends DoFn<BigQueryStorageApiInsertError, Void> {
-      @ProcessElement
-      public void process(ProcessContext c) {
-        throw new RuntimeException(c.element().getErrorMessage());
-      }
-    }
-
-    private static class NoOutputDoFn<T> extends DoFn<T, Row> {
-      @ProcessElement
-      public void process(ProcessContext c) {}
     }
 
     @Override
@@ -337,55 +294,53 @@ public class BigQueryStorageWriteApiSchemaTransformProvider
       WriteResult result =
           inputRows
               .apply(
-                  "element-count",
-                  ParDo.of(new ElementCounterFn<Row>("BigQuery-write-element-counter")))
+                  "element-count", ParDo.of(new ElementCounterFn("BigQuery-write-element-counter")))
               .setRowSchema(inputSchema)
               .apply(write);
 
-      // Give something that can be followed.
-      PCollection<Row> postWrite =
+      Schema rowSchema = inputRows.getSchema();
+      Schema errorSchema =
+          Schema.of(
+              Field.of("failed_row", FieldType.row(rowSchema)),
+              Field.of("error_message", FieldType.STRING));
+
+      // Failed rows
+      PCollection<Row> failedRows =
           result
               .getFailedStorageApiInserts()
-              .apply("post-write", ParDo.of(new NoOutputDoFn<BigQueryStorageApiInsertError>()))
-              .setRowSchema(Schema.of());
+              .apply(
+                  "Construct failed rows",
+                  MapElements.into(TypeDescriptors.rows())
+                      .via(
+                          (storageError) ->
+                              BigQueryUtils.toBeamRow(rowSchema, storageError.getRow())))
+              .setRowSchema(rowSchema);
 
-      if (configuration.getErrorHandling() == null) {
-        result
-            .getFailedStorageApiInserts()
-            .apply("Error on failed inserts", ParDo.of(new FailOnError()));
-        return PCollectionRowTuple.of("post_write", postWrite);
-      } else {
-        result
-            .getFailedStorageApiInserts()
-            .apply(
-                "error-count",
-                ParDo.of(
-                    new ElementCounterFn<BigQueryStorageApiInsertError>(
-                        "BigQuery-write-error-counter")));
+      // Failed rows with error message
+      PCollection<Row> failedRowsWithErrors =
+          result
+              .getFailedStorageApiInserts()
+              .apply(
+                  "Construct failed rows and errors",
+                  MapElements.into(TypeDescriptors.rows())
+                      .via(
+                          (storageError) ->
+                              Row.withSchema(errorSchema)
+                                  .withFieldValue("error_message", storageError.getErrorMessage())
+                                  .withFieldValue(
+                                      "failed_row",
+                                      BigQueryUtils.toBeamRow(rowSchema, storageError.getRow()))
+                                  .build()))
+              .setRowSchema(errorSchema);
 
-        // Failed rows with error message
-        Schema errorSchema =
-            Schema.of(
-                Field.of("failed_row", FieldType.row(inputSchema)),
-                Field.of("error_message", FieldType.STRING));
-        PCollection<Row> failedRowsWithErrors =
-            result
-                .getFailedStorageApiInserts()
-                .apply(
-                    "Construct failed rows and errors",
-                    MapElements.into(TypeDescriptors.rows())
-                        .via(
-                            (storageError) ->
-                                Row.withSchema(errorSchema)
-                                    .withFieldValue("error_message", storageError.getErrorMessage())
-                                    .withFieldValue(
-                                        "failed_row",
-                                        BigQueryUtils.toBeamRow(inputSchema, storageError.getRow()))
-                                    .build()))
-                .setRowSchema(errorSchema);
-        return PCollectionRowTuple.of("post_write", postWrite)
-            .and(configuration.getErrorHandling().getOutput(), failedRowsWithErrors);
-      }
+      PCollection<Row> failedRowsOutput =
+          failedRows
+              .apply("error-count", ParDo.of(new ElementCounterFn("BigQuery-write-error-counter")))
+              .setRowSchema(rowSchema);
+
+      return PCollectionRowTuple.of(FAILED_ROWS_TAG, failedRowsOutput)
+          .and(FAILED_ROWS_WITH_ERRORS_TAG, failedRowsWithErrors)
+          .and("errors", failedRowsWithErrors);
     }
 
     BigQueryIO.Write<Row> createStorageWriteApiTransform() {

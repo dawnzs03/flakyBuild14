@@ -60,10 +60,6 @@ $defs:
             type: array
             items:
               $ref: '#/$defs/transform'
-          extra_transforms:
-            type: array
-            items:
-              $ref: '#/$defs/transform'
           source:
             $ref: '#/$defs/transform'
           sink:
@@ -104,10 +100,7 @@ $defs:
       - if:
           properties: { type: { const: composite }}
         then:
-          allOf:
-            - $ref: '#/$defs/nestedTransform'
-            - properties:
-                extra_transforms: { not: {} }
+          $ref: '#/$defs/nestedTransform'
       - if:
           properties: { type: { const: chain }}
         then:

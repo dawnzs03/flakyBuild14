@@ -117,27 +117,6 @@ class YamlTransformE2ETest(unittest.TestCase):
           ''')
       assert_that(result, equal_to([41, 43, 47, 53, 61, 71, 83, 97, 113, 131]))
 
-  def create_has_schema(self):
-    with beam.Pipeline(options=beam.options.pipeline_options.PipelineOptions(
-        pickle_library='cloudpickle')) as p:
-      result = p | YamlTransform(
-          '''
-          type: chain
-          transforms:
-            - type: Create
-              config:
-                  elements: [{a: 1, b: 'x'}, {a: 2, b: 'y'}]
-            - type: MapToFields
-              config:
-                  language: python
-                  fields:
-                      repeated: a * b
-            - type: PyMap
-              config:
-                  fn: "lambda x: x.repeated"
-          ''')
-      assert_that(result, equal_to(['x', 'yy']))
-
   def test_implicit_flatten(self):
     with beam.Pipeline(options=beam.options.pipeline_options.PipelineOptions(
         pickle_library='cloudpickle')) as p:
@@ -249,23 +228,6 @@ class YamlTransformE2ETest(unittest.TestCase):
                 input: PyFilter
             output: AnotherFilter
             ''')
-
-  def test_annotations(self):
-    t = LinearTransform(5, b=100)
-    annotations = t.annotations()
-    with beam.Pipeline(options=beam.options.pipeline_options.PipelineOptions(
-        pickle_library='cloudpickle')) as p:
-      result = p | YamlTransform(
-          '''
-          type: chain
-          transforms:
-            - type: Create
-              config:
-                elements: [0, 1, 2, 3]
-            - type: %r
-              config: %s
-          ''' % (annotations['yaml_type'], annotations['yaml_args']))
-      assert_that(result, equal_to([100, 105, 110, 115]))
 
 
 class CreateTimestamped(beam.PTransform):
@@ -646,19 +608,6 @@ class ProviderAffinityTest(unittest.TestCase):
           result3,
           equal_to([('provider3', 'provider3', 'provider4', 'provider4')]),
           label='StartWith3')
-
-
-@beam.transforms.ptransform.annotate_yaml
-class LinearTransform(beam.PTransform):
-  """A transform used for testing annotate_yaml."""
-  def __init__(self, a, b):
-    self._a = a
-    self._b = b
-
-  def expand(self, pcoll):
-    a = self._a
-    b = self._b
-    return pcoll | beam.Map(lambda x: a * x + b)
 
 
 if __name__ == '__main__':

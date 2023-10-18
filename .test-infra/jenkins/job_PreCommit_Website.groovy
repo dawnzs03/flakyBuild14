@@ -15,23 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.sdk.extensions.sql;
 
-import java.io.Serializable;
-import java.util.List;
-import org.apache.beam.sdk.values.Row;
+import PrecommitJobBuilder
 
-/**
- * A seekable table converts a JOIN operator to an inline lookup. It's triggered by {@code SELECT *
- * FROM FACT_TABLE JOIN LOOKUP_TABLE ON ...}.
- */
-public interface BeamSqlSeekableTable extends Serializable {
-  /** prepare the instance. */
-  default void setUp() {};
+PrecommitJobBuilder builder = new PrecommitJobBuilder(
+    scope: this,
+    nameBase: 'Website',
+    gradleTask: ':websitePreCommit',
+    triggerPathPatterns: ['^website/.*$'])
+builder.build()
 
-  /** return a list of {@code Row} with given key set. */
-  List<Row> seekRow(Row lookupSubRow);
-
-  /** cleanup resources of the instance. */
-  default void tearDown() {};
-}
