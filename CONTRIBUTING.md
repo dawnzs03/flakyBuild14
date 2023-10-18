@@ -1,165 +1,93 @@
-# Contributing to Apache Tomcat
+# Contributing Code or Documentation to the Micronaut Framework
 
-Firstly, thanks for your interest in contributing! I hope that this will be a
-pleasant experience for you, and that you will return to continue
-contributing.
+## Finding Issues to Work on
 
-Please visit our [Get Involved page](https://tomcat.apache.org/getinvolved.html)
-for more information on how to contribute.
+If you are interested in contributing to the Micronaut Framework and are looking for issues to work on, take a look at the issues tagged with [help wanted](https://github.com/micronaut-projects/micronaut-core/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).
 
-## Code of Conduct
+## JDK Setup
 
-This project and everyone participating in it are governed by the Apache
-software Foundation's
-[Code of Conduct](https://www.apache.org/foundation/policies/conduct.html). By
-participating, you are expected to adhere to this code. If you are aware of
-unacceptable behavior, please visit the
-[Reporting Guidelines page](https://www.apache.org/foundation/policies/conduct.html#reporting-guidelines)
-and follow the instructions there.
+The Micronaut Framework currently requires JDK 8
 
-## How Can I Contribute?
+## IDE Setup
 
-Most of the contributions that we receive are code contributions, but you can
-also contribute to the documentation, wiki, etc., or simply report solid bugs
-for us to fix.
+The Micronaut Framework project is imported into IntelliJ IDEA by opening the `build.gradle` file.
 
-### Reporting Bugs
+## Docker Setup
 
-Please review our [guide](https://tomcat.apache.org/bugreport.html) on how to
-submit a bug report. This page also has links to other resources to assist
-you.
+The Micronaut Framework tests require Docker.
 
-### Reporting Translation improvements
+## Running Tests
 
-Apache Tomcat project uses POEditor for managing the localization files.
-Please see more at https://cwiki.apache.org/confluence/x/vIPzBQ
+To run the tests use `./gradlew check`.
 
-### Your First Code Contribution
+[Geb](http://gebish.org) functional tests are ignored unless you specify the geb environment via system property.
 
-### Trouble Deciding How to Contribute?
+To run with Chrome `./gradlew -Dgeb.env=chrome check`.
 
-Unsure where to begin contributing to Tomcat? You can start by taking a look at
-the issues marked 'Beginner', link below. Please note that the Beginner keyword
-is pretty new to the project, so if there aren't any issues in the filter feel
-free to ask on the [dev list](https://tomcat.apache.org/lists.html#tomcat-dev).
+To run with Firefox `./gradlew -Dgeb.env=firefox check`.
 
-* [Beginner issues](https://bz.apache.org/bugzilla/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&bug_status=NEEDINFO&keywords=Beginner&keywords_type=allwords&list_id=160824&product=Tomcat%207&product=Tomcat%208.5&product=Tomcat%209&query_format=advanced) -
-issues which should only require a few lines of code, and a test or two to
-resolve.
+## Building Documentation
 
-The list above shows all bugs that are marked 'Beginner' and are open in the
-currently supported Tomcat versions (7, 8.5, and 9).
+The documentation sources are located at `src/main/docs/guide`.
 
-If you prefer C over Java, you may also take a look at the tomcat-native and
-Tomcat Connectors products in Bugzilla.
+To build the documentation run `./gradlew publishGuide` or `./gradlew pG` then open `build/working/02-docs-raw/index.html`
+> This only generates the raw guide without the API and Configuration references; therefore, the API links in the manual
+> will not resolve in a browser.
 
-### How to Provide Your First Patch
+To include the API (javadocs) and Configuration references run `./gradlew docs` instead and open `build/docs/index.html`
 
-Excited yet? This section will guide you through providing a patch to the
-committers of the project for review and acceptance.
 
-##### Choose Your Method of Submission
+## Working on the code base
 
-You can provide a patch in one of the following ways (in order of preference):
+If you are working with the IntelliJ IDEA development environment, you can import the project using Intellij's Gradle Tooling ("File / Open..." and select the "build.gradle" file or the project directory).
 
-* GitHub Pull Request
-* Patch attachment to the Bugzilla issue
-* Email the patch to the developer list. This is not preferred, but if no bug
-is associated with the patch, or you would like a developer review, an email
-may be appropriate.
+Create a branch from the release branch to which you anticipate merging back changes, e.g. `3.4.x`, `3.5.x`, `3.6.x`, etc.
 
-##### Get the Sources
-
-Now that you've chosen how you want to submit a patch, you need to get the
-source code.
-
-###### Download The Source Distribution
-
-This method works if you want to submit a patch via email, but
-the difference in using the sources distribution and a VCS is that you have to
-manually generate the patch file by using diff. If this is what you want, you
-can download the sources from the "Source Code Distributions" section of the
-Download Page. There is one such page for every major Tomcat version:
-
-- [Tomcat 11](https://tomcat.apache.org/download-11.cgi)
-- [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
-- [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
-- [Tomcat 7](https://tomcat.apache.org/download-70.cgi)
-
-##### Manual Patch Generation
-
-If you have chosen to attach a patch to the Bugzilla issue (or email
-one), then you'll need to download the sources as noted above, make your
-desired changes and then manually generate your patch using diff (or any
-other tool).
-
-##### GitHub
-
-To submit a GitHub Pull Request you'll need to fork the
-[repository](https://github.com/apache/tomcat), clone your fork to do the work:
+The most important task to complete before submitting work is the `check` task. This executes all the unit tests as well as various code quality checks.
 
 ```
-$ git clone https://github.com/$USERNAME/tomcat.git
+./gradlew check
 ```
 
-and then push your changes, and submit a Pull Request via the GitHub UI.
+The `check` task should complete successfully. Otherwise, the initial pull request will fail, and you will need to make corrections before it can be reviewed (unless you are opening a draft pull request).
 
-#### Submitting Your Patch!
+## Creating a pull request
 
-After you've chosen your method of submission, retrieved the sources, and
-fixed the issue it's time to submit your work. At this point, just follow
-the method of submission you chose earlier.
+Once you are satisfied with your changes:
 
-* GitHub PR - after resolving the issue in your local fork and pushing to your
-copy of the repository, open a GitHub PR for review.
-* Bugzilla attachment - attach the patch to the Bugzilla issue
-* Email - again, not preferred, but you may send an email to the developer list
-with a patch attached for review.
+- Commit changes to the local branch you created.
+- Push that branch with changes to the corresponding remote branch on GitHub
+- Submit a [pull request](https://help.github.com/articles/creating-a-pull-request)
 
-#### Waiting For Feedback
+## Checkstyle
 
-It may take a while for committers to review. Please be patient during this
-time as all committers are volunteers on the project. If a significant amount
-of time has lapsed since your submission, such as a couple of months, feel free
-to either update your BZ, PR, or email the dev list with a message to bump your
-issue. Sometimes things get lost in all the work and we need a reminder :smile:
+The code base should remain clean, following industry best practices for organization, javadoc and style, as much as possible.
 
-## IDE Support
+The Micronaut Framework uses [Checkstyle](http://checkstyle.sourceforge.net/) to make sure that all the code follows those standards. The configuration file is defined in `config/checkstyle/checkstyle.xml`.
+To execute the Checkstyle task run:
 
-Special IDE support for
-[Eclipse](https://www.eclipse.org/ide/),
-[IntelliJ IDEA](https://www.jetbrains.com/idea/) and
-[NetBeans](https://netbeans.org/)
-is provided through special ant targets:
-
-```bash
-ant ide-eclipse
 ```
-```bash
-ant ide-intellij
-```
-```bash
-ant ide-netbeans
+./gradlew <module-name>:checkstyleMain
 ```
 
-Just execute the ant target for your IDE after checking out the sources
-to set up the appropriate configuration files.
-Also make sure to re-execute the target after switching branches or
-after pulling upstream changes in order to keep your IDE configurations in sync.
+Before contributing new code it is recommended you install IntelliJ [CheckStyle-IDEA](https://plugins.jetbrains.com/plugin/1065-checkstyle-idea) plugin and configure it to use Micronaut Framework's checkstyle configuration file.
 
-## Style Guide
+IntelliJ will mark in red the issues Checkstyle finds. For example:
 
-Apache Tomcat has very loosely defined coding conventions, but the following
-guidelines will be useful:
+![checkstyle-issue](https://docs.micronaut.io/docsassets/img/checkstyle-issue.png)
 
-* Use spaces for indenting, not tabs
-* 120 char line width for Java source, 80 char line width for documentation
-source (.txt, .xml)
-* Java source: { at end of line, 4 space indents
-* XML source: 2 space indents
+In this case, to fix the issues, we need to:
 
-## Did we miss something?
+- Add one empty line before `package` in line 16
+- Add the Javadoc for the constructor in line 27
+- Add a space after `if` in line 34
 
-Have you reviewed this guide and found it lacking? Or are you confused about
-some particular step? If so, please let us know! Or better yet, submit a PR to
-address the issue :wink:
+The plugin also adds a new tab in IDEA's bottom view pane to run a checkstyle report to display errors and warnings.
+Run the report and fix any exposed issues before submitting a pull request. The gradle `check` task also produces an HTML report if there are errors.
+
+## Building on Windows 10
+
+The following prerequisites are needed for building and testing on Windows 10:
+
+* Docker Desktop version 2.0.0.0 win81 build 29211 or higher is installed and running.
+* OpenSSL's binaries are installed, for example (https://indy.fulgan.com/SSL/) and on the PATH.

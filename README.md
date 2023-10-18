@@ -1,82 +1,65 @@
-## Welcome to Apache Tomcat!
+# Micronaut Framework
 
-### What Is It?
+[![Build Status](https://github.com/micronaut-projects/micronaut-core/workflows/Java%20CI/badge.svg)](https://github.com/micronaut-projects/micronaut-core/actions)
+[![Revved up by Gradle Enterprise](https://img.shields.io/badge/Revved%20up%20by-Gradle%20Enterprise-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.micronaut.io/scans)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=micronaut-projects_micronaut-core&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=micronaut-projects_micronaut-core)
 
-The Apache Tomcat® software is an open source implementation of the Java
-Servlet, JavaServer Pages, Java Expression Language and Java WebSocket
-technologies. The Java Servlet, JavaServer Pages, Java Expression Language and
-Java WebSocket specifications are developed under the
-[Java Community Process](https://jcp.org/en/introduction/overview).
+[Micronaut Framework](https://micronaut.io) is a modern, JVM-based, full stack Java framework designed for building modular, easily testable JVM applications with support for Java, Kotlin and the Groovy language.
 
-The Apache Tomcat software is developed in an open and participatory
-environment and released under the
-[Apache License version 2](https://www.apache.org/licenses/). The Apache Tomcat
-project is intended to be a collaboration of the best-of-breed developers from
-around the world. We invite you to participate in this open development
-project. To learn more about getting involved,
-[click here](https://tomcat.apache.org/getinvolved.html) or keep reading.
+Micronaut Framework is developed by the creators of the Grails framework and takes inspiration from lessons learnt over the years building real-world applications from monoliths to microservices using Spring, Spring Boot and Grails.
 
-Apache Tomcat software powers numerous large-scale, mission-critical web
-applications across a diverse range of industries and organizations. Some of
-these users and their stories are listed on the
-[PoweredBy wiki page](https://cwiki.apache.org/confluence/display/TOMCAT/PoweredBy).
+Micronaut Framework aims to provide all the tools necessary to build JVM applications including:
 
-Apache Tomcat, Tomcat, Apache, the Apache feather, and the Apache Tomcat
-project logo are trademarks of the Apache Software Foundation.
+* Dependency Injection and Inversion of Control (IoC)
+* Aspect Oriented Programming (AOP)
+* Sensible Defaults and Auto-Configuration
 
-### Get It
+With Micronaut Framework you can build Message-Driven Applications, Command Line Applications, HTTP Servers and more whilst for Microservices in particular Micronaut Framework also provides:
 
-For every major Tomcat version there is one download page containing
-links to the latest binary and source code downloads, but also
-links for browsing the download directories and archives:
-- [Tomcat 11](https://tomcat.apache.org/download-11.cgi)
-- [Tomcat 10](https://tomcat.apache.org/download-10.cgi)
-- [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
-- [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
-- [Tomcat 7](https://tomcat.apache.org/download-70.cgi)
+* Distributed Configuration
+* Service Discovery
+* HTTP Routing
+* Client-Side Load Balancing
 
-To facilitate choosing the right major Tomcat version one, we have provided a
-[version overview page](https://tomcat.apache.org/whichversion.html).
+At the same time Micronaut Framework aims to avoid the downsides of frameworks like Spring, Spring Boot and Grails by providing:
 
-### Documentation
+* Fast startup time
+* Reduced memory footprint
+* Minimal use of reflection
+* Minimal use of proxies
+* No runtime bytecode generation
+* Easy Unit Testing
 
-The documentation available as of the date of this release is
-included in the docs webapp which ships with tomcat. You can access that webapp
-by starting tomcat and visiting <http://localhost:8080/docs/> in your browser.
-The most up-to-date documentation for each version can be found at:
-- [Tomcat 11.0](https://tomcat.apache.org/tomcat-11.0-doc/)
-- [Tomcat 10](https://tomcat.apache.org/tomcat-10.1-doc/)
-- [Tomcat 9](https://tomcat.apache.org/tomcat-9.0-doc/)
-- [Tomcat 8](https://tomcat.apache.org/tomcat-8.5-doc/)
+This is achieved by pre-computing the framework infrastructure at compilation time which reduces the logic required at runtime for the application to work.
 
-### Installation
+For more information on using Micronaut Framework see the documentation at [micronaut.io](https://micronaut.io)
 
-Please see [RUNNING.txt](RUNNING.txt) for more info.
+## Example Applications
 
-### Licensing
+Example Micronaut Framework applications can be found in the [Examples repository](https://github.com/micronaut-projects/micronaut-examples)
 
-Please see [LICENSE](LICENSE) for more info.
+## Building From Source
 
-### Support and Mailing List Information
+To build from source checkout the code and run:
 
-* Free community support is available through the
-[tomcat-users](https://tomcat.apache.org/lists.html#tomcat-users) email list and
-a dedicated [IRC channel](https://tomcat.apache.org/irc.html) (#tomcat on
-Freenode).
+```
+./gradlew publishToMavenLocal
+```
 
-* If you want freely available support for running Apache Tomcat, please see the
-resources page [here](https://tomcat.apache.org/findhelp.html).
+To build the documentation run `./gradlew docs`. The documentation is built to `build/docs/index.html`.
 
-* If you want to be informed about new code releases, bug fixes,
-security fixes, general news and information about Apache Tomcat, please
-subscribe to the
-[tomcat-announce](https://tomcat.apache.org/lists.html#tomcat-announce) email
-list.
+## Contributing Code
 
-* If you have a concrete bug report for Apache Tomcat, please see the
-instructions for reporting a bug
-[here](https://tomcat.apache.org/bugreport.html).
+If you wish to contribute to the development of Micronaut Framework please read the [CONTRIBUTING.md](CONTRIBUTING.md)
 
-### Contributing
+## Versioning
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for more info.
+Micronaut Framework is using Semantic Versioning 2.0.0. To understand what that means, please see the specification [documentation](https://semver.org/). Exclusions to Micronaut Framework's public API include any classes annotated with `@Experimental` or `@Internal`, which reside in the `io.micronaut.core.annotation` package.
+
+## CI
+
+[GitHub Actions](https://github.com/micronaut-projects/micronaut-core/actions) are used to build Micronaut Framework. If a build fails in `master`, check the [test reports](https://micronaut-projects.github.io/micronaut-core/index.html).
+
+
+
+

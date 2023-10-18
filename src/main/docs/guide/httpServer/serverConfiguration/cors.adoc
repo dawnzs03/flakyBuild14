@@ -1,0 +1,1 @@
+The Micronaut framework supports CORS (link:https://www.w3.org/TR/cors/[Cross Origin Resource Sharing]) out of the box. By default, CORS requests are rejected.
