@@ -28,11 +28,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   set-properties:
     runs-on: [self-hosted, ubuntu-20.04]

@@ -52,11 +52,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   beam_PreCommit_PythonDocs:
     name: ${{matrix.job_name}} (${{matrix.job_phrase}})

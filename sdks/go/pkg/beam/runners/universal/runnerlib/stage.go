@@ -51,7 +51,7 @@ func Stage(ctx context.Context, id, endpoint, binary, st string) (retrievalToken
 	return StageViaLegacyAPI(ctx, cc, binary, st)
 }
 
-// StageViaPortableAPI is a beam internal function for uploading artifacts to the staging service
+// StageViaPortableApi is a beam internal function for uploading artifacts to the staging service
 // via the portable API.
 //
 // It will be unexported at a later time.
@@ -181,7 +181,7 @@ func stageFile(filename string, stream jobpb.ArtifactStagingService_ReverseArtif
 	}
 }
 
-// StageViaLegacyAPI is a beam internal function for uploading artifacts to the staging service
+// StageViaLegacyApi is a beam internal function for uploading artifacts to the staging service
 // via the legacy API.
 //
 // It will be unexported at a later time.

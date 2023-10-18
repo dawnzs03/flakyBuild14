@@ -66,11 +66,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   beam_PreCommit_Java_Examples_Dataflow:
     name: ${{matrix.job_name}} (${{matrix.job_phrase}})

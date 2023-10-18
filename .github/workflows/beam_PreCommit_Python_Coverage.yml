@@ -51,11 +51,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   beam_PreCommit_Python_Coverage:
     name: ${{matrix.job_name}} (${{matrix.job_phrase}})

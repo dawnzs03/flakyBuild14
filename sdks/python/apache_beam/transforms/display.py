@@ -184,7 +184,7 @@ class DisplayData(object):
         dd_protos.append(
             beam_runner_api_pb2.DisplayData(
                 urn=common_urns.StandardDisplayData.DisplayData.LABELLED.urn,
-                payload=dd_proto.SerializeToString()))
+                payload=create_payload(dd).SerializeToString()))
     return dd_protos
 
   @classmethod

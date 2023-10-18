@@ -430,11 +430,8 @@ public class StorageApiWriteUnshardedRecords<DestinationT, ElementT>
                 WriteStream writeStream =
                     Preconditions.checkStateNotNull(maybeDatasetService).getWriteStream(streamName);
                 if (writeStream != null && writeStream.hasTableSchema()) {
-                  TableSchema updatedFromStream = writeStream.getTableSchema();
-                  currentSchema.set(updatedFromStream);
+                  currentSchema.set(writeStream.getTableSchema());
                   updated.set(true);
-                  LOG.debug(
-                      "Fetched updated schema for table {}:\n\t{}", tableUrn, updatedFromStream);
                 }
               }
               return null;

@@ -51,11 +51,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   beam_PreCommit_Whitespace:
     name: ${{matrix.job_name}} (${{ matrix.job_phrase }})

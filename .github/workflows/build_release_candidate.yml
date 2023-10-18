@@ -41,11 +41,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   publish_java_artifacts:
     if: ${{github.event.inputs.PUBLISH_JAVA_ARTIFACTS == 'yes'}}

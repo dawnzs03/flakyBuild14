@@ -23,12 +23,6 @@ on:
 
 
 
-
-
-
-
-
-
 jobs:
   precommit_check:
     name: precommit-check

@@ -66,8 +66,7 @@ This `Dockerfile` uses the prebuilt Python 3.7 SDK container image [`beam_python
   ```
   export BASE_IMAGE="apache/beam_python3.7_sdk:2.25.0"
   export IMAGE_NAME="myremoterepo/mybeamsdk"
-  # Avoid using `latest` with custom containers to make reproducing failures easier.
-  export TAG="mybeamsdk-versioned-tag"
+  export TAG="latest"
 
   # Optional - pull the base image into your local Docker daemon to ensure
   # you have the most up-to-date version of the base image locally.
@@ -298,11 +297,6 @@ python -m apache_beam.examples.wordcount \
   --sdk_container_image=$IMAGE_URL
 
 {{< /runner >}}
-
-Avoid using the tag `:latest` with your custom images. Tag your builds with a date
-or a unique identifier. If something goes wrong, using this type of tag might make
-it possible to revert the pipeline execution to a previously known working
-configuration and allow for an inspection of changes.
 
 
 ### Troubleshooting

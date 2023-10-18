@@ -35,11 +35,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   tour_of_beam_test:
     name: Tour of Beam Frontend Test

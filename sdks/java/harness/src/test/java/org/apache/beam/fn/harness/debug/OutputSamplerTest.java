@@ -307,9 +307,7 @@ public class OutputSamplerTest {
               }
 
               for (int i = 0; i < 1000000; i++) {
-                ElementSample<Integer> sample =
-                    outputSampler.sample(WindowedValue.valueInGlobalWindow(i));
-                outputSampler.exception(sample, new RuntimeException(""), "ptransformId", "pbId");
+                outputSampler.sample(WindowedValue.valueInGlobalWindow(i));
               }
 
               doneSignal.countDown();
@@ -326,9 +324,7 @@ public class OutputSamplerTest {
               }
 
               for (int i = -1000000; i < 0; i++) {
-                ElementSample<Integer> sample =
-                    outputSampler.sample(WindowedValue.valueInGlobalWindow(i));
-                outputSampler.exception(sample, new RuntimeException(""), "ptransformId", "pbId");
+                outputSampler.sample(WindowedValue.valueInGlobalWindow(i));
               }
 
               doneSignal.countDown();

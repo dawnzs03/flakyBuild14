@@ -67,11 +67,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   beam_PreCommit_Kotlin_Examples:
     name: ${{matrix.job_name}} (${{matrix.job_phrase}})

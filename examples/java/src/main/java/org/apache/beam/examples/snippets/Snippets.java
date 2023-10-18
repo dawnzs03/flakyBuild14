@@ -1357,28 +1357,27 @@ public class Snippets {
       }
 
       public interface Service {
-        List<RecordPosition> readNextRecords(long position) throws ThrottlingException;
+        List<Record> readNextRecords(long position) throws ThrottlingException;
       }
 
-      public interface RecordPosition {
+      public interface Record {
         long getPosition();
       }
 
       // [START SDF_UserInitiatedCheckpoint]
       @ProcessElement
       public ProcessContinuation processElement(
-          RestrictionTracker<OffsetRange, Long> tracker,
-          OutputReceiver<RecordPosition> outputReceiver) {
+          RestrictionTracker<OffsetRange, Long> tracker, OutputReceiver<Record> outputReceiver) {
         long currentPosition = tracker.currentRestriction().getFrom();
         Service service = initializeService();
         try {
           while (true) {
-            List<RecordPosition> records = service.readNextRecords(currentPosition);
+            List<Record> records = service.readNextRecords(currentPosition);
             if (records.isEmpty()) {
               // Return a short delay if there is no data to process at the moment.
               return ProcessContinuation.resume().withResumeDelay(Duration.standardSeconds(10));
             }
-            for (RecordPosition record : records) {
+            for (Record record : records) {
               if (!tracker.tryClaim(record.getPosition())) {
                 return ProcessContinuation.stop();
               }

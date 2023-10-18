@@ -49,11 +49,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   beam_Python_ValidatesContainer_Dataflow_ARM:
     name: ${{matrix.job_name}} (${{matrix.job_phrase}} ${{ matrix.python_version }})

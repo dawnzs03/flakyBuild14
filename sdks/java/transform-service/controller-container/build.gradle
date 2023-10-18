@@ -90,5 +90,5 @@ if (project.rootProject.hasProperty(["docker-pull-licenses"])) {
 }
 
 task pushAll {
-    dependsOn docker
+    dependsOn dockerPush
 }

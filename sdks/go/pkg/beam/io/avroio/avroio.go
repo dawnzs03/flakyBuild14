@@ -20,9 +20,9 @@ import (
 	"context"
 	"encoding/json"
 	"reflect"
+	"strings"
 
 	"github.com/apache/beam/sdks/v2/go/pkg/beam"
-	"github.com/apache/beam/sdks/v2/go/pkg/beam/io/fileio"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/io/filesystem"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/log"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/register"
@@ -30,7 +30,8 @@ import (
 )
 
 func init() {
-	register.DoFn3x1[context.Context, fileio.ReadableFile, func(beam.X), error]((*avroReadFn)(nil))
+	register.Function3x1(expandFn)
+	register.DoFn3x1[context.Context, string, func(beam.X), error]((*avroReadFn)(nil))
 	register.DoFn3x1[context.Context, int, func(*string) bool, error]((*writeAvroFn)(nil))
 	register.Emitter1[beam.X]()
 	register.Iter1[string]()
@@ -48,8 +49,7 @@ func Read(s beam.Scope, glob string, t reflect.Type) beam.PCollection {
 }
 
 func read(s beam.Scope, t reflect.Type, col beam.PCollection) beam.PCollection {
-	matches := fileio.MatchAll(s, col, fileio.MatchEmptyAllow())
-	files := fileio.ReadMatches(s, matches, fileio.ReadUncompressed())
+	files := beam.ParDo(s, expandFn, col)
 	return beam.ParDo(s,
 		&avroReadFn{Type: beam.EncodedType{T: t}},
 		files,
@@ -57,15 +57,42 @@ func read(s beam.Scope, t reflect.Type, col beam.PCollection) beam.PCollection {
 	)
 }
 
+func expandFn(ctx context.Context, glob string, emit func(string)) error {
+	if strings.TrimSpace(glob) == "" {
+		return nil // ignore empty string elements here
+	}
+
+	fs, err := filesystem.New(ctx, glob)
+	if err != nil {
+		return err
+	}
+	defer fs.Close()
+
+	files, err := fs.List(ctx, glob)
+	if err != nil {
+		return err
+	}
+	for _, filename := range files {
+		emit(filename)
+	}
+	return nil
+}
+
 type avroReadFn struct {
 	// Avro schema type
 	Type beam.EncodedType
 }
 
-func (f *avroReadFn) ProcessElement(ctx context.Context, file fileio.ReadableFile, emit func(beam.X)) (err error) {
-	log.Infof(ctx, "Reading AVRO from %v", file.Metadata.Path)
+func (f *avroReadFn) ProcessElement(ctx context.Context, filename string, emit func(beam.X)) (err error) {
+	log.Infof(ctx, "Reading AVRO from %v", filename)
 
-	fd, err := file.Open(ctx)
+	fs, err := filesystem.New(ctx, filename)
+	if err != nil {
+		return
+	}
+	defer fs.Close()
+
+	fd, err := fs.OpenRead(ctx, filename)
 	if err != nil {
 		return
 	}

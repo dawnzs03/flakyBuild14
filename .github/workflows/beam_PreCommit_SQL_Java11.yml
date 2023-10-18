@@ -52,11 +52,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   beam_PreCommit_SQL_Java11:
     name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})

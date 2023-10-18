@@ -18,10 +18,11 @@ package parquetio
 
 import (
 	"context"
+	"io"
 	"reflect"
+	"strings"
 
 	"github.com/apache/beam/sdks/v2/go/pkg/beam"
-	"github.com/apache/beam/sdks/v2/go/pkg/beam/io/fileio"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/io/filesystem"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/register"
 	"github.com/xitongsys/parquet-go-source/buffer"
@@ -30,11 +31,14 @@ import (
 )
 
 func init() {
+	register.Function3x1(expandFn)
 	register.Emitter1[string]()
 
-	register.DoFn3x1[context.Context, fileio.ReadableFile, func(beam.X), error](&parquetReadFn{})
+	beam.RegisterType(reflect.TypeOf((*parquetReadFn)(nil)).Elem())
+	register.DoFn3x1[context.Context, string, func(beam.X), error](&parquetReadFn{})
 	register.Emitter1[beam.X]()
 
+	beam.RegisterType(reflect.TypeOf((*parquetWriteFn)(nil)).Elem())
 	register.DoFn3x1[context.Context, int, func(*beam.X) bool, error](&parquetWriteFn{})
 	register.Iter1[beam.X]()
 }
@@ -59,8 +63,7 @@ func Read(s beam.Scope, glob string, t reflect.Type) beam.PCollection {
 }
 
 func read(s beam.Scope, t reflect.Type, col beam.PCollection) beam.PCollection {
-	matches := fileio.MatchAll(s, col, fileio.MatchEmptyAllow())
-	files := fileio.ReadMatches(s, matches, fileio.ReadUncompressed())
+	files := beam.ParDo(s, expandFn, col)
 	return beam.ParDo(s,
 		&parquetReadFn{Type: beam.EncodedType{T: t}},
 		files,
@@ -68,12 +71,45 @@ func read(s beam.Scope, t reflect.Type, col beam.PCollection) beam.PCollection {
 	)
 }
 
+func expandFn(ctx context.Context, glob string, emit func(string)) error {
+	if strings.TrimSpace(glob) == "" {
+		return nil // ignore empty string elements here
+	}
+
+	fs, err := filesystem.New(ctx, glob)
+	if err != nil {
+		return err
+	}
+	defer fs.Close()
+
+	files, err := fs.List(ctx, glob)
+	if err != nil {
+		return err
+	}
+	for _, filename := range files {
+		emit(filename)
+	}
+	return nil
+}
+
 type parquetReadFn struct {
 	Type beam.EncodedType
 }
 
-func (a *parquetReadFn) ProcessElement(ctx context.Context, file fileio.ReadableFile, emit func(beam.X)) error {
-	data, err := file.Read(ctx)
+func (a *parquetReadFn) ProcessElement(ctx context.Context, filename string, emit func(beam.X)) error {
+	fs, err := filesystem.New(ctx, filename)
+	if err != nil {
+		return err
+	}
+	defer fs.Close()
+
+	fd, err := fs.OpenRead(ctx, filename)
+	if err != nil {
+		return err
+	}
+	defer fd.Close()
+
+	data, err := io.ReadAll(fd)
 	if err != nil {
 		return err
 	}

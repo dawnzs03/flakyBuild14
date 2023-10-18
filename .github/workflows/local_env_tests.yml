@@ -36,11 +36,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   run_local_env_install_ubuntu:
     timeout-minutes: 25

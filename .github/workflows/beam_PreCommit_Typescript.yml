@@ -53,11 +53,6 @@ on:
 
 
 
-
-
-
-
-
 jobs:
   beam_PreCommit_Typescript:
     name: ${{matrix.job_name}} (${{matrix.job_phrase}})

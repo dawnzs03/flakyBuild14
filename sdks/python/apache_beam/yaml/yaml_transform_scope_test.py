@@ -61,7 +61,7 @@ class ScopeTest(unittest.TestCase):
           - type: PyMap
             name: Square
             input: Create
-            config:
+            config: 
               fn: "lambda x: x*x"
         '''
 
@@ -123,11 +123,7 @@ class ScopeTest(unittest.TestCase):
       self.assertIsInstance(result, beam.transforms.ParDo)
       self.assertEqual(result.label, 'Map(lambda x: x*x)')
 
-      result_annotations = {
-          key: value
-          for (key, value) in result.annotations().items()
-          if key.startswith('yaml')
-      }
+      result_annotations = {**result.annotations()}
       target_annotations = {
           'yaml_type': 'PyMap',
           'yaml_args': '{"fn": "lambda x: x*x"}',
@@ -150,7 +146,7 @@ class LightweightScopeTest(unittest.TestCase):
             fn: "lambda x: x * x * x"
           - type: Filter
             name: FilterOutBigNumbers
-            input: PyMap
+            input: PyMap 
             keep: "lambda x: x<100"
           '''
     return yaml.load(pipeline_yaml, Loader=SafeLineLoader)

@@ -2005,13 +2005,9 @@ public class SpannerIO {
     /* Number of times an aborted write to spanner could be retried */
     private static final int ABORTED_RETRY_ATTEMPTS = 5;
     /* Error string in Aborted exception during schema change */
-    private final String schemaChangeErrString =
+    private final String errString =
         "Transaction aborted. "
             + "Database schema probably changed during transaction, retry may succeed.";
-
-    /* Error string in Aborted exception for concurrent transaction in Spanner Emulator */
-    private final String emulatorErrorString =
-        "The emulator only supports one transaction at a time.";
 
     @VisibleForTesting static Sleeper sleeper = Sleeper.DEFAULT;
 
@@ -2143,9 +2139,7 @@ public class SpannerIO {
           if (retry >= ABORTED_RETRY_ATTEMPTS) {
             throw e;
           }
-          if (e.isRetryable()
-              || e.getMessage().contains(schemaChangeErrString)
-              || e.getMessage().contains(emulatorErrorString)) {
+          if (e.isRetryable() || e.getMessage().contains(errString)) {
             continue;
           }
           throw e;
