@@ -845,8 +845,7 @@ public abstract class IndexProviderTest {
         assertTrue(results.contains("restore-doc1"));
     }
 
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/1091
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @RepeatedIfExceptionsTest(repeats = 4, minSuccess = 2)
     public void testTTL() throws Exception {
         if (!index.getFeatures().supportsDocumentTTL())
             return;

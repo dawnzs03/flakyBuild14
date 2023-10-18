@@ -35,14 +35,10 @@ All of JanusGraph's tests are written for JUnit.  JanusGraph's JUnit tests are a
 
 ### Marking tests as flaky
 
-If a test should be marked as flaky, then first [open an issue](https://github.com/JanusGraph/janusgraph/issues/new?assignees=&labels=testing%2Fflaky&projects=&template=flaky-test.md)
-where you can add information about the flaky test that could be helpful later to others to understand why the test is
-marked as flaky and hopefully for fixing it.
-Afterwards, add the annotation to the test and link to the issue you just created:
+If a test should be marked as flaky add following annotation to the test and open an issue.
 
 ```java
-// flaky test: https://github.com/JanusGraph/janusgraph/issues/[ISSUE_NUMBER]
-@RepeatedIfExceptionsTest(repeats = 3)
+@RepeatedIfExceptionsTest(repeats = 4, minSuccess = 2)
 public void testFlakyFailsSometimes(){}
 ```
 
@@ -131,7 +127,7 @@ mvn clean install -pl janusgraph-es -Delasticsearch.docker.version=6.0.0 -Delast
 
 **Note** Running CQL tests require Docker.
 
-CQL tests are executed using [testcontainers-java](https://www.testcontainers.org/).
+CQL tests are executed using [testcontainers-java](https://www.testcontainers.org/). 
 CQL tests can be executed against a Cassandra 3 using the profile `cassandra3`, or a Scylla 3 using the profile `scylladb`.
 
 ```bash
@@ -161,10 +157,10 @@ mvn clean install -pl janusgraph-cql -Dcassandra.docker.image=cassandra -Dcassan
 
 ### TinkerPop tests
 
-The CQL backend is tested with TinkerPop tests using following command.
+The CQL backend is tested with TinkerPop tests using following command. 
 
-**Note: Profiles are not supported during running TinkerPop tests.
-If you do not want to use the default config, you can set `cassandra.docker.image`,
+**Note: Profiles are not supported during running TinkerPop tests. 
+If you do not want to use the default config, you can set `cassandra.docker.image`, 
 `cassandra.docker.version`, or `cassandra.docker.partitioner`.**
 
 ```bash
@@ -174,8 +170,8 @@ mvn clean install -Dtest.skip.tp=false -DskipTests=true -pl janusgraph-cql \
 
 ### Create new configuration files for new Versions of Cassandra
 
-The file `janusgraph-cql/src/test/resources/docker/docker-compose.yml` can be used to generate new configuration files.
-Therefore, you have to start a Cassandra instance using `docker-compose up`.
+The file `janusgraph-cql/src/test/resources/docker/docker-compose.yml` can be used to generate new configuration files. 
+Therefore, you have to start a Cassandra instance using `docker-compose up`. 
 Afterward, you can extract the configuration which is located in the following file `/etc/cassandra/cassandra.yaml`.
 
 ## Running hbase tests

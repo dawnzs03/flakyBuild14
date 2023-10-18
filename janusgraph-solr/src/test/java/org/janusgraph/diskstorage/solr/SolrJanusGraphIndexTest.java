@@ -81,7 +81,6 @@ public abstract class SolrJanusGraphIndexTest extends JanusGraphIndexTest {
         super.testClearStorage();
     }
 
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/2271
     @Override
     @RepeatedIfExceptionsTest(repeats = 10, suspend = 1000L)
     public void testIndexReplay() throws Exception {

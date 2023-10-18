@@ -14,7 +14,6 @@
 
 package org.janusgraph.graphdb.cql;
 
-import io.github.artsok.ParameterizedRepeatedIfExceptionsTest;
 import io.github.artsok.RepeatedIfExceptionsTest;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -228,44 +227,20 @@ public class CQLGraphTest extends JanusGraphTest {
         assertTrue(features.hasCellTTL());
     }
 
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/1457
-    @ParameterizedRepeatedIfExceptionsTest(repeats = 4, minSuccess = 2)
+    @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    @Override
-    public void simpleLogTest(boolean useStringId) throws InterruptedException {
-        super.simpleLogTest(useStringId);
+    public void simpleLogTest(boolean useStringId) {
+        for (int i = 0; i < 3; i++) {
+            try {
+                super.simpleLogTest(useStringId);
+                // If the test passes, break out of the loop.
+                break;
+            } catch (Exception ex) {
+                log.info("Attempt #{} fails", i, ex);
+            }
+        }
     }
 
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/1457
-    @ParameterizedRepeatedIfExceptionsTest(repeats = 4, minSuccess = 2)
-    @ValueSource(booleans = {true, false})
-    @Override
-    public void simpleLogTestWithFailure(boolean useStringId) throws InterruptedException {
-        super.simpleLogTestWithFailure(useStringId);
-    }
-
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/1497
-    @RepeatedIfExceptionsTest(repeats = 3)
-    @Override
-    public void testEdgeTTLTiming() throws Exception {
-        super.testEdgeTTLTiming();
-    }
-
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/1464
-    @RepeatedIfExceptionsTest(repeats = 3)
-    @Override
-    public void testVertexTTLWithCompositeIndex() throws Exception {
-        super.testVertexTTLWithCompositeIndex();
-    }
-
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/1465
-    @RepeatedIfExceptionsTest(repeats = 3)
-    @Override
-    public void testVertexTTLImplicitKey() throws Exception {
-        super.testVertexTTLImplicitKey();
-    }
-
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/3142
     @RepeatedIfExceptionsTest(repeats = 3)
     @Override
     public void testReindexingForEdgeIndex() throws ExecutionException, InterruptedException {

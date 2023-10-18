@@ -52,8 +52,7 @@ public class ExpirationCacheTest extends KCVSCacheTest {
         return new ExpirationKCVSCache(store,METRICS_STRING,expirationTime.toMillis(),graceWait.toMillis(),CACHE_SIZE);
     }
 
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/2934
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @RepeatedIfExceptionsTest(repeats = 4, minSuccess = 2)
     public void testExpiration() throws Exception {
         testExpiration(Duration.ofMillis(200));
         testExpiration(Duration.ofSeconds(4));
@@ -97,7 +96,6 @@ public class ExpirationCacheTest extends KCVSCacheTest {
         verifyResults(key, keys, query, 4);
     }
 
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/3352
     @RepeatedIfExceptionsTest(repeats = 3)
     public void testGracePeriod() throws Exception {
         testGracePeriod(Duration.ofMillis(200));

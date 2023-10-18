@@ -109,8 +109,7 @@ public class CQLConfiguredGraphFactoryTest extends AbstractConfiguredGraphFactor
         }
     }
 
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/3393
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @Test
     public void dropGraphShouldRemoveGraphKeyspace() throws Exception {
         final MapConfiguration graphConfig = getGraphConfig();
         final String graphName = graphConfig.getString(GRAPH_NAME.toStringWithoutRoot());
@@ -133,18 +132,10 @@ public class CQLConfiguredGraphFactoryTest extends AbstractConfiguredGraphFactor
         }
     }
 
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/3096
     @RepeatedIfExceptionsTest(repeats = 3)
     @Override
     public void updateConfigurationShouldRemoveGraphFromCache() throws Exception {
         super.updateConfigurationShouldRemoveGraphFromCache();
-    }
-
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/3959
-    @RepeatedIfExceptionsTest(repeats = 3)
-    @Override
-    public void dropShouldCleanUpTraversalSourceAndBindings() throws Exception {
-        super.dropShouldCleanUpTraversalSourceAndBindings();
     }
 }
 

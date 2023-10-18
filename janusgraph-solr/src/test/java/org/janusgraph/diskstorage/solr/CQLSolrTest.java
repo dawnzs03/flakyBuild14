@@ -14,7 +14,6 @@
 
 package org.janusgraph.diskstorage.solr;
 
-import io.github.artsok.RepeatedIfExceptionsTest;
 import org.janusgraph.JanusGraphCassandraContainer;
 import org.janusgraph.diskstorage.configuration.ModifiableConfiguration;
 import org.junit.jupiter.api.Test;
@@ -37,13 +36,6 @@ public class CQLSolrTest extends SolrJanusGraphIndexTest {
     @Override
     public boolean supportsWildcardQuery() {
         return false;
-    }
-
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/3356
-    @RepeatedIfExceptionsTest(repeats = 3)
-    @Override
-    public void testSetIndexing() {
-        super.testSetIndexing();
     }
 
     @Test

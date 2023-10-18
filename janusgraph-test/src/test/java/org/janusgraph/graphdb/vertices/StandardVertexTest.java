@@ -59,9 +59,7 @@ public class StandardVertexTest {
         standardVertex = spy(new StandardVertex(tx, 1, (byte) 1));
     }
 
-    // This test is flaky simply because it tests a possible deadlock
-    // https://github.com/JanusGraph/janusgraph/pull/1486
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @RepeatedIfExceptionsTest(repeats = 3, minSuccess = 1)
     public void shouldNotStuckInDeadlockWhenTheVerticeAndItsRelationIsDeletedInParallel()
         throws InterruptedException, TimeoutException, ExecutionException {
 

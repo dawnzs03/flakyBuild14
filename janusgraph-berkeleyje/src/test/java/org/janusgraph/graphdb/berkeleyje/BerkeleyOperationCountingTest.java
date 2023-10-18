@@ -14,6 +14,7 @@
 
 package org.janusgraph.graphdb.berkeleyje;
 
+import io.github.artsok.RepeatedIfExceptionsTest;
 import org.janusgraph.BerkeleyStorageSetup;
 import org.janusgraph.diskstorage.configuration.WriteConfiguration;
 import org.janusgraph.graphdb.JanusGraphOperationCountingTest;
@@ -24,6 +25,12 @@ public class BerkeleyOperationCountingTest extends JanusGraphOperationCountingTe
     @Override
     public WriteConfiguration getBaseConfiguration() {
         return BerkeleyStorageSetup.getBerkeleyJEGraphConfiguration();
+    }
+
+    @Override
+    @RepeatedIfExceptionsTest(repeats = 4, minSuccess = 2)
+    public void testIdCounts() {
+        super.testIdCounts();
     }
 
     @AfterEach

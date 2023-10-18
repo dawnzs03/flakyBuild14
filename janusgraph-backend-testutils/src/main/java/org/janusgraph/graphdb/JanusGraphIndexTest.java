@@ -2188,8 +2188,7 @@ public abstract class JanusGraphIndexTest extends JanusGraphBaseTest {
         assertEquals(4, recoveryStats[1]); //all 4 index transaction had provoked errors in the indexing backend
     }
 
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/2272
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @Test
     public void testIndexUpdatesWithoutReindex() throws InterruptedException, ExecutionException {
         final Object[] settings = new Object[]{option(LOG_SEND_DELAY, MANAGEMENT_LOG), Duration.ofMillis(0),
                 option(KCVSLog.LOG_READ_LAG_TIME, MANAGEMENT_LOG), Duration.ofMillis(50),
@@ -3198,8 +3197,7 @@ public abstract class JanusGraphIndexTest extends JanusGraphBaseTest {
 
     }
 
-    // flaky test: https://github.com/JanusGraph/janusgraph/issues/3976
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @RepeatedIfExceptionsTest(repeats = 4, minSuccess = 2)
     public void shouldUpdateIndexFieldsAfterIndexModification() throws InterruptedException, ExecutionException {
         clopen(option(FORCE_INDEX_USAGE), true, option(LOG_READ_INTERVAL, MANAGEMENT_LOG), Duration.ofMillis(5000));
         String key1 = "testKey1";
