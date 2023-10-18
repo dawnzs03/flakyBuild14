@@ -1,0 +1,25 @@
+name: Validate Gradle Wrapper
+
+on:
+  push:
+    branches: [ robolectric ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+jobs:
+  validation:
+    name: Validation
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/wrapper-validation-action@v1
