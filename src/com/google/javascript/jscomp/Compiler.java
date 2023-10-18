@@ -34,6 +34,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import com.google.common.io.BaseEncoding;
 import com.google.debugging.sourcemap.SourceMapConsumerV3;
@@ -103,6 +104,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -258,7 +261,7 @@ public class Compiler extends AbstractCompiler implements ErrorHandler, SourceFi
   private ImmutableMap<String, Supplier<Node>> runtimeLibraryTypedAsts;
 
   // Types that have been forward declared
-  private Set<String> forwardDeclaredTypes = new LinkedHashSet<>();
+  private Set<String> forwardDeclaredTypes = new HashSet<>();
 
   private boolean typeCheckingHasRun = false;
 
@@ -320,7 +323,7 @@ public class Compiler extends AbstractCompiler implements ErrorHandler, SourceFi
   public Compiler(@Nullable PrintStream outStream) {
     addChangeHandler(recentChange);
     this.outStream = outStream;
-    this.moduleTypesByName = new LinkedHashMap<>();
+    this.moduleTypesByName = new HashMap<>();
   }
 
   /** Creates a Compiler that uses a custom error manager. */
@@ -1958,7 +1961,7 @@ public class Compiler extends AbstractCompiler implements ErrorHandler, SourceFi
 
         // Build a map of module identifiers for any input which provides no namespace.
         // These files could be imported modules which have no exports, but do have side effects.
-        Map<String, CompilerInput> inputModuleIdentifiers = new LinkedHashMap<>();
+        Map<String, CompilerInput> inputModuleIdentifiers = new HashMap<>();
         for (CompilerInput input : moduleGraph.getAllInputs()) {
           if (input.getKnownProvides().isEmpty()) {
             ModulePath modPath = moduleLoader.resolve(input.getSourceFile().getName());
@@ -1968,7 +1971,7 @@ public class Compiler extends AbstractCompiler implements ErrorHandler, SourceFi
 
         // Find out if any input attempted to import a module that had no exports.
         // In this case we must force module rewriting to occur on the imported file
-        Map<String, CompilerInput> inputsToRewrite = new LinkedHashMap<>();
+        Map<String, CompilerInput> inputsToRewrite = new HashMap<>();
         for (CompilerInput input : moduleGraph.getAllInputs()) {
           for (String require : input.getKnownRequiredSymbols()) {
             if (inputModuleIdentifiers.containsKey(require)
@@ -2133,8 +2136,8 @@ public class Compiler extends AbstractCompiler implements ErrorHandler, SourceFi
       boolean supportEs6Modules, boolean supportCommonJSModules) {
     maybeDoThreadedParsing();
     List<CompilerInput> entryPoints = new ArrayList<>();
-    Map<String, CompilerInput> inputsByProvide = new LinkedHashMap<>();
-    Map<String, CompilerInput> inputsByIdentifier = new LinkedHashMap<>();
+    Map<String, CompilerInput> inputsByProvide = new HashMap<>();
+    Map<String, CompilerInput> inputsByIdentifier = new HashMap<>();
     for (CompilerInput input : moduleGraph.getAllInputs()) {
       Iterable<String> provides =
           Iterables.filter(input.getProvides(), p -> !p.startsWith("module$"));
@@ -2157,10 +2160,7 @@ public class Compiler extends AbstractCompiler implements ErrorHandler, SourceFi
       }
     }
 
-    Set<CompilerInput> workingInputSet = new LinkedHashSet<>();
-    for (CompilerInput input : moduleGraph.getAllInputs()) {
-      workingInputSet.add(input);
-    }
+    Set<CompilerInput> workingInputSet = Sets.newHashSet(moduleGraph.getAllInputs());
     for (CompilerInput entryPoint : entryPoints) {
       findModulesFromInput(
           entryPoint,
@@ -2615,8 +2615,8 @@ public class Compiler extends AbstractCompiler implements ErrorHandler, SourceFi
    */
   private abstract static class SeenSetLicenseTracker implements LicenseTracker {
     private final AbstractCompiler compiler;
-    private final Set<String> globallyUniqueLicenses = new LinkedHashSet<>();
-    private final Set<String> currentlySeenLicenses = new LinkedHashSet<>();
+    private final Set<String> globallyUniqueLicenses = new HashSet<>();
+    private final Set<String> currentlySeenLicenses = new HashSet<>();
     private String lastSeenFile = "";
 
     public SeenSetLicenseTracker(AbstractCompiler compiler) {
@@ -2720,17 +2720,17 @@ public class Compiler extends AbstractCompiler implements ErrorHandler, SourceFi
   public static class ChunkGraphAwareLicenseTracker implements LicenseTracker {
 
     private final AbstractCompiler compiler;
-    private final Map<JSChunk, Set<String>> licensesFromChunks = new LinkedHashMap<>();
+    private final Map<JSChunk, Set<String>> licensesFromChunks = new HashMap<>();
 
     private boolean haveInitializedCurrentChunkLicenses = false;
-    private final Set<String> currentChunkLicencesInTDeps = new LinkedHashSet<>();
+    private final Set<String> currentChunkLicencesInTDeps = new HashSet<>();
 
     private String lastSeenFile = "";
-    private final Set<String> licensesNewInCurrentFile = new LinkedHashSet<>();
+    private final Set<String> licensesNewInCurrentFile = new HashSet<>();
 
     // Not a final set as this is re-initialized in setCurrentChunkContext, and then stored into
     // the licensesFromChunks map.
-    private Set<String> licensesNewInCurrentChunk = new LinkedHashSet<>();
+    private Set<String> licensesNewInCurrentChunk = new HashSet<>();
     private LogFile log = LogFile.createNoOp();
     private JSChunk currentChunk;
 
@@ -2751,7 +2751,7 @@ public class Compiler extends AbstractCompiler implements ErrorHandler, SourceFi
       if (this.licensesFromChunks.containsKey(chunk)) {
         throw new IllegalStateException("Visiting a chunk more than once is not allowed.");
       }
-      this.licensesNewInCurrentChunk = new LinkedHashSet<>();
+      this.licensesNewInCurrentChunk = new HashSet<>();
       this.licensesFromChunks.put(chunk, this.licensesNewInCurrentChunk);
     }
 
