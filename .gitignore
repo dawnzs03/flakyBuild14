@@ -1,21 +1,49 @@
-/bin/
-/.settings/
-/.classpath
-/.project
-/dist/
-/build/
-/nbproject/
-/data/
-/error.lock
-/error.txt
-/test.out.txt
+### Java
+Thumbs.db
 .DS_Store
-/.idea/
+.gradle
+build/
+target/
+out/
+.idea
+.vscode
 *.iml
 *.ipr
 *.iws
-.checkstyle
-/temp/
-/h2web/
-.pmd
-docs/html/testOutput.html
+.project
+.settings
+.classpath
+.attach*
+**/*.class
+**/bin/*
+
+### Configurations
+docker-compose.override.yml
+cli/src/main/resources/application-*.yml
+*/src/test/resources/application-test.yml
+/local
+
+### Javascript
+node
+node_modules
+yarn-error.log
+yarn.lock
+ui/node_modules
+ui/.env.local
+ui/.env.*.local
+webserver/src/main/resources/ui
+yarn.lock
+ui/coverage
+ui/stats.html
+ui/.frontend-gradle-plugin
+
+### Docker
+/.env
+docker-compose*.overide.yml
+docker/app/plugins/*.jar
+docker/app/kestra
+docker/app/confs/*.yml
+docker/app/secrets/*.yml
+
+### Build
+core/src/main/resources/gradle.properties

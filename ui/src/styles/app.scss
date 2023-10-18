@@ -1,0 +1,73 @@
+@use "@kestra-io/ui-libs/src/scss/variables.scss" as global-var;
+@use 'element-plus/theme-chalk/src/mixins/mixins' as mixin;
+
+ @use "@kestra-io/ui-libs/src/scss/app.scss";
+
+// element-plus
+@use "layout/element-plus-overload";
+
+// vue-tour
+@use "vue3-tour/dist/vue3-tour.css";
+@use "layout/vue-tour-overload.scss";
+
+// layout
+@use "layout/root";
+@use "layout/root-dark";
+@use "layout/html-tag" as *;
+
+// components
+@use "layout/charts";
+@use "components/vue-material-design-icon";
+@use "components/vue-nprogress" with (
+    $indigo: global-var.$indigo
+);
+
+// main layout
+main {
+    padding-right: var(--spacer);
+    padding-left: var(--spacer);
+    margin-right: auto;
+    margin-left: auto;
+
+    padding-top: var(--spacer);
+    padding-bottom: 86px !important;
+    transition: all 0.3s ease;
+
+    &.menu-collapsed {
+        #{--offset-from-menu}: 15px;
+        padding-left: calc(var(--menu-collapsed-width) + var(--offset-from-menu));
+    }
+
+    &.menu-not-collapsed {
+        #{--offset-from-menu}: var(--spacer);
+        padding-left: calc(var(--menu-width) + var(--offset-from-menu));
+
+        @include mixin.res(lg) {
+            #{--offset-from-menu}: calc(var(--spacer) * 4);
+            padding-left: calc(var(--menu-width) + var(--offset-from-menu));
+            padding-right: calc(var(--spacer) * 4);
+        }
+    }
+}
+
+// status
+@each $key, $value in global-var.$colors {
+    .bg-#{$key} {
+        background-color: $value;
+    }
+
+    .el-button.status-#{$key} {
+        cursor: default;
+        border: 0.5px solid $value;
+        background: var(--bs-white);
+
+        .material-design-icon {
+            color: $value;
+        }
+
+        html.dark & {
+            background: var(--bs-tertiary);
+        }
+    }
+}
+
