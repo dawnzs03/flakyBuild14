@@ -1,1 +1,0 @@
-create external table test_table ( a int ) stored by 'org.apache.hadoop.hive.hbase.HBaseStorageHandler' stored as orc;

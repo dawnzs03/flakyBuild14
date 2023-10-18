@@ -1,52 +1,33 @@
-<!--
-Thanks for sending a pull request!  Here are some tips for you:
-  1. If this is your first time, please read our contributor guidelines: https://cwiki.apache.org/confluence/display/Hive/HowToContribute
-  2. Ensure that you have created an issue on the Hive project JIRA: https://issues.apache.org/jira/projects/HIVE/summary
-  3. Ensure you have added or run the appropriate tests for your PR: 
-  4. If the PR is unfinished, add '[WIP]' in your PR title, e.g., '[WIP]HIVE-XXXXX:  Your PR title ...'.
-  5. Be sure to keep the PR description updated to reflect all changes.
-  6. Please write your PR title to summarize what this PR proposes.
-  7. If possible, provide a concise example to reproduce the issue for a faster review.
+# Description
 
+<!--
+- Write a pull request description that is detailed enough to understand what the pull request does, how, and why.
 -->
 
-### What changes were proposed in this pull request?
+# Target
+
+- [ ] I checked that the commit is targeting the correct branch (note that Camel 3 uses `camel-3.x`, whereas Camel 4 uses the `main` branch)
+
+# Tracking
+- [ ] If this is a large change, bug fix, or code improvement, I checked there is a [JIRA issue](https://issues.apache.org/jira/browse/CAMEL) filed for the change (usually before you start working on it).
+
 <!--
-Please clarify what changes you are proposing. The purpose of this section is to outline the changes and how this PR fixes the issue. 
-If possible, please consider writing useful notes for better and faster reviews in your PR. See the examples below.
-  1. If you refactor some codes with changing classes, showing the class hierarchy will help reviewers.
-  2. If you fix some SQL features, you can provide some references of other DBMSes.
-  3. If there is design documentation, please add the link.
-  4. If there is a discussion in the mailing list, please add the link.
+# *Note*: trivial changes like, typos, minor documentation fixes and other small items do not require a JIRA issue. In this case your pull request should address just this issue, without pulling in other changes.
 -->
 
+# Apache Camel coding standards and style
 
-### Why are the changes needed?
+- [ ] I checked that each commit in the pull request has a meaningful subject line and body.
+
 <!--
-Please clarify why the changes are needed. For instance,
-  1. If you propose a new API, clarify the use case for a new API.
-  2. If you fix a bug, you can clarify why it is a bug.
+If you're unsure, you can format the pull request title like `[CAMEL-XXX] Fixes bug in camel-file component`, where you replace `CAMEL-XXX` with the appropriate JIRA issue.
 -->
 
+- [ ] I have run `mvn clean install -DskipTests` locally and I have committed all auto-generated changes
 
-### Does this PR introduce _any_ user-facing change?
 <!--
-Note that it means *any* user-facing change including all aspects such as the documentation fix.
-If yes, please clarify the previous behavior and the change this PR proposes - provide the console output, description, screenshot and/or a reproducable example to show the behavior difference if possible.
-If possible, please also clarify if this is a user-facing change compared to the released Hive versions or within the unreleased branches such as master.
-If no, write 'No'.
+You can run the aforementioned command in your module so that the build auto-formats your code. This will also be verified as part of the checks and your PR may be rejected if if there are uncommited changes after running `mvn clean install -DskipTests`.
+
+You can learn more about the contribution guidelines at https://github.com/apache/camel/blob/main/CONTRIBUTING.md
 -->
 
-### Is the change a dependency upgrade?
-<!--
-If yes, please attach a file with output from mvn dependency:tree to validate a complete upgrade of dependency.
-If no, write 'No'.
--->
-
-
-### How was this patch tested?
-<!--
-If tests were added, say they were added here. Please make sure to add some test cases that check the changes thoroughly including negative and positive cases if possible.
-If it was tested in a way different from regular unit tests, please clarify how you tested step by step, ideally copy and paste-able, so that other reviewers can test and check, and descendants can verify in the future.
-If tests were not added, please describe why they were not added and/or why it was difficult to add.
--->

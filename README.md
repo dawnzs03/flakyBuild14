@@ -1,122 +1,110 @@
-Apache Hive (TM)
-================
-[![Master Build Status](https://travis-ci.org/apache/hive.svg?branch=master)](https://travis-ci.org/apache/hive/branches)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.hive/hive/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.apache.hive%22)
+# Apache Camel
 
-The Apache Hive (TM) data warehouse software facilitates reading,
-writing, and managing large datasets residing in distributed storage
-using SQL. Built on top of Apache Hadoop (TM), it provides:
-
-* Tools to enable easy access to data via SQL, thus enabling data
-  warehousing tasks such as extract/transform/load (ETL), reporting,
-  and data analysis
-
-* A mechanism to impose structure on a variety of data formats
-
-* Access to files stored either directly in Apache HDFS (TM) or in other
-  data storage systems such as Apache HBase (TM)
-
-* Query execution using Apache Hadoop MapReduce or Apache Tez frameworks.
-
-Hive provides standard SQL functionality, including many of the later
-2003 and 2011 features for analytics.  These include OLAP functions,
-subqueries, common table expressions, and more.  Hive's SQL can also be
-extended with user code via user defined functions (UDFs), user defined
-aggregates (UDAFs), and user defined table functions (UDTFs).
-
-Hive users have a choice of 3 runtimes when executing SQL queries.
-Users can choose between Apache Hadoop MapReduce or Apache Tez
-frameworks as their execution backend. MapReduce is a
-mature framework that is proven at large scales. However, MapReduce
-is a purely batch framework, and queries using it may experience
-higher latencies (tens of seconds), even over small datasets. Apache
-Tez is designed for interactive query, and has substantially reduced
-overheads versus MapReduce.
-
-Users are free to switch back and forth between these frameworks
-at any time. In each case, Hive is best suited for use cases
-where the amount of data processed is large enough to require a
-distributed system.
-
-Hive is not designed for online transaction processing. It is best used
-for traditional data warehousing tasks.  Hive is designed to maximize
-scalability (scale out with more machines added dynamically to the Hadoop
-cluster), performance, extensibility, fault-tolerance, and
-loose-coupling with its input formats.
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.camel/apache-camel/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/org.apache.camel/apache-camel)
+[![Javadocs](https://www.javadoc.io/badge/org.apache.camel/apache-camel.svg?color=brightgreen)](https://www.javadoc.io/doc/org.apache.camel/camel-api)
+[![Stack Overflow](https://img.shields.io/:stack%20overflow-apache--camel-brightgreen.svg)](http://stackoverflow.com/questions/tagged/apache-camel)
+[![Chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://camel.zulipchat.com/)
+[![Twitter](https://img.shields.io/twitter/follow/ApacheCamel.svg?label=Follow&style=social)](https://twitter.com/ApacheCamel)
 
 
-General Info
-============
+[Apache Camel](https://camel.apache.org/) is an Open Source integration framework that empowers you to quickly and easily integrate various systems consuming or producing data.
 
-For the latest information about Hive, please visit out website at:
+### Introduction
 
-  http://hive.apache.org/
+Camel empowers you to define routing and mediation rules in a variety of domain-specific languages (DSL, such as Java, XML, Groovy, Kotlin, and YAML). This means you get smart completion of routing rules in your IDE, whether in a Java or XML editor.
+
+Apache Camel uses URIs to enable easier integration with all kinds of
+transport or messaging model including HTTP, ActiveMQ, JMS, JBI, SCA, MINA
+or CXF together with working with pluggable Data Format options.
+Apache Camel is a small library that has minimal dependencies for easy embedding
+in any Java application. Apache Camel lets you work with the same API regardless of the 
+transport type, making it possible to interact with all the components provided out-of-the-box, 
+with a good understanding of the API.
+
+Apache Camel has powerful Bean Binding and integrated seamlessly with
+popular frameworks such as Spring, Quarkus, and CDI.
+
+Apache Camel has extensive testing support allowing you to easily
+unit test your routes.
+
+## Components
+
+Apache Camel comes alongside several artifacts with components, data formats, languages, and kinds.
+The up to date list is available online at the Camel website:
+
+* Components: <https://camel.apache.org/components/latest/>
+* Data Formats: <https://camel.apache.org/components/latest/dataformats/>
+* Languages: <https://camel.apache.org/components/latest/languages/>
+* Miscellaneous: <https://camel.apache.org/components/latest/#_miscellaneous_components>
+
+## Examples
+
+Apache Camel comes with many examples.
+The up to date list is available online at GitHub:
+
+* Examples: <https://github.com/apache/camel-examples/tree/main/examples#welcome-to-the-apache-camel-examples>
+
+## Getting Started
+
+To help you get started, try the following links:
+
+**Getting Started**
+
+<https://camel.apache.org/getting-started.html>
+
+The beginner examples are another powerful alternative pathway for getting started with Apache Camel.
+
+* Examples: <https://github.com/apache/camel-examples/tree/main/examples#welcome-to-the-apache-camel-examples>
+
+**Building**
+
+<https://camel.apache.org/building.html>
+
+**Contributions**
+
+We welcome all kinds of contributions, the details of which are specified here:
+
+<https://github.com/apache/camel/blob/main/CONTRIBUTING.md>
 
 
-Getting Started
-===============
+Please refer to the website for details of finding the issue tracker, 
+email lists, GitHub, chat
 
-- Installation Instructions and a quick tutorial:
-  https://cwiki.apache.org/confluence/display/Hive/GettingStarted
+Website: <https://camel.apache.org/>
 
-- Instructions to build Hive from source:
-  https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-BuildingHivefromSource
+Github (source): <https://github.com/apache/camel>
 
-- A longer tutorial that covers more features of HiveQL:
-  https://cwiki.apache.org/confluence/display/Hive/Tutorial
+Issue tracker: <https://issues.apache.org/jira/projects/CAMEL>
 
-- The HiveQL Language Manual:
-  https://cwiki.apache.org/confluence/display/Hive/LanguageManual
+Mailing-list: <https://camel.apache.org/community/mailing-list/>
 
+Chat: <https://camel.zulipchat.com/>
 
-Requirements
-============
+StackOverflow: <https://stackoverflow.com/questions/tagged/apache-camel>
 
-Java
-------
-
-| Hive Version  | Java Version  |
-| ------------- |:-------------:|
-| Hive 1.0      | Java 6        |
-| Hive 1.1      | Java 6        |
-| Hive 1.2      | Java 7        |
-| Hive 2.x      | Java 7        |
-| Hive 3.x      | Java 8        |
-| Hive 4.x      | Java 8        |
+Twitter: <https://twitter.com/ApacheCamel>
 
 
-Hadoop
-------
+**Support**
 
-- Hadoop 1.x, 2.x
-- Hadoop 3.x (Hive 3.x)
+For additional help, support, we recommend referencing this page first:
 
+<https://camel.apache.org/community/support/>
 
-Upgrading from older versions of Hive
-=====================================
+**Getting Help**
 
-- Hive includes changes to the MetaStore schema. If
-  you are upgrading from an earlier version of Hive it is imperative
-  that you upgrade the MetaStore schema by running the appropriate
-  schema upgrade scripts located in the scripts/metastore/upgrade
-  directory.
+If you get stuck somewhere, please feel free to reach out to us on either StackOverflow, Chat, or the email mailing list.
 
-- We have provided upgrade scripts for MySQL, PostgreSQL, Oracle,
-  Microsoft SQL Server, and Derby databases. If you are using a
-  different database for your MetaStore you will need to provide
-  your own upgrade script.
+Please help us make Apache Camel better - we appreciate any feedback
+you may have.
 
-Useful mailing lists
-====================
+Enjoy!
 
-1. user@hive.apache.org - To discuss and ask usage questions. Send an
-   empty email to user-subscribe@hive.apache.org in order to subscribe
-   to this mailing list.
+-----------------
+The Camel riders!
 
-2. dev@hive.apache.org - For discussions about code, design and features.
-   Send an empty email to dev-subscribe@hive.apache.org in order to
-   subscribe to this mailing list.
+# Licensing
 
-3. commits@hive.apache.org - In order to monitor commits to the source
-   repository. Send an empty email to commits-subscribe@hive.apache.org
-   in order to subscribe to this mailing list.
+The terms for software licensing are detailed in the `LICENSE.txt` file,  
+located in the working directory.
+

@@ -1,1 +1,0 @@
-FAILED: SemanticException STORED AS is not supported for storage handler org.apache.hadoop.hive.hbase.HBaseStorageHandler

@@ -1,4 +1,0 @@
-Ln:1 PRINT
-Before return
-Ln:2 RETURN
-Signal: LEAVE_ROUTINE
