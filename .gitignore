@@ -1,42 +1,63 @@
 # Eclipse
 .classpath
 .project
-.settings/
+.settings
+eclipsebin
 
-# Intellij
-.idea/
+# m2e-apt
+.factorypath
+
+# Ant
+bin/
+out/
+
+# Maven
+dist
+target
+pom.xml.*
+release.properties
+
+# Gradle
+.gradle/
+build
+
+# Android Profiling
+*.hprof
+
+# IntelliJ
+.idea
 *.iml
 *.iws
+*.ipr
+classes
+
+# Other editors
+*.orig
+*.swp
+*~
+\#*\#
 
 # Mac
 .DS_Store
 
-# Maven
-log/
-target/
-site/
-maven-wrapper.jar
-maven-checksum-extension.jar
+tmp
+local.properties
 
-# Gradle
-.gradle/
-build/
-!**/src/**/build/
-gradle-*-bin.zip
-gradle-wrapper.jar
+# CTS stuff
+cts/
+cts-libs/
 
-# Shade plugin
-dependency-reduced-pom.xml
-
-# Versions plugin
-pom.xml.versionsBackup
-
-# Release plugin
-pom.xml.releaseBackup
-release.properties
-
-# Android
-*/gen/*
-
-# JVM
-.attach*
+# CMake
+# CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+*.a
+*.dylib
