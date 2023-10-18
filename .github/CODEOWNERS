@@ -1,9 +1,10 @@
-# Each line is a file pattern followed by one or more owners.
+# committer will be the owner of all codes
+*   @StarRocks/starrocks-committer
 
-# These owners will be the default owners for everything related to the clients team in
-# the repo . @hazelcast/clients team will be requested for
-# review when someone opens a pull request.
+# /docs/ belong to docs-maintainer
+/docs/  @StarRocks/docs-maintainer
 
-**/client/**           @hazelcast/apis
-**/hazelcast-client**  @hazelcast/apis
-**/serialization**     @hazelcast/apis
+# sql/parser/StarRocksLex.g4 sql/parser/StarRocks.g4 belong to syntax-committer
+/fe/fe-core/src/main/java/com/starrocks/sql/parser/StarRocksLex.g4  @StarRocks/syntax-committer
+/fe/fe-core/src/main/java/com/starrocks/sql/parser/StarRocks.g4  @StarRocks/syntax-committer
+/gensrc/script/functions.py  @StarRocks/syntax-committer

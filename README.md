@@ -1,411 +1,126 @@
-# Hazelcast
-
-[![Slack](https://img.shields.io/badge/slack-chat-green.svg)](https://slack.hazelcast.com/) 
-[![javadoc](https://javadoc.io/badge2/com.hazelcast/hazelcast/5.0/javadoc.svg)](https://javadoc.io/doc/com.hazelcast/hazelcast/5.0)
-[![Docker pulls](https://img.shields.io/docker/pulls/hazelcast/hazelcast)](https://img.shields.io/docker/pulls/hazelcast/hazelcast)
-[![Total Alerts](https://img.shields.io/lgtm/alerts/g/hazelcast/hazelcast.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/hazelcast/hazelcast/alerts)
-[![Code Quality: Java](https://img.shields.io/lgtm/grade/java/g/hazelcast/hazelcast.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/hazelcast/hazelcast/context:java)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hz-os-master&metric=alert_status)](https://sonarcloud.io/dashboard?id=hz-os-master)
-
-----
-
-## What is Hazelcast
-
-Hazelcast is a distributed computation and storage platform for consistently
-low-latency querying, aggregation and stateful computation against event streams
-and traditional data sources. It allows you to quickly build resource-efficient,
-real-time applications. You can deploy it at any scale from small edge devices
-to a large cluster of cloud instances. 
-
-A cluster of Hazelcast nodes share both the data storage and computational load
-which can dynamically scale up and down. When you add new nodes to the cluster,
-the data is automatically rebalanced across the cluster, and currently running
-computational tasks (known as jobs) snapshot their state and scale with
-processing guarantees.
-
-## When to use Hazelcast
-
-Hazelcast provides a platform that can handle multiple types of workloads for
-building real-time applications.
-
-* Stateful data processing over streaming data or data at rest
-* Querying streaming and batch data sources directly using SQL
-* Ingesting data through a library of connectors and serving it using
-  low-latency SQL queries
-* Pushing updates to applications on events
-* Low-latency queue-based or pub-sub messaging  
-* Fast access to contextual and transactional data via caching patterns such as
-  read/write-through and write-behind
-* Distributed coordination for microservices
-* Replicating data from one region to another or between data centers in the
-  same region
-
-## Key Features
-
-* Stateful and fault-tolerant data processing and querying over data streams
-  and data at rest using SQL or dataflow API
-* A comprehensive library of connectors such as Kafka, Hadoop, S3, RDBMS, JMS
-  and many more
-* Distributed messaging using pub-sub and queues
-* Distributed, partitioned, queryable key-value store with event listeners,
-  which can also be used to store contextual data for enriching event streams
-  with low latency
-* A production-ready Raft-implementation which allows lineralizable (CP)
-  concurrency primitives such as distributed locks.
-* Tight integration for deploying machine learning models with Python to a data
-  processing pipeline
-* Cloud-native, run everywhere architecture
-* Zero-downtime operations with rolling upgrades
-* At-least-once and exactly-once processing guarantees for stream processing
-  pipelines
-* Data replication between data centers and geographic regions using WAN 
-* Microsecond performance for key-value point lookups and pub-sub
-* Unique data processing architecture results in 99.99% latency of under 10ms
-  for streaming queries with millions of events per second.
-* Client libraries in [Java](https://github.com/hazelcast/hazelcast),
- [Python](https://github.com/hazelcast/hazelcast-python-client), [Node.js](https://github.com/hazelcast/hazelcast-nodejs-client), [.NET](https://github.com/hazelcast/hazelcast-csharp-client), [C++](https://github.com/hazelcast/hazelcast-cpp-client) and [Go](https://github.com/hazelcast/hazelcast-go-client)
-
-### Operational Data Store
-
-Hazelcast provides distributed in-memory data structures which are partitioned,
-replicated and queryable. One of the main use cases for Hazelcast is for storing
-a _working set_ of data for fast querying and access. 
-
-The main data structure underlying Hazelcast, called `IMap`, is a key-value store
-which has a rich set of features, including:
-
-* Integration with [data
-  sources](https://docs.hazelcast.com/hazelcast/latest/pipelines/sources-sinks.htm)
-  for one time or continuous ingestion
-* [Read-through and
-  write-through](https://docs.hazelcast.com/hazelcast/latest/data-structures/map.html#loading-and-storing-persistent-data)
-  caching patterns
-* Indexing and querying through
-  [SQL](https://docs.hazelcast.com/hazelcast/latest/query/sql-overview.html)
-* Processing entries in place for [atomic
-  updates](https://docs.hazelcast.com/hazelcast/latest/computing/entry-processor.html)
-* [Expiring
-  items](https://docs.hazelcast.com/hazelcast/latest/data-structures/map.html#map-eviction)
-  automatically based on certain criteria like TTL or last access time
-* [Near
-  cache](https://docs.hazelcast.com/hazelcast/latest/performance/near-cache.html)
-  for caching entries on the client
-* [Listeners](https://docs.hazelcast.com/hazelcast/latest/events/object-events.html)
-  for pushing changes to clients
-* [Data Replication](https://docs.hazelcast.com/hazelcast/latest/wan/wan.html)
-  between datacenters (Enterprise version only)
-* [Persistence](https://docs.hazelcast.com/hazelcast/latest/storage/persistence.html)
-  of data on disk (Enterprise version only)
-
-Hazelcast stores data in
-[partitions](https://docs.hazelcast.com/hazelcast/latest/consistency-and-replication/replication-algorithm.html),
-which are distributed to all the nodes. You can increase the storage capacity
-by adding additional nodes, and if one of the nodes go down, the data is
-restored automatically from the backup replicas.
-
-<img src="images/replication.png"/>
-
-You can interact with maps using SQL or a programming language client of your
-choice. You can create and interact with a map as follows:
-
-```sql
-CREATE MAPPING myMap (name varchar EXTERNAL NAME "__key", age INT EXTERNAL NAME "this") 
-TYPE IMap
-OPTIONS ('keyFormat'='varchar','valueFormat'='int');
-INSERT INTO myMap VALUES('Jake', 29);
-SELECT * FROM myMap;
-```
-
-The same can be done programmatically as follows using one of the [supported
-programming
-languages](https://docs.hazelcast.com/hazelcast/latest/clients/hazelcast-clients.html).
-Here are some exmaples in Java and Python:
-
-```java
-var hz = HazelcastClient.newHazelcastClient();
-IMap<String, Integer> map = hz.getMap("myMap");
-map.set(Alice, 25);
-```
-
-```python
-import hazelcast
-
-client = hazelcast.HazelcastClient()
-my_map = client.get_map("myMap")
-age = my_map.get("Alice").result()
-```
-
-Other programming languages supported are
-[C#](https://docs.hazelcast.com/hazelcast/latest/clients/dotnet.html),
-[C++](https://docs.hazelcast.com/hazelcast/latest/clients/cplusplus.html),
-[Node.js](https://docs.hazelcast.com/hazelcast/latest/clients/nodejs.html) and
-[Go](https://docs.hazelcast.com/hazelcast/latest/clients/go.html).
-
-Alternatively, you can ingest data directly from the many [sources supported](https://docs.hazelcast.com/hazelcast/latest/pipelines/sources-sinks.html)
-using SQL:
-
-```sql
-CREATE MAPPING csv_ages (name VARCHAR, age INT)
-TYPE File
-OPTIONS ('format'='csv',
-    'path'='/data', 'glob'='data.csv');
-SINK INTO myMap
-SELECT name, age FROM csv_ages;
-```
-
-Hazelcast also provides additional data structures such as ReplicatedMap, Set,
-MultiMap and List. For a full list, refer to the [distributed data
-structures](https://docs.hazelcast.com/hazelcast/latest/data-structures/distributed-data-structures.html)
-section of the docs.
-
-### Stateful Data Processing
-
-Hazelcast has a built-in data processing engine called
-[Jet](https://arxiv.org/abs/2103.10169). Jet can be used to build both streaming
-and batch data pipelines that are elastic. You can use it to process large
-volumes of real-time events or huge batches of static datasets. To give a sense
-of scale, a single node of Hazelcast has been proven to [aggregate 10 million
-events per second](https://jet-start.sh/blog/2020/08/05/gc-tuning-for-jet) with
-latency under 10 milliseconds. A cluster of Hazelcast nodes can process [billion
-events per
-second](https://hazelcast.com/blog/billion-events-per-second-with-millisecond-latency-streaming-analytics-at-giga-scale/).
-
-<img src="images/latency.png"/>
-
-An application which aggregates millions of sensor readings per
-second with 10-millisecond resolution from Kafka looks like the
-following:
-
-```java
-var hz = Hazelcast.bootstrappedInstance();
-
-var p = Pipeline.create();
-
-p.readFrom(KafkaSources.<String, Reading>kafka(kafkaProperties, "sensors"))
- .withTimestamps(event -> event.getValue().timestamp(), 10) // use event timestamp, allowed lag in ms
- .groupingKey(reading -> reading.sensorId())
- .window(sliding(1_000, 10)) // sliding window of 1s by 10ms
- .aggregate(averagingDouble(reading -> reading.temperature()))
- .writeTo(Sinks.logger());
-
-hz.getJet().newJob(p).join();
-```
-
-Use the following command to deploy the application to the server:
-
-```bash
-bin/hazelcast submit analyze-sensors.jar
-```
-
-Jet supports advanced streaming features such as [exactly-once processing](https://docs.hazelcast.com/hazelcast/latest/fault-tolerance/fault-tolerance.html) and
-[watermarks](https://docs.hazelcast.com/hazelcast/latest/architecture/event-time-processing.html).
-
-#### Data Processing using SQL
-
-Jet also powers the [SQL engine](https://docs.hazelcast.com/hazelcast/latest/query/sql-overview.html)
-in Hazelcast which can execute both streaming and batch queries. Internally, all SQL queries
-are converted to Jet jobs.
-
-```sql
-CREATE MAPPING trades (
-    id BIGINT,
-    ticker VARCHAR,
-    price DECIMAL,
-    amount BIGINT)
-TYPE Kafka
-OPTIONS (
-    'valueFormat' = 'json',
-    'bootstrap.servers' = 'kafka:9092'
-);
-SELECT ticker, ROUND(price * 100) AS price_cents, amount
-  FROM trades
-  WHERE price * amount > 100;
-+------------+----------------------+-------------------+
-|ticker      |           price_cents|             amount|
-+------------+----------------------+-------------------+
-|EFGH        |                  1400|                 20|
-```
-
-### Messaging
-
-Hazelcast provides lightweight options for adding messaging to your application.
-The two main constructs for messaging are topics and queues.
-
-#### Topics
-
-Topics provide a publish-subscribe pattern where each message is fanned out to
-multiple subscribers. See the examples below in Java and Python:
-
-```java
-var hz = Hazelcast.bootstrappedInstance();
-ITopic<String> topic = hz.getTopic("my_topic");
-topic.addMessageListener(msg -> System.out.println(msg));
-topic.publish("message");
-```
-
-```python
-topic = client.get_topic("my_topic")
-
-def handle_message(msg):
-    print("Received message %s"  % msg.message)
-topic.add_listener(on_message=handle_message)
-topic.publish("my-message")
-```
-
-For examples in other languages, please refer to the [docs](https://docs.hazelcast.com/hazelcast/latest/data-structures/topic.html).
-
-#### Queues
-
-Queues provide FIFO-semantics and you can add items from one client and remove
-from another. See the examples below in Java and Python:
-
-```java
-var client = Hazelcast.newHazelcastClient();
-IQueue<String> queue = client.getQueue("my_queue");
-queue.put("new-item")
-```
-
-```python
-import hazelcast
-
-client = hazelcast.HazelcastClient()
-q = client.get_queue("my_queue")
-my_item = q.take().result()
-print("Received item %s" % my_item)
-```
-
-For examples in other languages, please refer to the [docs](https://docs.hazelcast.com/hazelcast/latest/data-structures/queue.html).
-
-## Get Started
-
-Follow the [Getting Started
-Guide](https://docs.hazelcast.com/hazelcast/latest/getting-started/install-hazelcast)
-to install and start using Hazelcast.
-
-## Documentation
-
-Read the [documentation](https://docs.hazelcast.com/) for
-in-depth details about how to install Hazelcast and an overview of the features.
-
-## Get Help
-
-You can use the following channels for getting help with Hazelcast:
-
-* [Hazelcast mailing list](http://groups.google.com/group/hazelcast)
-* [Slack](https://slack.hazelcast.com/) for chatting with the
-  development team and other Hazelcast users.
-* [Stack Overflow](https://stackoverflow.com/tags/hazelcast)
-
-## How to Contribute
-
-Thanks for your interest in contributing! The easiest way is to just send a pull
-request. Have a look at the
-[issues](https://github.com/hazelcast/hazelcast-jet/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
-marked as good first issue for some guidance.
-
-### Building From Source
-
-Building Hazelcast requires at minimum JDK 11. Pull the latest source from the
-repository and use Maven install (or package) to build:
-
-```bash
-$ git pull origin master
-$ ./mvnw clean package -DskipTests
-```
-
-It is recommended to use the included Maven wrapper script.
-It is also possible to use local Maven distribution with the same 
-version that is used in the Maven wrapper script.
-
-Additionally, there is a `quick` build activated by setting the `-Dquick` system
-property that skips tests, checkstyle validation, javadoc and source plugins and
-does not build `extensions` and `distribution` modules.
-
-### Testing
-
-Take into account that the default build executes thousands of tests which may
-take a considerable amount of time. Hazelcast has 3 testing profiles:
-
-* Default: Type `./mvnw test` to run quick/integration tests (those can be run
-  in parallel without using network by using `-P parallelTest` profile).
-* Slow Tests: Type `./mvnw test -P nightly-build` to run tests that are either slow
-  or cannot be run in parallel.
-* All Tests: Type `./mvnw test -P all-tests` to run all tests serially using
-  network.
-
-Some tests require Docker to run. Set `-Dhazelcast.disable.docker.tests` system property to ignore them.
-
-When developing a PR it is sufficient to run your new tests and some 
-related subset of tests locally. Our PR builder will take care of running
-the full test suite.
-
-## Trigger Phrases in the Pull Request Conversation
-
-When you create a pull request (PR), it must pass a build-and-test
-procedure. Maintainers will be notified about your PR, and they can
-trigger the build using special comments. These are the phrases you may
-see used in the comments on your PR:
-
-* `run-lab-run` - run the default PR builder
-* `run-lts-compilers` - compiles the sources with JDK 11 and JDK 17 (without running tests)
-* `run-ee-compile` - compile hazelcast-enterprise with this PR
-* `run-ee-tests` - run tests from hazelcast-enterprise with this PR
-* `run-windows` - run the tests on a Windows machine (HighFive is not supported here)
-* `run-with-jdk17` - run the tests with JDK 17
-* `run-with-ibm-jdk-8` - run the tests with IBM JDK 8
-* `run-cdc-debezium-tests` - run all tests in the
-  `extensions/cdc-debezium` module
-* `run-cdc-mysql-tests` - run all tests in the `extensions/cdc-mysql`
-  module
-* `run-cdc-postgres-tests` - run all tests in the
-  `extensions/cdc-postgres` module
-* `run-mongodb-tests` - run all tests in the `extensions/mongodb` module
-* `run-s3-tests` - run all tests in the `extensions/s3` module
-* *`run-nightly-tests` - run nightly (slow) tests. WARNING: Use with care as this is a resource consuming task.*
-* *`run-ee-nightly-tests` - run nightly (slow) tests from hazelcast-enterprise. WARNING: Use with care as this is a resource consuming task.*
-* `run-sql-only` - run default tests in `hazelcast-sql`, `hazelcast-distribution`, and `extensions/mapstore` modules
-* `run-docs-only` - do not run any tests, check that only files with `.md` or `.adoc` suffix are added in the PR
-* `run-sonar` - run SonarCloud analysis
-* `run-arm64` - run the tests on arm64 machine
-
-Where not indicated, the builds run on a Linux machine with Oracle JDK 11.
-
-### Creating PRs for Hazelcast SQL
-
-When creating a PR with changes located in the `hazelcast-sql` module and nowhere else,
-you can label your PR with `SQL-only`. This will change the standard PR builder to one that
-will only run tests related to SQL (see `run-sql-only` above), which will significantly shorten
-the build time vs. the default PR builder. **NOTE**: this job will fail if you've made changes
-anywhere other than `hazelcast-sql`.
-
-### Creating PRs which contain only documentation
-
-When creating a PR which changes only documentation (files with suffix `.md` or `.adoc`) it 
-makes no sense to run tests. For that case the label `docs-only` can be used. The job will fail 
-in case you've made other changes than in `.md` or `.adoc` files.
-
-## License
-
-Source code in this repository is covered by one of two licenses:
-
- 1. [Apache License 2.0](https://docs.hazelcast.com/hazelcast/latest/index.html#licenses-and-support)
- 2. [Hazelcast Community
-    License](http://hazelcast.com/hazelcast-community-license)
-
-The default license throughout the repository is Apache License 2.0 unless the
-header specifies another license.
-
-## Acknowledgments
-[![](https://www.yourkit.com/images/yklogo.png)](http://www.yourkit.com/)
-
-Thanks to [YourKit](http://www.yourkit.com/) for supporting open source software
-by providing us a free license for their Java profiler.
-
-We owe (the good parts of) our CLI tool's user experience to
-[picocli](https://picocli.info/).
-
-## Copyright
-
-Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
-
-Visit [www.hazelcast.com](http://www.hazelcast.com/) for more info.
+
+ <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=e8355b6b-a9fc-4d4e-8ed8-b3157aa1827d" />
+ <p align="center">
+ <a href="https://starrocks.io/index">
+    <img  width="900" src="https://cdn.starrocks.io/static/github/starrocks.png">
+   </a>
+</p>
+<p align="center">
+  <a href="https://starrocks.io/download/community">Download</a> | <a href="https://docs.starrocks.io/">Docs</a> | <a href="https://starrocks.io/blog/benchmark-test">Benchmarks</a> | <a href="https://github.com/StarRocks/demo">Demo</a>
+</p>
+<p align="center">
+
+ <img src="https://img.shields.io/badge/Made%20with-JAVA%20%26%20C%2B%2B-red" alt="JAVA&C++">
+    </a>
+    <img src="https://img.shields.io/github/commit-activity/m/StarRocks/starrocks" alt="Commit Activities">
+    </a>
+   <a href="https://github.com/StarRocks/starrocks/issues">
+    <img src="https://img.shields.io/github/issues-raw/StarRocks/starrocks" alt="Open Issues">
+  </a>
+  </a>
+   <a href="https://starrocks.io/index">
+    <img src="https://img.shields.io/badge/Visit%20StarRocks-Website-green" alt="Website">
+  </a>
+  </a>
+   <a href="https://join.slack.com/t/starrocks/shared_invite/zt-z5zxqr0k-U5lrTVlgypRIV8RbnCIAzg">
+    <img src="https://img.shields.io/badge/Join-Slack-ff69b4" alt="Slack">
+  </a>
+  </a>
+   <a href="https://twitter.com/StarRocksLabs">
+    <img src="https://img.shields.io/twitter/follow/StarRocksLabs?style=social" alt="Twitter">
+  </a>
+ </p>
+
+<div align="center"> 
+
+  </div>
+StarRocks, a Linux Foundation project, is the next-generation data platform designed to make data-intensive real-time analytics fast and easy. 
+It delivers query speeds 5 to 10 times faster than other popular solutions. StarRocks can perform real-time analytics well while updating historical records. It can also enhance real-time analytics with historical data from data lakes easily. With StarRocks, you can get rid of the de-normalized tables and get the best performance and flexibility. <br>
+
+Learn more 👉🏻 [Introduction to StarRocks](https://www.starrocks.io/blog/introduction_to_starrocks )
+
+<br>
+ <p align="center">
+    <img src="https://cdn.starrocks.io/static/github/community.gif">
+   </a>
+</p>
+</br>
+
+## Features
+
+* **🚀 Native vectorized SQL engine:** StarRocks adopts vectorization technology to make full use of the parallel computing power of CPU, achieving sub-second query returns in multi-dimensional analyses, which is 5 to 10 times faster than previous systems.
+* **📊 Standard SQL:** StarRocks supports ANSI SQL syntax (fully supported TPC-H and TPC-DS). It is also compatible with the MySQL protocol. Various clients and BI software can be used to access StarRocks.
+* **💡 Smart query optimization:** StarRocks can optimize complex queries through CBO (Cost Based Optimizer). With a better execution plan, the data analysis efficiency will be greatly improved.
+* **⚡ Real-time update:** The updated model of StarRocks can perform upsert/delete operations according to the primary key, and achieve efficient query while concurrent updates.
+* **🪟 Intelligent materialized view:** The materialized view of StarRocks can be automatically updated during the data import and automatically selected when the query is executed.
+* **✨ Querying data in data lakes directly**: StarRocks allows direct access to data from Apache Hive™, Apache Iceberg™, and Apache Hudi™ without importing.
+* **🎛️ Resource management**: This feature allows StarRocks to limit resource consumption for queries and implement isolation and efficient use of resources among tenants in the same cluster.
+* **💠 Easy to maintain**: Simple architecture makes StarRocks easy to deploy, maintain and scale out. StarRocks tunes its query plan agilely, balances the resources when the cluster is scaled in or out, and recovers the data replica under node failure automatically.
+
+
+
+<br>
+  
+## Architecture Overview
+
+ <p align="center">
+    <img src="images/arch.png">
+   </a>
+</p>
+
+StarRocks’s streamlined architecture is mainly composed of two modules: Frontend (FE) and Backend (BE).  The entire system eliminates single points of failure through seamless and horizontal scaling of FE and BE, as well as replication of metadata and data.
+
+Starting from version 3.0, StarRocks supports a new shared-data architecture, which can provide better scalability and lower costs.
+
+ <p align="center">
+    <img src="images/arch-v30.png">
+   </a>
+</p>
+
+
+<br>
+
+## Resources
+
+### 📚 Read the docs
+
+| Section | Description |
+|-|-|
+| [Deploy](https://docs.starrocks.io/en-us/latest/quick_start/Deploy) | Learn how to run and configure StarRocks.|
+| [Articles](https://github.com/StarRocks/starrocks/discussions/categories/how-tos-tutorials-best-practices-and-architecture-articles)| How-tos, Tutorials, Best Practices and Architecture Articles. |
+| [Docs](https://docs.starrocks.io/en-us/latest/introduction/StarRocks_intro)| Full documentation. |
+| [Blogs](https://starrocks.io/blog) | StarRocks deep dive and user stories.  |
+
+### ❓ Get support  
+[<img align="right" width="150" src="https://firstcontributions.github.io/assets/Readme/join-slack-team.png">](https://join.slack.com/t/starrocks/shared_invite/zt-z5zxqr0k-U5lrTVlgypRIV8RbnCIAzg)
+-  [Slack community: ](https://join.slack.com/t/starrocks/shared_invite/zt-z5zxqr0k-U5lrTVlgypRIV8RbnCIAzg)join technical discussions, ask questions, and meet other users!
+-  [YouTube channel:](https://www.youtube.com/channel/UC38wR-ogamk4naaWNQ45y7Q/featured) subscribe to the latest video tutorials and webcasts.
+-  [GitHub issues:](https://github.com/StarRocks/starrocks/issues) report an issue with StarRocks.
+
+
+<br>  
+  
+## Contributing to StarRocks
+
+We welcome all kinds of contributions from the community, individuals and partners. We owe our success to your active involvement.
+
+1. See [Contributing.md](https://github.com/StarRocks/starrocks/blob/main/CONTRIBUTING.md) to get started.
+2. Set up StarRocks development environment:
+* [IDE Setup](https://docs.starrocks.io/en-us/main/developers/development-environment/ide-setup) 
+3. Understand our [GitHub workflow](https://github.com/StarRocks/community/blob/main/Contributors/guide/workflow.md) for opening a pull request; use this [PR Template](https://github.com/StarRocks/starrocks/blob/main/.github/PULL_REQUEST_TEMPLATE.md) when submitting a pull request.
+4. Pick a [good first issue](https://github.com/StarRocks/starrocks/labels/good%20first%20issue) and start contributing. 
+
+**📝 License:** StarRocks is licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+**👥 Community Membership:** Learn more about different [contributor roles](community/membership.md) in StarRocks community.
+  
+<br>
+  
+## Used By
+
+This project is used by the following companies. Learn more about their use cases:
+
+- [Airbnb](https://www.youtube.com/watch?v=AzDxEZuMBwM&ab_channel=StarRocks_labs)
+- [Trip.com](https://starrocks.medium.com/trip-com-starrocks-efficiently-supports-high-concurrent-queries-dramatically-reduces-labor-and-1e1921dd6bf8) 
+- [Zepp Health](https://starrocks.io/blog/zeppheath) 
+- [Lenovo](https://starrocks.io/blog/lenovo_en) 
