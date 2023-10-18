@@ -1,2 +1,0 @@
-io.micronaut.inject.beanbuilder.TestInterceptorBindingRemapper
-io.micronaut.annotation.mapping.RemapToRepeatableAnnotationSpec$TheAnnotationMapper
