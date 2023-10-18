@@ -1,49 +1,67 @@
-### Java
-Thumbs.db
+# OS files
 .DS_Store
-.gradle
+Icon\r\r
+.floo
+.flooignore
+.gradletasknamecache
+*~
+
+# Java files
+.classpath
+.gradle/
+.project
+.settings
 build/
-target/
-out/
-.idea
-.vscode
+
+# intellij files
+.idea/
+.shelf/
 *.iml
 *.ipr
 *.iws
-.project
-.settings
-.classpath
-.attach*
-**/*.class
-**/bin/*
+build-idea/
+reports/
+test-output/
 
-### Configurations
-docker-compose.override.yml
-cli/src/main/resources/application-*.yml
-*/src/test/resources/application-test.yml
-/local
+# eclipse files
+bin/
+.jdt.ls/
+benchmarks/.factorypath
 
-### Javascript
-node
-node_modules
-yarn-error.log
-yarn.lock
-ui/node_modules
-ui/.env.local
-ui/.env.*.local
-webserver/src/main/resources/ui
-yarn.lock
-ui/coverage
-ui/stats.html
-ui/.frontend-gradle-plugin
+# Python files
+__pycache__/
+.installed.cfg
+_venv/
+.venv/
+*.pyc
+*.pyo
+.mypy_cache/
+blackbox/get-pip.py
+blackbox/.mypy_cache/
+develop-eggs/
+eggs/
+parts/
+tmp/
 
-### Docker
-/.env
-docker-compose*.overide.yml
-docker/app/plugins/*.jar
-docker/app/kestra
-docker/app/confs/*.yml
-docker/app/secrets/*.yml
+# app files
+app/adminui/
+app/data/
+app/enterprise/
+app/extensions/
+app/logs/
+app/oss_modules/
+app/plugins/
+app/src/main/dist/bin/crate.bat
+app/src/main/resources/crate-build.properties
 
-### Build
-core/src/main/resources/gradle.properties
+# Docs
+_out/
+out/
+
+# Misc
+sandbox/crate/data/
+sandbox/crate/repo/
+sandbox/crate2/data/
+sandbox/crate2/repo/
+**/antlr/
+**/gen/

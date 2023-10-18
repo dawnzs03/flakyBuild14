@@ -1,7 +1,6 @@
+---
+blank_issues_enabled: true
 contact_links:
-  - name: GitHub Discussions
-    url: https://github.com/kestra-io/kestra/discussions
-    about: Ask questions about Kestra on Github
-  - name: Chat
-    url: https://kestra.io/slack
-    about: Chat with us on Slack.
+  - name: Community Support
+    url: https://community.crate.io/
+    about: Get help from the CrateDB community.

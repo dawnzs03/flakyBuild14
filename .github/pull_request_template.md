@@ -1,14 +1,15 @@
-<!--
-Before opening a PR, open a ticket describing the issue or feature the
-PR will address. Follow the steps in CONTRIBUTING.md.
+## Summary of the changes / Why this improves CrateDB
 
-Replace this comment with a description of the change. Describe how it
-addresses the linked ticket.
--->
 
-<!--
-Link to relevant issues or previous PRs, one per line. Use "close" to
-automatically close an issue.
--->
+## Checklist
 
-close #<issue number>
+ - [ ] Added an entry in `CHANGES.txt` for user facing changes
+ - [ ] Updated documentation & `sql_features` table for user facing changes
+ - [ ] Touched code is covered by tests
+ - [ ] [CLA](https://crate.io/community/contribute/cla/) is signed
+ - [ ] This does not contain breaking changes, or if it does:
+    - It is released within a major release
+    - It is recorded in ``CHANGES.txt``
+    - It was marked as deprecated in an earlier release if possible
+    - You've thought about the consequences and other components are adapted
+      (E.g. AdminUI)

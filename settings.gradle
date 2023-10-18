@@ -1,18 +1,28 @@
-rootProject.name="kestra"
+include 'libs:shared',
+        'libs:cli',
+        'libs:dex',
+        'libs:pgwire',
+        'libs:es-x-content',
+        'libs:sql-parser',
+        'libs:guice',
+        'server',
+        'plugins:dns-discovery',
+        'plugins:es-discovery-ec2',
+        'plugins:es-repository-url',
+        'plugins:es-repository-s3',
+        'plugins:es-repository-azure',
+        'plugins:es-analysis-common',
+        'plugins:es-analysis-phonetic',
+        'plugins:cr8-copy-s3',
+        'app',
+        'blackbox',
+        'extensions:jmx-monitoring',
+        'extensions:lang-js',
+        'extensions:functions',
+        'benchmarks'
 
-include 'cli'
-include 'core'
-
-include 'runner-memory'
-
-include 'storage-local'
-
-include 'repository-memory'
-
-include 'jdbc'
-include 'jdbc-h2'
-include 'jdbc-mysql'
-include 'jdbc-postgres'
-
-include 'webserver'
-include 'ui'
+buildCache {
+    local {
+        enabled = !System.getenv().containsKey("CI_RUN")
+    }
+}

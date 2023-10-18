@@ -1,9 +1,4 @@
-# Match the .editorconfig
-*           text=auto eol=lf
-
-# Scripts
-*.bat       text eol=crlf
-*.sh        text eol=lf
-
-# Gradle wrapper
-/gradlew    text eol=lf
+*.sh text eol=lf
+gradlew text eol=lf
+blackbox/bin/** text eol=lf
+app/src/main/dist/bin/crate eol=lf

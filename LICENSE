@@ -1,7 +1,7 @@
 
                                  Apache License
                            Version 2.0, January 2004
-                        https://www.apache.org/licenses/
+                        http://www.apache.org/licenses/
 
    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
@@ -176,16 +176,43 @@
 
    END OF TERMS AND CONDITIONS
 
-   Copyright 2019 Nigh Tech.
+===============================================================================
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+This section describes all third-party components bundled with the CrateDB
+source code.
 
-       https://www.apache.org/licenses/LICENSE-2.0
+As a general guideline, it is a policy of the Apache Software Foundation that
+all bundled third-party components should be available under a category A
+license (https://www.apache.org/legal/resolved.html#category-a).
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+The "server" directory contains source code that originates from the Apache
+Lucene and Elasticsearch projects.
+
+-------------------------------------------------------------------------------
+
+Elasticsearch
+Copyright 2009-2021 Elasticsearch B.V.
+
+Licensed under the Apache License, Version 2.0 (see above for full license
+text).
+
+Elasticsearch bundles a number of third-party components. For a full list of
+the respective licenses, consult the relevant LICENSE.txt files included with
+the source code.
+
+-------------------------------------------------------------------------------
+
+Apache Lucene
+
+Licensed to the Apache Software Foundation (ASF) under one or more contributor
+license agreements.
+
+The ASF licenses Apache Lucene to You under the Apache License, Version 2.0
+(the "License"); you may not use it except in compliance with the License.
+
+-------------------------------------------------------------------------------
+
+To get a quick overview about licenses of all bundled third-party build-time
+dependencies, please also see the "3RD-PARTY-NOTICES.md" file.
+
+===============================================================================

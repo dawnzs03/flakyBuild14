@@ -1,481 +1,278 @@
-plugins {
-    // micronaut
-    id "java"
-    id 'java-library'
-    id "idea"
-    id "com.github.johnrengelman.shadow" version "8.1.1"
-    id "application"
+/*
+ * Licensed to Crate.io GmbH ("Crate") under one or more contributor
+ * license agreements.  See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.  Crate licenses
+ * this file to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.  You may
+ * obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * However, if you have executed another commercial license agreement
+ * with Crate these terms will supersede the license and you may use the
+ * software solely pursuant to the terms of the relevant commercial agreement.
+ */
 
-    // test
-    id 'com.adarshr.test-logger' version '3.2.0'
-    id "org.sonarqube" version "4.3.1.3277"
-    id 'jacoco-report-aggregation'
+import io.crate.gradle.TestLogger
 
-    // helper
-    id "com.github.ben-manes.versions" version "0.48.0"
-
-    // front
-    id 'org.siouan.frontend-jdk11' version '8.0.0' apply false
-
-    // release
-    id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
-    id 'net.researchgate.release' version '3.0.2'
-    id "com.gorylenko.gradle-git-properties" version "2.4.1"
-    id 'signing'
-    id 'ru.vyarus.pom' version '2.2.2' apply false
-    id 'ru.vyarus.github-info' version '1.5.0' apply false
-}
-
-idea {
-    module {
-        downloadJavadoc = true
-        downloadSources = true
-    }
-}
-
-/**********************************************************************************************************************\
- * Main
- **********************************************************************************************************************/
-mainClassName = "io.kestra.cli.App"
-sourceCompatibility = 17
-targetCompatibility = 17
-
-dependencies {
-    implementation project(":cli")
-    testImplementation project(":cli")
-}
-
-/**********************************************************************************************************************\
- * Dependencies
- **********************************************************************************************************************/
-allprojects {
-    group "io.kestra"
-
-    sourceCompatibility = 17
-    targetCompatibility = 17
-
+buildscript {
     repositories {
         mavenCentral()
     }
-
-    // micronaut
-    apply plugin: "java"
-    apply plugin: "java-library"
-    apply plugin: "idea"
-    apply plugin: "jacoco"
-
-    configurations {
-        developmentOnly // for dependencies that are needed for development only
-    }
-
-    //
-    configurations.all {
-        resolutionStrategy {
-            force("org.jooq:jooq:3.17.14")
-            force("org.slf4j:slf4j-api:1.7.36")
-
-            // ugly bug on google cloud plugins
-            force("com.google.protobuf:protobuf-java:3.23.3")
-            force("com.google.protobuf:protobuf-java-util:3.23.3")
-
-            // ugly bug for elastic plugins
-            force("org.apache.httpcomponents:httpclient:4.5.13")
-
-            // ugly bug on crypto plugin
-            force('org.bouncycastle:bcprov-jdk15on:1.70')
-            force('org.bouncycastle:bcpg-jdk15on:1.70')
-
-            // ugly bug for jackson
-            force("com.fasterxml.jackson:jackson-bom:" + jacksonVersion)
-            force("com.fasterxml.jackson.core:jackson-bom:" + jacksonVersion)
-            force("com.fasterxml.jackson.core:jackson-core:" + jacksonVersion)
-            force("com.fasterxml.jackson.core:jackson-databind:" + jacksonVersion)
-            force("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:" + jacksonVersion)
-            force("com.fasterxml.jackson.module:jackson-module-parameter-names:" + jacksonVersion)
-            force("com.fasterxml.jackson.datatype:jackson-datatype-guava:" + jacksonVersion)
-            force("com.fasterxml.jackson.core:jackson-annotations:" + jacksonVersion)
-            force("com.fasterxml.jackson.dataformat:jackson-dataformat-smile:" + jacksonVersion)
-            force("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:" + jacksonVersion)
-        }
-    }
-
-    // dependencies
     dependencies {
-        // lombok
-        annotationProcessor "org.projectlombok:lombok:" + lombokVersion
-        compileOnly 'org.projectlombok:lombok:' + lombokVersion
-
-        // micronaut
-        annotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
-        annotationProcessor "io.micronaut:micronaut-inject-java"
-        annotationProcessor "io.micronaut:micronaut-validation"
-        implementation platform("io.micronaut:micronaut-bom:$micronautVersion")
-        implementation "io.micronaut:micronaut-inject"
-        implementation "io.micronaut:micronaut-validation"
-        implementation "io.micronaut:micronaut-runtime"
-        implementation "javax.annotation:javax.annotation-api"
-        implementation "io.micronaut.data:micronaut-data-model"
-        implementation "io.micronaut:micronaut-management"
-        implementation "io.micrometer:micrometer-core"
-        implementation "io.micronaut.micrometer:micronaut-micrometer-registry-prometheus"
-        api "io.micronaut:micronaut-http-client"
-        api "io.micronaut.rxjava2:micronaut-rxjava2-http-client"
-
-        // logs
-        implementation "org.slf4j:slf4j-api"
-        implementation "ch.qos.logback:logback-classic"
-        implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.19.0'
-        implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.36'
-        implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.36'
-        implementation group: 'org.fusesource.jansi', name: 'jansi', version: '2.4.0'
-
-        // jackson
-        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
-        implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml'
-        implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names'
-        implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-guava'
-
-        // kestra
-        implementation group: 'com.devskiller.friendly-id', name: 'friendly-id', version: '1.1.0'
-        implementation 'com.github.jknack:handlebars:4.3.1'
-        implementation group: 'net.thisptr', name: 'jackson-jq', version: '1.0.0-preview.20230409'
-
-        // exposed utils
-        api group: 'com.google.guava', name: 'guava', version: '32.1.2-jre'
-        api group: 'commons-io', name: 'commons-io', version: '2.13.0'
-        api group: 'org.apache.commons', name: 'commons-lang3', version: '3.13.0'
-        api "io.swagger.core.v3:swagger-annotations"
+        classpath 'de.thetaphi:forbiddenapis:3.5.1'
     }
 }
 
-/**********************************************************************************************************************\
- * Test
- **********************************************************************************************************************/
-subprojects {
-    apply plugin: "com.adarshr.test-logger"
+def download(File downloadDir, String url, String name) {
+    downloadDir.mkdirs()
+    def dest = new File(downloadDir, name)
+    ant.get(
+            src: url,
+            verbose: true,
+            usetimestamp: true,
+            skipexisting: true,
+            dest: dest
+    )
+    return dest
+}
 
-    sourceCompatibility = 17
-    targetCompatibility = 17
+apply from: 'gradle/dependencies.gradle'
+apply plugin: 'base'
 
-    dependencies {
-        // lombok
-        testAnnotationProcessor "org.projectlombok:lombok:" + lombokVersion
-        testCompileOnly 'org.projectlombok:lombok:' + lombokVersion
+repositories {
+    mavenCentral()
+}
 
-        // micronaut
-        testAnnotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
-        testAnnotationProcessor "io.micronaut:micronaut-inject-java"
-        testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
+boolean runSlowTests = System.getProperty("tests.crate.slow")
+if (runSlowTests) {
+    println "Configured to run the crate slow tests as well, grab yourself a coffee"
+}
 
-        testImplementation "org.junit.jupiter:junit-jupiter-api"
-        testImplementation "io.micronaut.test:micronaut-test-junit5"
-        testImplementation "org.junit.jupiter:junit-jupiter-engine"
-        testImplementation "org.junit.jupiter:junit-jupiter-params"
-        testImplementation "org.junit-pioneer:junit-pioneer:2.0.1"
+allprojects {
+    apply plugin: 'jacoco'
 
-        // hamcrest
-        testImplementation 'org.hamcrest:hamcrest:2.2'
-        testImplementation 'org.hamcrest:hamcrest-library:2.2'
-        testImplementation group: 'org.exparity', name: 'hamcrest-date', version: '2.0.8'
-    }
-
-    test {
+    tasks.withType(Test) {
         useJUnitPlatform()
 
-        maxHeapSize = "4048m"
+        // force run, see: http://gradle.1045684.n5.nabble.com/how-does-gradle-decide-when-to-run-tests-td3314172.html
+        outputs.upToDateWhen { false }
 
-        // configure en_US default locale for tests
-        systemProperty 'user.language', 'en'
-        systemProperty 'user.country', 'US'
+        minHeapSize = "1024m"
+        maxHeapSize = "1024m"
 
-        environment 'SECRET_MY_SECRET', "{\"secretKey\":\"secretValue\"}".bytes.encodeBase64().toString()
-        environment 'SECRET_WEBHOOK_KEY', "secretKey".bytes.encodeBase64().toString()
-        environment 'SECRET_NON_B64_SECRET', "some secret value"
-    }
-
-    testlogger {
-        theme 'mocha-parallel'
-        showExceptions true
-        showFullStackTraces true
-        showCauses true
-        slowThreshold 2000
-        showStandardStreams true
-        showPassedStandardStreams false
-        showSkippedStandardStreams true
-    }
-}
-
-/**********************************************************************************************************************\
- * Micronaut
- **********************************************************************************************************************/
-allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            options.encoding = "UTF-8"
-            options.compilerArgs.add("-parameters")
-            options.compilerArgs.add("-Xlint:all")
-            options.compilerArgs.add("-Xlint:-processing")
+        // allow to set the number of test forks from the CLI
+        if (project.hasProperty('testForks')) {
+            maxParallelForks = project.testForks as int
+            systemProperty "processors", Math.max(maxParallelForks / 2.0d, 1) as int
         }
-    }
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-    options.compilerArgs.add("-parameters")
-}
-
-run.classpath += configurations.developmentOnly
-test.classpath += configurations.developmentOnly
-
-run.jvmArgs(
-    "-noverify",
-    "-XX:TieredStopAtLevel=1",
-    "-Dcom.sun.management.jmxremote",
-    '-Dmicronaut.environments=dev,override'
-)
-
-/**********************************************************************************************************************\
- * Jar
- **********************************************************************************************************************/
-jar {
-    manifest {
-        attributes (
-            "Main-Class": mainClassName,
-            "X-Kestra-Name": project.name,
-            "X-Kestra-Title": project.name,
-            "X-Kestra-Group": project.group,
-            "X-Kestra-Version": project.version
-        )
-    }
-}
-
-shadowJar {
-    archiveClassifier.set(null)
-    mergeServiceFiles()
-    zip64 true
-}
-
-distZip.dependsOn shadowJar
-distTar.dependsOn shadowJar
-startScripts.dependsOn shadowJar
-startShadowScripts.dependsOn jar
-shadowJar.dependsOn 'ui:assembleFrontend'
-
-/**********************************************************************************************************************\
- * Executable Jar
- **********************************************************************************************************************/
-def executableDir = file("${buildDir}/executable")
-def executable = file("${buildDir}/executable/${project.name}-${project.version}")
-
-task writeExecutableJar()  {
-    group "build"
-    description "Write an executable jar from shadow jar"
-    dependsOn = [shadowJar]
-
-    doFirst {
-        executableDir.mkdirs()
-    }
-
-    doLast {
-        executable.write("")
-        executable.append("\n: <<END_OF_KESTRA_SELFRUN\r\n")
-        executable.append(file("gradle/jar/selfrun.bat").readBytes())
-        executable.append("\r\nEND_OF_KESTRA_SELFRUN\r\n\n")
-        executable.append(file("gradle/jar/selfrun.sh").readBytes())
-        executable.append(file("${buildDir}/libs/${project.name}-${project.version}.jar").readBytes())
-        executable.setExecutable(true)
-    }
-
-}
-
-task executableJar(type: Zip) {
-    group "build"
-    description "Zip the executable jar"
-    dependsOn = [writeExecutableJar]
-
-    archiveFileName = "${project.name}-${project.version}.zip"
-    destinationDirectory = file("${buildDir}/archives")
-
-    from executableDir
-    archiveClassifier.set(null)
-}
-
-/**********************************************************************************************************************\
- * Jacoco
- **********************************************************************************************************************/
-subprojects {
-    test {
-        finalizedBy jacocoTestReport
-    }
-
-    jacoco {
-        toolVersion = "0.8.9"
-    }
-
-    jacocoTestReport {
-        getAdditionalSourceDirs().setFrom(files(sourceSets.main.allSource.srcDirs))
-        getSourceDirectories().setFrom(files(sourceSets.main.allSource.srcDirs))
-        getClassDirectories().setFrom(files(sourceSets.main.output))
-        reports {
-            html.required = true
-            xml.required = true
+        if (project.hasProperty('disableAssertions')) {
+            enableAssertions = false
+            // LuceneTestCase defaults this value to 'true' if not set which results in an exception if '-ea' is skipped
+            systemProperty "tests.asserts", "false"
         }
-    }
 
-    sonar {
-        properties {
-            property "sonar.coverage.jacoco.xmlReportPaths", "$projectDir.parentFile.path/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml"
+        // tell ES to add required permissions for gradle
+        systemProperty "tests.gradle", "true"
+        systemProperty "file.encoding", "UTF-8"
+
+        // pass system properties to gradle process
+        // you you can filter tests by test groups,
+        // e.g. -Dtests.nightly=true
+        System.properties.keySet().each { item ->
+            if (item.startsWith("tests.")) {
+                systemProperty "$item", System.getProperty(item)
+            }
         }
-    }
-}
-
-
-task jacoco(type: JacocoReport) {
-    dependsOn = subprojects.test
-
-    def javaProject = subprojects.findAll { it.name != 'ui' };
-
-    getAdditionalSourceDirs().setFrom(files(javaProject.sourceSets.main.allSource.srcDirs))
-    getSourceDirectories().setFrom(files(javaProject.sourceSets.main.allSource.srcDirs))
-    getClassDirectories().setFrom(files(javaProject.sourceSets.main.output))
-    getExecutionData().setFrom(files(javaProject.jacocoTestReport.executionData))
-}
-
-tasks.named('check') {
-    dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
-}
-
-/**********************************************************************************************************************\
- * Sonar
- **********************************************************************************************************************/
-sonar {
-    properties {
-        property "sonar.projectKey", "kestra-io_kestra"
-        property "sonar.organization", "kestra-io"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
-/**********************************************************************************************************************\
- * Standalone
- **********************************************************************************************************************/
-task runStandalone(type: JavaExec) {
-    group = "application"
-    classpath = project(":cli").sourceSets.main.runtimeClasspath
-    mainClass = mainClassName
-    environment 'MICRONAUT_ENVIRONMENTS', 'override'
-    args 'server', 'standalone', '--plugins', 'local/plugins'
-}
-
-/**********************************************************************************************************************\
- * Publish
- **********************************************************************************************************************/
-nexusPublishing {
-    repositoryDescription = "${project.group}:${rootProject.name}:${project.version}"
-    useStaging = !project.version.endsWith("-SNAPSHOT")
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
-    }
-}
-
-subprojects {
-    apply plugin: "maven-publish"
-    apply plugin: 'signing'
-    apply plugin: 'ru.vyarus.pom'
-    apply plugin: 'ru.vyarus.github-info'
-
-    javadoc {
-        options {
-            locale = 'en_US'
-            encoding = 'UTF-8'
-            addStringOption("Xdoclint:none", "-quiet")
-        }
-    }
-
-    task sourcesJar(type: Jar) {
-        dependsOn = [':core:copyGradleProperties']
-        dependsOn = [':ui:assembleFrontend']
-        archiveClassifier.set('sources')
-        from sourceSets.main.allSource
-    }
-    sourcesJar.dependsOn ':core:copyGradleProperties'
-    sourcesJar.dependsOn ':ui:assembleFrontend'
-
-    task javadocJar(type: Jar) {
-        archiveClassifier.set('javadoc')
-        from javadoc
-    }
-
-    task testsJar(type: Jar) {
-        archiveClassifier.set('tests')
-        from sourceSets.test.output
-    }
-
-    github {
-        user 'kestra-io'
-        license 'Apache'
-        repository 'kestra'
-        site 'https://kestra.io'
-    }
-
-    pom {
-        description 'The modern, scalable orchestrator & scheduler open source platform'
-
-        developers {
-            developer {
-                id "tchiotludo"
-                name "Ludovic Dehon"
+        if ("true".equals(System.getProperty("tests.verbose", "false").toLowerCase())) {
+            // show which tests are actually run
+            // very helpful if you want to see if your included/excluded tests are correct
+            afterTest { descriptor, result ->
+              logger.lifecycle(" # " + descriptor + " -> " + result)
             }
         }
     }
 
-    publishing {
-        publications {
-            sonatypePublication(MavenPublication) {
-                version project.version
+    jacoco {
+        toolVersion = "0.8.10"
+    }
 
-                if (project.name.contains('cli')) {
-                    groupId "io.kestra"
-                    artifactId "kestra"
+    group = 'io.crate'
 
-                    artifact shadowJar
-                    artifact executableJar
-                } else {
-                    from components.java
+    tasks.withType(Javadoc) {
+        failOnError = false
+    }
 
-                    groupId project.group
-                    artifactId project.name
+    tasks.withType(Test) {
+        doFirst {
+            // move lucene-test-framework to the beginning of the classpath
+            // for cli ./gradlew use
+            def cp = project.sourceSets.test.runtimeClasspath
+            def testFrameworkEntry = cp.find({ it.name.contains("lucene-test-framework") })
+            if (testFrameworkEntry != null) {
+                project.sourceSets.test.runtimeClasspath = files(testFrameworkEntry) + cp.filter({
+                    !it.name.contains("lucene-test-framework")
+                })
+            }
+        }
+    }
 
-                    artifact sourcesJar
-                    artifact javadocJar
-                    artifact testsJar
+}
+
+clean {
+    doLast {
+        delete project.buildDir
+    }
+}
+
+// intellij configuration
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+
+    project.ext {
+        isEclipse = (System.getProperty("eclipse.launcher") != null
+            || System.getProperty("eclipse.application") != null
+            || gradle.startParameter.taskNames.contains('eclipse')
+            || gradle.startParameter.taskNames.contains('cleanEclipse'))
+        isIdea = (System.getProperty("idea.active") != null
+                || gradle.startParameter.taskNames.contains('idea')
+                || gradle.startParameter.taskNames.contains('cleanIdea')
+                || gradle.startParameter.taskNames.contains('cleanIdeaBuild'))
+    }
+
+    if (isIdea) {
+        project.buildDir = file('build-idea')
+    }
+    idea {
+        module {
+            inheritOutputDirs = false
+            outputDir = file('build-idea/classes/main')
+            testOutputDir = file('build-idea/classes/test')
+            excludeDirs += file('build')
+        }
+    }
+
+    if (isEclipse) {
+        project.buildDir = file('build-eclipse')
+    }
+
+    if (it.name != 'es') {
+        task cleanIdeaBuild {
+            doLast {
+                tasks.clean.execute()
+            }
+        }
+    }
+}
+
+final testLogger = new TestLogger()
+project.gradle.addListener(testLogger)
+
+
+task jacocoReport(type: JacocoReport) {
+    // tests must have been executed so that execution data for the sub projects is generated
+    // this task doesn't define a hard dependency on the tests to avoid running them twice in travis-ci
+    executionData fileTree(project.rootDir.absolutePath).include('**/build/jacoco/*.exec')
+
+    subprojects.each {
+        evaluationDependsOn(it.path)
+        if (it.plugins.withType(JavaPlugin) && it.tasks.withType(Test)) {
+            sourceSets it.sourceSets.main
+            dependsOn << it.tasks.withType(Test)
+        }
+    }
+
+    reports {
+        xml {
+            required = true
+            destination file(project.buildDir.path + '/reports/jacoco/test/jacocoTestReport.xml')
+        }
+        csv.required = false
+        html {
+            required = true
+            destination file(project.buildDir.path + '/reports/jacoco/jacocoHtml')
+        }
+    }
+}
+
+subprojects {
+    idea {
+        module {
+            iml {
+                // ensure testing dependencies come before es dependencies
+                // when calling tests from intellij
+                withXml {
+                    def node = it.asNode()
+
+                    def testFramework = node.component.orderEntry.find {
+                        it.@'type' == 'module-library' && it.library.CLASSES.root.find {
+                            it.@'url'.contains('lucene-test-framework')
+                        }
+                    }
+                    if (testFramework != null) {
+                        println "moving test framework"
+                        def parent = testFramework.parent()
+                        def newNode = new Node(parent, testFramework.name(), testFramework.attributes(), testFramework.value())
+                        parent.remove(testFramework)
+                        parent.children().add(5, newNode)
+                    }
                 }
             }
         }
     }
-
-    signing {
-        sign publishing.publications.sonatypePublication
-    }
 }
 
 
-/**********************************************************************************************************************\
- * Version
- **********************************************************************************************************************/
-release {
-    preCommitText = 'chore(version):'
-    preTagCommitMessage = 'update to version'
-    tagCommitMessage = 'tag version'
-    newVersionCommitMessage = 'update snapshot version'
-    tagTemplate = 'v${version}'
-    pushReleaseVersionBranch = 'master'
-    buildTasks = ['classes']
 
-    git {
-        requireBranch.set('release')
+def jvmTestFlags = ['-ea', "-Dproject_build_dir=$project.buildDir", '-Dproject_root=$PROJECT_DIR$']
+
+idea {
+    workspace {
+        iws.withXml { xmlFile ->
+            def runManager = xmlFile.asNode().component.find { it.@name == 'RunManager' }
+
+            // enable assertions for junit tests
+            def junitDefaults = runManager.configuration.find { it.@default == 'true' && it.@type == 'JUnit' }
+            junitDefaults.option.find { it.@name == 'VM_PARAMETERS' }.replaceNode {
+                option(name: 'VM_PARAMETERS', value: jvmTestFlags.join(' '))
+            }
+
+            // add Crate application configuration
+            def crateApp = runManager.configuration.find { it.@name == 'Crate' && it.@type == 'Application' }
+            if (crateApp == null) {
+                runManager.append(new XmlParser().parse(file("idea/crateApp.xml")))
+            }
+        }
     }
+
+    project {
+        vcs = 'Git'
+
+        ipr {
+            withXml { provider ->
+                def node = provider.asNode()
+                node.append(new XmlParser().parse(file("idea/codeStyle.xml")))
+                node.append(new XmlParser().parse(file("idea/codeInspection.xml")))
+                def copyrightManager = node.component.find { it.'@name' == 'CopyrightManager' }
+                copyrightManager.@default = "CrateASL2"
+                def aslCopyright = copyrightManager.copyright.find {
+                    it.option.find { it.@name == "myName" }?.@value == "CrateASL2"
+                }
+                if (aslCopyright == null) {
+                    copyrightManager.append(new XmlParser().parse(file("idea/copyright.xml")))
+                }
+            }
+        }
+    }
+}
+
+wrapper {
+    gradleVersion = '7.4.1'
 }
