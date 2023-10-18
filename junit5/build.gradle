@@ -1,3 +1,0 @@
-dependencies {
-    api libs.junit5.jupiter.api
-}

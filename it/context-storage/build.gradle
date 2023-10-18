@@ -1,3 +1,0 @@
-// This module is for testing RequestContextStorage, so we don't need other dependency except `:core`.
-// To override RequestContextStorage, we have to use Java SPI, which affects other tests, so we need
-// an isolated module.

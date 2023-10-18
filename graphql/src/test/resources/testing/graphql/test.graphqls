@@ -1,9 +1,0 @@
-type Query {
-    foo: String
-    error: String
-    optionalInput(value: ComplexTypeInput): String
-}
-
-input ComplexTypeInput {
-    innerValue: String!
-}

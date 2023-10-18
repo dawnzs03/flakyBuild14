@@ -1,2 +1,0 @@
-management.endpoint.health.status.http-mapping:
-  DOWN: 500

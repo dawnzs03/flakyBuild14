@@ -1,4 +1,0 @@
-dependencies {
-    // Bucket4j - rate-limiting library based on Token-Bucket algorithm
-    implementation libs.bucket4j
-}

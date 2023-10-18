@@ -1,3 +1,0 @@
-dependencies {
-    api libs.resilience4j.circuitbreaker
-}

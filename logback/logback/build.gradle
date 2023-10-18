@@ -1,4 +1,0 @@
-dependencies {
-    // Logback
-    api project(':logback12')
-}

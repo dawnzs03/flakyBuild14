@@ -1,4 +1,0 @@
-dependencies {
-    implementation libs.protobuf.java
-    api libs.protobuf.java.util
-}

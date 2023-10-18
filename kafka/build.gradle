@@ -1,4 +1,0 @@
-dependencies {
-    // Kafka
-    api libs.kafka
-}

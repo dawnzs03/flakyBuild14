@@ -1,4 +1,0 @@
-dependencies {
-    api libs.graphql.java
-    implementation project(':graphql-protocol')
-}

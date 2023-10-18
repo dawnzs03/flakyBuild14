@@ -1,5 +1,0 @@
-dependencies {
-    testImplementation libs.javax.jsr311
-    testImplementation libs.eureka.client
-    testImplementation libs.eureka.test.utils
-}

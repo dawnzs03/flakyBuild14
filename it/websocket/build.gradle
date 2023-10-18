@@ -1,7 +1,0 @@
-dependencies {
-    testImplementation libs.jakarta.websocket
-    testImplementation libs.jetty11.http2.server
-    testImplementation libs.jetty11.websocket
-    testImplementation libs.java.websocket
-    testImplementation libs.logback14
-}

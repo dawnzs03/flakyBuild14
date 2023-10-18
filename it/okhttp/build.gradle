@@ -1,4 +1,0 @@
-dependencies {
-    testImplementation libs.okhttp4
-    testImplementation libs.okhttp4.tls
-}

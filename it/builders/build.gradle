@@ -1,3 +1,0 @@
-dependencies {
-    projectsWithFlags('java', 'publish', 'no_aggregation')
-}

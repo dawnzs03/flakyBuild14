@@ -1,4 +1,0 @@
-dependencies {
-    testImplementation libs.testcontainers.consul
-    testImplementation libs.testcontainers.junit.jupiter
-}
