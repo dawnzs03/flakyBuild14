@@ -123,12 +123,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             counter++;
         }
 
-        String result = servlet.getResult();
-        Assert.assertTrue(result.startsWith("1false2true3true4true5"));
-
-        result = result.substring(22);
-        // Should be "false" (or possibly "") at this point. Must not be "true".
-        Assert.assertNotEquals("true", servlet.getResult());
+        Assert.assertEquals("1false2true3true4true5false", servlet.getResult());
 
         // Check the access log
         alv.validateAccessLog(1, 200, Bug49528Servlet.THREAD_SLEEP_TIME,
@@ -308,10 +303,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                             result.append(req.isAsyncStarted());
                         } catch (NullPointerException npe) {
                             result.append("false");
-                        } catch (Throwable t) {
-                            // Additional debugging for intermittent test failure
-                            result.append(t.getClass().getName());
-                            t.printStackTrace();
                         }
                         done = true;
                     } catch (InterruptedException | IOException e) {
