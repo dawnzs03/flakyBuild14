@@ -905,7 +905,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private String getProtocolNegotiated() {
         try (var localArena = Arena.ofConfined()) {
-            MemorySegment lenAddress = localArena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment lenAddress = localArena.allocate(ValueLayout.JAVA_INT, 0);
             MemorySegment protocolPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             SSL_get0_alpn_selected(state.ssl, protocolPointer, lenAddress);
             if (MemorySegment.NULL.equals(protocolPointer)) {
@@ -1463,7 +1463,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             synchronized (OpenSSLEngine.this) {
                 if (!destroyed) {
                     try (var localArena = Arena.ofConfined()) {
-                        MemorySegment lenPointer = localArena.allocate(ValueLayout.JAVA_INT);
+                        MemorySegment lenPointer = localArena.allocate(ValueLayout.ADDRESS);
                         var session = SSL_get_session(state.ssl);
                         if (MemorySegment.NULL.equals(session)) {
                             return new byte[0];

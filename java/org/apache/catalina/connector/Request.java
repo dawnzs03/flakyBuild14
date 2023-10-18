@@ -3045,11 +3045,7 @@ public class Request implements HttpServletRequest {
         boolean success = false;
         try {
             // Set this every time in case limit has been changed via JMX
-            int maxParameterCount = getConnector().getMaxParameterCount();
-            if (parts != null && maxParameterCount > 0) {
-                maxParameterCount -= parts.size();
-            }
-            parameters.setLimit(maxParameterCount);
+            parameters.setLimit(getConnector().getMaxParameterCount());
 
             // getCharacterEncoding() may have been overridden to search for
             // hidden form field containing request encoding
