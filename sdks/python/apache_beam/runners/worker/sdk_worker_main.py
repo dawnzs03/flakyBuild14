@@ -153,7 +153,9 @@ def create_harness(environment, dry_run=False):
   if dry_run:
     return
 
-  data_sampler = DataSampler.create(sdk_pipeline_options)
+  data_sampler = None
+  if 'enable_data_sampling' in experiments:
+    data_sampler = DataSampler()
 
   sdk_harness = SdkHarness(
       control_address=control_service_descriptor.url,
