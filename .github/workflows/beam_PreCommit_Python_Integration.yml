@@ -83,7 +83,7 @@ jobs:
           github_job: "${{ github.job }} (${{ matrix.python_version }})"
           github_current_run_id: ${{ github.run_id }}
       - name: Install Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
       - name: Install Java
